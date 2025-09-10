@@ -26,7 +26,7 @@ jobs:
       - name: Run clang-format and auto-fix
         run: |
           FILES=$(find . -name '*.c' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp')
-          clang-format -i $FILES
+          clang-format --dump-config -i $FILES
 
       - name: Commit and push changes (if any)
         run: |
