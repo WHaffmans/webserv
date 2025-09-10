@@ -8,7 +8,6 @@ on:
 jobs:
   clang-tools:
     runs-on: ubuntu-latest
-    container: silkeh/clang:latest  # Pre-built container with clang tools
 
     permissions:
       contents: write   # Needed to push changes back
@@ -19,10 +18,15 @@ jobs:
         with:
           ref: ${{ github.head_ref }}  # checkout the PR branch so we can push back
 
+      - name: Install clang tools
+        run: |
+          sudo apt update
+          sudo apt install -y clang-format clang-tidy
+
       - name: Run clang-format and auto-fix
         run: |
           FILES=$(find . -name '*.c' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp')
-          clang-format --dump-config -i $FILES
+          clang-format -i $FILES
 
       - name: Commit and push changes (if any)
         run: |
