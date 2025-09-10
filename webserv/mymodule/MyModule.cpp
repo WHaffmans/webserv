@@ -2,6 +2,7 @@
 
 #include <iostream>
 
-void MyModule::doSomething() {
-    std::cout   << "Doing really something!"  << std::endl;
+void MyModule::doSomething()
+{
+    std::cout << "Doing really something!" << std::endl;
 }
