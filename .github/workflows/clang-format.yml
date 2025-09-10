@@ -1,0 +1,42 @@
+name: Clang Format & Tidy
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  clang-tools:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write   # Needed to push changes back
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}  # checkout the PR branch so we can push back
+
+      - name: Install clang tools
+        run: |
+          sudo apt update
+          sudo apt install -y clang-format clang-tidy
+
+      - name: Run clang-format and auto-fix
+        run: |
+          FILES=$(find . -name '*.c' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp')
+          clang-format -i $FILES
+
+      - name: Commit and push changes (if any)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -u
+          if ! git diff --cached --quiet; then
+            git commit -m "Apply clang-format fixes"
+            git push
+          else
+            echo "No formatting changes needed"
+          fi
+
