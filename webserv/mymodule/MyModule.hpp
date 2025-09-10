@@ -1,6 +1,7 @@
 #pragma once
 
-class MyModule {
-public:
-	void doSomething();
+class MyModule
+{
+  public:
+    void doSomething();
 };

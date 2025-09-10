@@ -4,5 +4,5 @@
 
 void MyModule::doSomething()
 {
-	std::cout << "Doing something!" << std::endl;
+    std::cout << "Doing something!" << std::endl;
 }

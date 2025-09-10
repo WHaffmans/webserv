@@ -2,7 +2,7 @@
 
 int main()
 {
-	MyModule module;
-	module.doSomething();
-	return 0;
+    MyModule module;
+    module.doSomething();
+    return 0;
 }
