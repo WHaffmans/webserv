@@ -2,7 +2,6 @@
 
 int main()
 {
-    MyModule module;
-    module.doSomething();
+    MyModule::doSomething();
     return 0;
 }

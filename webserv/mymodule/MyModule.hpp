@@ -3,5 +3,5 @@
 class MyModule
 {
   public:
-    void doSomething();
+    static void doSomething();
 };
