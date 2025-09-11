@@ -32,8 +32,8 @@ class ConfigManager
 
     void init(const std::string &filePath);
     static ConfigManager &getInstance();
-    
-    private:
+
+  private:
     bool _initialized;
     ConfigManager();
     ~ConfigManager();
