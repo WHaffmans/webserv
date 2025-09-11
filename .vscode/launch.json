@@ -1,0 +1,69 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug webserv",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/webserv",
+            "args": ["${workspaceFolder}/config/default.conf"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build Debug",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "name": "Debug webserv (ASAN)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/webserv",
+            "args": ["${workspaceFolder}/config/default.conf"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [
+                {
+                    "name": "ASAN_OPTIONS",
+                    "value": "abort_on_error=1:detect_leaks=1:check_initialization_order=1"
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build ASAN",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "name": "Launch Release",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/webserv",
+            "args": ["${workspaceFolder}/config/default.conf"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "preLaunchTask": "Build Release",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "internalConsoleOptions": "openOnSessionStart"
+        }
+    ]
+}

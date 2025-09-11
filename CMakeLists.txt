@@ -21,6 +21,15 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
+# Define available build types for IDE
+set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
+    "Debug"
+    "Release" 
+    "ASAN"
+    "RelWithDebInfo"
+    "MinSizeRel"
+)
+
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 # Set build flags for different build types

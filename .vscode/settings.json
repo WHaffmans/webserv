@@ -1,0 +1,45 @@
+{
+    "cmake.buildTypes": [
+        {
+            "name": "Debug",
+            "displayName": "Debug",
+            "description": "Debug build with symbols and no optimization",
+            "buildType": "Debug"
+        },
+        {
+            "name": "Release", 
+            "displayName": "Release",
+            "description": "Optimized release build",
+            "buildType": "Release"
+        },
+        {
+            "name": "ASAN",
+            "displayName": "AddressSanitizer", 
+            "description": "Debug build with AddressSanitizer",
+            "buildType": "ASAN"
+        }
+    ],
+    "cmake.defaultVariants": {
+        "buildType": {
+            "default": "Release",
+            "description": "The build type",
+            "choices": {
+                "debug": {
+                    "short": "Debug",
+                    "long": "Debug build with symbols",
+                    "buildType": "Debug"
+                },
+                "release": {
+                    "short": "Release", 
+                    "long": "Optimized release build",
+                    "buildType": "Release"
+                },
+                "asan": {
+                    "short": "ASAN",
+                    "long": "AddressSanitizer build",
+                    "buildType": "ASAN"
+                }
+            }
+        }
+    }
+}

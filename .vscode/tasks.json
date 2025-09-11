@@ -1,0 +1,95 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build All",
+            "type": "shell",
+            "command": "make",
+            "args": ["all"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"],
+            "detail": "Build all targets (release, debug, asan)"
+        },
+        {
+            "label": "Build Release",
+            "type": "shell",
+            "command": "make",
+            "args": ["release"],
+            "group": "build",
+            "problemMatcher": ["$gcc"],
+            "detail": "Build release target"
+        },
+        {
+            "label": "Build Debug",
+            "type": "shell",
+            "command": "make",
+            "args": ["debug"],
+            "group": "build",
+            "problemMatcher": ["$gcc"],
+            "detail": "Build debug target"
+        },
+        {
+            "label": "Build ASAN",
+            "type": "shell",
+            "command": "make",
+            "args": ["asan"],
+            "group": "build",
+            "problemMatcher": ["$gcc"],
+            "detail": "Build AddressSanitizer target"
+        },
+        {
+            "label": "Run Release",
+            "type": "shell",
+            "command": "make",
+            "args": ["run_release"],
+            "group": "test",
+            "dependsOn": "Build Release",
+            "detail": "Build and run release version"
+        },
+        {
+            "label": "Run Debug",
+            "type": "shell",
+            "command": "make",
+            "args": ["run_debug"],
+            "group": "test",
+            "dependsOn": "Build Debug",
+            "detail": "Build and run debug version"
+        },
+        {
+            "label": "Run ASAN",
+            "type": "shell",
+            "command": "make",
+            "args": ["run_asan"],
+            "group": "test",
+            "dependsOn": "Build ASAN",
+            "detail": "Build and run AddressSanitizer version"
+        },
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "make",
+            "args": ["clean"],
+            "group": "build",
+            "detail": "Clean build artifacts"
+        },
+        {
+            "label": "Full Clean",
+            "type": "shell",
+            "command": "make",
+            "args": ["fclean"],
+            "group": "build",
+            "detail": "Remove build directory completely"
+        },
+        {
+            "label": "Rebuild",
+            "type": "shell",
+            "command": "make",
+            "args": ["re"],
+            "group": "build",
+            "detail": "Full clean and rebuild"
+        }
+    ]
+}

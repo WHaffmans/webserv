@@ -1,87 +1,51 @@
-# Compiler and flags
-CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++20 -MMD -MP
-
-# Build type (default to debug)
-BUILD_TYPE ?= debug
-
-# Build-specific flags
-ifeq ($(BUILD_TYPE), release)
-	CXXFLAGS += -O3 -DNDEBUG
-	BUILD_SUFFIX = release
-else ifeq ($(BUILD_TYPE), asan)
-	CXXFLAGS += -g -O1 -fsanitize=address -fno-omit-frame-pointer
-	BUILD_SUFFIX = asan
-else
-	CXXFLAGS += -g -O0 -DDEBUG
-	BUILD_SUFFIX = debug
-endif
-
-# Directories
-SRCDIR = webserv
-BUILDDIR = build/$(BUILD_SUFFIX)
-OBJDIR = $(BUILDDIR)/obj
-
-# Target executable
-NAME = $(BUILDDIR)/webserv
-
-# Source files
-SOURCES = $(wildcard $(SRCDIR)/*.cpp) \
-          $(wildcard $(SRCDIR)/*/*.cpp)
-
-# Object files
-OBJECTS = $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
-
-# Dependency files
-DEPENDS = $(OBJECTS:.o=.d)
-
-# Include directories
-INCLUDES = -I.
+# Variables
+BUILD_DIR = build
+CMAKE = cmake
+CMAKE_BUILD = cmake --build
+CMAKE_FLAGS = -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+CONFIG_FILE = config/default.conf
 
 # Default target
-all: $(NAME)
+all: release debug asan
 
-# Create executable
-$(NAME): $(OBJECTS)
-	@mkdir -p $(BUILDDIR)
-	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(NAME)
+# Configure CMake if build directory doesn't exist
+$(BUILD_DIR):
+	$(CMAKE) -B $(BUILD_DIR) $(CMAKE_FLAGS)
 
-# Compile source files to object files
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp Makefile
-	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+# Build targets with specific build types
+release: $(BUILD_DIR)
+	$(CMAKE) -B $(BUILD_DIR) $(CMAKE_FLAGS) -DCMAKE_BUILD_TYPE=Release
+	$(CMAKE_BUILD) $(BUILD_DIR) --target webserv
 
-# Clean object files
+debug: $(BUILD_DIR)
+	$(CMAKE) -B $(BUILD_DIR) $(CMAKE_FLAGS) -DCMAKE_BUILD_TYPE=Debug
+	$(CMAKE_BUILD) $(BUILD_DIR) --target webserv
+
+asan: $(BUILD_DIR)
+	$(CMAKE) -B $(BUILD_DIR) $(CMAKE_FLAGS) -DCMAKE_BUILD_TYPE=ASAN
+	$(CMAKE_BUILD) $(BUILD_DIR) --target webserv
+
+# Run targets
+run_release: release
+	./$(BUILD_DIR)/webserv $(CONFIG_FILE)
+
+run_debug: debug
+	./$(BUILD_DIR)/webserv $(CONFIG_FILE)
+
+run_asan: asan
+	./$(BUILD_DIR)/webserv $(CONFIG_FILE)
+
+# Clean targets
 clean:
-	rm -rf $(OBJDIR)
+	@if [ -d "$(BUILD_DIR)" ]; then \
+		$(CMAKE_BUILD) $(BUILD_DIR) --target clean; \
+	fi
 
-# Clean everything (object files, executable, and build directory)
-fclean: clean
-	rm -rf $(BUILDDIR)
-
-# Clean all build types
-fclean-all:
-	rm -rf build
+fclean:
+	rm -rf $(BUILD_DIR)
 
 # Rebuild everything
 re: fclean all
 
-# Run the executable (rebuild first)
-run: re
-	./$(NAME)
-
-# Build type targets
-debug:
-	$(MAKE) BUILD_TYPE=debug
-
-release:
-	$(MAKE) BUILD_TYPE=release
-
-asan:
-	$(MAKE) BUILD_TYPE=asan
-
-# Phony targets
-.PHONY: all clean fclean fclean-all re run debug release asan
-
-# Include dependency files
--include $(DEPENDS)
+# Mark targets as phony
+.PHONY: all release debug asan run_release run_debug run_asan clean fclean re
