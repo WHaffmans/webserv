@@ -15,6 +15,7 @@ class ConfigManager
 
     void init(const std::string &filePath);
     static ConfigManager &getInstance();
+    const std::vector<ServerConfig> &getServerConfigs() const { return serverConfigs; }
 
   private:
     bool _initialized;

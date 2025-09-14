@@ -41,8 +41,9 @@ void ServerConfig::parseServerBlock(const std::string &block)
             throw std::runtime_error("Malformed block in config file.");
         }
         // Optionally parse the server block here
-        std::string serverBlock = block.substr(bracePos + 1, closeBrace - bracePos - 1);
-        locations.emplace(locationPath, LocationConfig(serverBlock));
+        std::string locationBlock = block.substr(bracePos + 1, closeBrace - bracePos - 1);
+        std::cout << "Added location: " << locationPath << '\n';
+        locations.emplace(locationPath, LocationConfig(locationBlock));
         pos = closeBrace + 1;
     }
 
@@ -52,8 +53,7 @@ void ServerConfig::parseServerBlock(const std::string &block)
 
 void ServerConfig::parseDirectives(const std::string &declarations)
 {
-    // Placeholder for actual directives parsing logic
-    std::cout << "Parsing directives:\n" << declarations << '\n';
+    std::cout << "Parsing server directives:\n";
     std::string line;
     std::istringstream stream(declarations);
     while (std::getline(stream, line))
@@ -63,8 +63,6 @@ void ServerConfig::parseDirectives(const std::string &declarations)
         lineStream >> directive;
         if (!directive.empty())
         {
-            std::cout << "Directive: " << directive << '\n';
-            // Implement the parsing logic here
             std::string value;
             lineStream >> value;
             if (directive == "listen")
@@ -115,6 +113,30 @@ void ServerConfig::parseDirectives(const std::string &declarations)
                 error_page[statusCode] = errorPagePath;
                 std::cout << "Set error_page for status " << statusCode << " to " << errorPagePath << '\n';
             }
+            else
+            {
+                std::cout << "Unknown directive: " << directive << '\n';
+            }
         }
     }
+}
+
+const LocationConfig &ServerConfig::getLocation(const std::string &path) const
+{
+    if (locations.count(path) > 0 ) // NOLINT
+    {
+        return locations.at(path);
+    }
+    throw std::runtime_error("Location not found: " + path);
+}
+
+std::vector<std::string> ServerConfig::getLocationPaths() const
+{
+    std::vector<std::string> paths;
+    paths.reserve(locations.size());
+    for (const auto &pair : locations)
+    {
+        paths.push_back(pair.first);
+    }
+    return paths;
 }
