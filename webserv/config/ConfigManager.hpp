@@ -1,26 +1,9 @@
 #pragma once
 
-#include <map>
-#include <memory>
 #include <string>
 #include <vector>
 
-struct LocationConfig
-{
-    std::string path;
-    bool autoIndex;
-    std::string indexFile;
-    // Add other location-specific configurations as needed
-};
-
-struct ServerConfig
-{
-    std::string host;
-    int port;
-    std::string root;
-    // Add other server-specific configurations as needed
-    std::unique_ptr<std::map<std::string, LocationConfig>> locations;
-};
+class ServerConfig;
 
 class ConfigManager
 {
@@ -39,7 +22,7 @@ class ConfigManager
     ~ConfigManager();
     std::vector<ServerConfig> serverConfigs;
 
-    // void parseConfigFile(const std::string &filePath);
-    // void parseServerBlock(const std::string &block);
-    // void parseLocationBlock(const std::string &block, ServerConfig &serverConfig);
+    void parseConfigFile(const std::string &filePath);
+    void parseGlobalDeclarations(const std::string &declarations);
+    
 };
