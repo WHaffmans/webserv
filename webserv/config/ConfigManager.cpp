@@ -115,9 +115,9 @@ void ConfigManager::parseConfigFile(const std::string &filePath)
     file.close();
 }
 
-void ConfigManager::parseGlobalDeclarations(const std::string &declarations)
-{
-    // Placeholder for actual global declarations parsing logic
-    std::cout << "Parsing global declarations:\n" << declarations << '\n';
-    // Implement the parsing logic here
-}
+// void ConfigManager::parseGlobalDeclarations(const std::string &declarations)
+// {
+//     // Placeholder for actual global declarations parsing logic
+//     std::cout << "Parsing global declarations:\n" << declarations << '\n';
+//     // Implement the parsing logic here
+// }

@@ -1,26 +1,23 @@
-#include <webserv/config/ServerConfig.hpp>
 #include <webserv/config/LocationConfig.hpp>
+#include <webserv/config/ServerConfig.hpp>
 #include <webserv/config/utils.hpp>
 
 #include <iostream>
-#include <string>
 #include <sstream>
+#include <string>
 
-ServerConfig::ServerConfig(std::string const &serverBlock)
-    : host(""), port(80), root("")
+ServerConfig::ServerConfig(std::string const &serverBlock) : port(80)
 {
     parseServerBlock(serverBlock);
 }
-
-
 
 void ServerConfig::parseServerBlock(const std::string &block)
 {
     // Placeholder for actual server block parsing logic
     std::cout << "Parsing server block:\n";
 
-      // Placeholder for actual file parsing logic
-    
+    // Placeholder for actual file parsing logic
+
     std::string serverDeclarations;
 
     size_t pos = 0;
@@ -35,7 +32,7 @@ void ServerConfig::parseServerBlock(const std::string &block)
             serverDeclarations += block.substr(pos);
             break;
         }
-        std::string locationPath = trim(block.substr(locationPos, bracePos - (locationPos )));
+        std::string locationPath = trim(block.substr(locationPos, bracePos - (locationPos)));
         // Add global declarations before this server block
         serverDeclarations += block.substr(pos, locationPos - pos);
         size_t closeBrace = findCorrespondingClosingBrace(block, bracePos);
@@ -62,14 +59,14 @@ void ServerConfig::parseDirectives(const std::string &declarations)
     while (std::getline(stream, line))
     {
         std::string directive;
-        std::istringstream ss{trim(line)};
-        ss >> directive;
+        std::istringstream lineStream{trim(line)};
+        lineStream >> directive;
         if (!directive.empty())
         {
             std::cout << "Directive: " << directive << '\n';
             // Implement the parsing logic here
             std::string value;
-            ss >>   value;
+            lineStream >> value;
             if (directive == "listen")
             {
 
@@ -95,16 +92,16 @@ void ServerConfig::parseDirectives(const std::string &declarations)
                 cgi_pass = value;
                 std::cout << "Set cgi_pass to " << cgi_pass << '\n';
             }
-            else if(directive =="cgi_ext")
+            else if (directive == "cgi_ext")
             {
                 cgi_ext = value;
                 std::cout << "Set cgi_ext to " << cgi_ext << '\n';
             }
-            else if(directive == "index")
+            else if (directive == "index")
             {
                 index_files.clear();
                 std::string indexFile;
-                while (ss >> indexFile)
+                while (lineStream >> indexFile)
                 {
                     index_files.push_back(indexFile);
                     std::cout << "Added index file: " << indexFile << '\n';
@@ -114,7 +111,7 @@ void ServerConfig::parseDirectives(const std::string &declarations)
             {
                 int statusCode = std::stoi(value);
                 std::string errorPagePath;
-                ss >> errorPagePath;
+                lineStream >> errorPagePath;
                 error_page[statusCode] = errorPagePath;
                 std::cout << "Set error_page for status " << statusCode << " to " << errorPagePath << '\n';
             }

@@ -1,13 +1,11 @@
 #include <webserv/config/LocationConfig.hpp>
 #include <webserv/config/utils.hpp>
 
-
 #include <iostream>
-#include <string>
 #include <sstream>
+#include <string>
 
-LocationConfig::LocationConfig(const std::string &locationBlock)
-    : path(""), autoIndex(false), indexFile("")
+LocationConfig::LocationConfig(const std::string &locationBlock) :  autoIndex(false)
 {
     parseLocationBlock(locationBlock);
 }
@@ -18,7 +16,6 @@ void LocationConfig::parseLocationBlock(const std::string &block)
     std::cout << "Parsing location block:\n" << block << '\n';
     // Implement the parsing logic here
     parseDirectives(block);
-       
 }
 void LocationConfig::parseDirectives(const std::string &declarations)
 {
@@ -30,14 +27,14 @@ void LocationConfig::parseDirectives(const std::string &declarations)
     while (std::getline(stream, line))
     {
         std::string directive;
-        std::istringstream ss{trim(line)};
-        ss >> directive;
+        std::istringstream lineStream{trim(line)};
+        lineStream >> directive;
         if (!directive.empty())
         {
             std::cout << "Directive: " << directive << '\n';
             // Implement the parsing logic here
             std::string value;
-            ss >> value;
+            lineStream >> value;
             if (directive == "autoindex")
             {
                 autoIndex = (value == "on");

@@ -23,6 +23,5 @@ class ConfigManager
     std::vector<ServerConfig> serverConfigs;
 
     void parseConfigFile(const std::string &filePath);
-    void parseGlobalDeclarations(const std::string &declarations);
-    
+    // void parseGlobalDeclarations(const std::string &declarations);
 };
