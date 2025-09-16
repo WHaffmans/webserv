@@ -6,7 +6,7 @@ CMAKE_FLAGS = -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 CONFIG_FILE = config/default.conf
 
 # Default target
-all: release debug asan
+all: release
 
 # Configure CMake if build directory doesn't exist
 $(BUILD_DIR):
@@ -24,6 +24,8 @@ debug: $(BUILD_DIR)
 asan: $(BUILD_DIR)
 	$(CMAKE) -B $(BUILD_DIR) $(CMAKE_FLAGS) -DCMAKE_BUILD_TYPE=ASAN
 	$(CMAKE_BUILD) $(BUILD_DIR) --target webserv
+
+run: run_release
 
 # Run targets
 run_release: release
@@ -48,4 +50,4 @@ fclean:
 re: fclean all
 
 # Mark targets as phony
-.PHONY: all release debug asan run_release run_debug run_asan clean fclean re
+.PHONY: all release debug asan run run_release run_debug run_asan clean fclean re
