@@ -28,7 +28,7 @@ int main(int argc, char **argv)
     }
 
     Server server(ConfigManager::getInstance());
-    // server.start();
+    server.start();
 
     return 0;
 }
