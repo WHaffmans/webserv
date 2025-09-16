@@ -59,7 +59,7 @@ void ServerConfig::parseDirectives(const std::string &declarations)
     while (std::getline(stream, line))
     {
         std::string directive;
-        std::istringstream lineStream{trim(line)};
+        std::istringstream lineStream{line};
         lineStream >> directive;
         if (!directive.empty())
         {
@@ -80,10 +80,10 @@ void ServerConfig::parseDirectives(const std::string &declarations)
                 root = value;
                 std::cout << "Set root to " << root << '\n';
             }
-            else if (directive == "server_name")
+            else if (directive == "host")
             {
                 host = value;
-                std::cout << "Set server_name to " << host << '\n';
+                std::cout << "Set host to " << host << '\n';
             }
             else if (directive == "cgi_pass")
             {
@@ -123,7 +123,7 @@ void ServerConfig::parseDirectives(const std::string &declarations)
 
 const LocationConfig &ServerConfig::getLocation(const std::string &path) const
 {
-    if (locations.count(path) > 0 ) // NOLINT
+    if (locations.count(path) > 0) // NOLINT
     {
         return locations.at(path);
     }

@@ -13,6 +13,17 @@ std::string trim(const std::string &str)
     return str.substr(first, last - first + 1);
 }
 
+std::string trimSemi(const std::string &str)
+{
+    size_t semi = str.find(';');
+
+    if (semi == str.length() - 1)
+    {
+        return str.substr(0, semi);
+    }
+    return str;
+}
+
 size_t findCorrespondingClosingBrace(const std::string &str, size_t openPos)
 {
     int braceCount = 1;

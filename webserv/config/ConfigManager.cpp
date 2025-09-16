@@ -43,7 +43,7 @@ void removeEmptyLines(std::string &str)
     {
         if (!trim(line).empty())
         {
-            result += line + '\n';
+            result += trimSemi(trim(line)) + '\n';
         }
     }
     str = result;
