@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-class ServerConfig;
+#include <webserv/config/ServerConfig.hpp>
 
 class ConfigManager
 {

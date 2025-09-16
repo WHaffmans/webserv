@@ -1,6 +1,7 @@
 #include <webserv/config/ConfigManager.hpp>
 #include <webserv/config/LocationConfig.hpp>
 #include <webserv/config/ServerConfig.hpp>
+#include <webserv/server/Server.hpp>
 
 #include <iostream>
 #include <string>
@@ -25,6 +26,9 @@ int main(int argc, char **argv)
             std::cout << "  Location: " << path << '\n';
         }
     }
+
+    Server server(ConfigManager::getInstance());
+    // server.start();
 
     return 0;
 }

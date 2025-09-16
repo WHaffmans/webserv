@@ -7,7 +7,7 @@
 #include <webserv/config/LocationConfig.hpp>
 
 class ServerConfig
-{
+{ 
   public:
     ServerConfig(const std::string &serverBlock);
 

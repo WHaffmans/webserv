@@ -43,7 +43,7 @@ void ServerConfig::parseServerBlock(const std::string &block)
         // Optionally parse the server block here
         std::string locationBlock = block.substr(bracePos + 1, closeBrace - bracePos - 1);
         std::cout << "Added location: " << locationPath << '\n';
-        locations.emplace(locationPath, LocationConfig(locationBlock));
+        locations.emplace(locationPath, locationBlock);
         pos = closeBrace + 1;
     }
 
