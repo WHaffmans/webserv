@@ -1,0 +1,66 @@
+classDiagram
+    direction TB
+
+    class Server {
+        +run()
+        +handle_new_connection(int)
+        +handle_client_event(int, int)
+        +setup_listeners()
+        +add_to_epoll(int)
+        +remove_from_epoll(int)
+        +std::vector<unique_ptr<Socket>> listeners_
+        +std::unordered_map<int, unique_ptr<Client>> clients_
+        +int epoll_fd_
+        +const Configuration* config_
+    }
+
+    class Socket {
+        +Socket(int)
+        +Socket()
+        +~Socket()
+        +bind(const sockaddr_in&) int
+        +listen(int) int
+        +accept() Socket
+        +recv(void*, size_t) ssize_t
+        +send(const void*, size_t) ssize_t
+        +set_non_blocking()
+        -fd_ int
+    }
+
+    class Client {
+        +Client(unique_ptr<Socket>)
+        +~Client()
+        +process_event(int)
+        +handle_read()
+        +handle_write()
+        +is_complete() bool
+        +unique_ptr<Socket> socket_
+        +unique_ptr<HTTP_Request> request_
+        +unique_ptr<HTTP_Response> response_
+        +const Server& server_
+    }
+
+    class HTTP_Request {
+        +parse_data(const std::string&)
+        +is_complete() bool
+        -method_ string
+        -uri_ string
+        -headers_ map<string, string>
+    }
+
+    class HTTP_Response {
+        +build_from_request(const HTTP_Request&)
+        +to_string() string
+        -status_ int
+        -body_ string
+        -headers_ map<string, string>
+    }
+
+
+    Server "1" o-- "1..*" Socket: listens on
+    Server "1" o-- "0..*" Client: manages
+    Server "1" -- "1" Configuration: knows about
+    Client "1" *-- "1" Socket: owns
+    Client "1" *-- "1" HTTP_Request: owns
+    Client "1" *-- "1" HTTP_Response: owns
+    Client "1" -- "1" Server: reports to
