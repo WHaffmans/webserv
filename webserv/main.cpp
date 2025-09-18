@@ -1,3 +1,4 @@
+#include "webserv/log/Log.hpp"
 #include <webserv/config/ConfigManager.hpp>
 #include <webserv/config/LocationConfig.hpp>
 #include <webserv/config/ServerConfig.hpp>
@@ -16,6 +17,8 @@ int main(int argc, char **argv)
     }
     ConfigManager::getInstance().init(argv[1]); // NOLINT
     Server server(ConfigManager::getInstance());
+    
+    Log::info("test log message: server starting...", {{"port", "8080"}, {"mode", "production"}});
     server.start();
 
     return 0;
