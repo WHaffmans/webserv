@@ -7,6 +7,10 @@
 #include <unordered_map>
 #include <webserv/log/LogLevel.hpp>
 
+
+#define LOG_INFO(message) \
+  Log::info(message, std::map<std::string, std::string>{{"file", __FILE__}, {"line", std::to_string(__LINE__)}, {"function", __FUNCTION__}})
+
 class Channel; // Forward declaration
 
 class Log
