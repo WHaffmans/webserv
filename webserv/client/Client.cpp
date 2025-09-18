@@ -1,5 +1,5 @@
 #include <iostream>
-#include <webserv/server/Client.hpp>
+#include <webserv/client/Client.hpp>
 
 Client::Client(int client_fd, Server &server, const ServerConfig &server_config)
     : client_fd(client_fd), server(std::ref(server)), server_config(std::cref(server_config))

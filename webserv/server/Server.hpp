@@ -2,7 +2,7 @@
 
 #include <functional>
 #include <webserv/config/ConfigManager.hpp>
-#include <webserv/server/Client.hpp>
+#include <webserv/client/Client.hpp>
 
 class Client;
 
