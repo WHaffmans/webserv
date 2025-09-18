@@ -1,5 +1,4 @@
 #include "webserv/socket/Socket.hpp"
-#include <algorithm>   // For std::find
 #include <arpa/inet.h> // For inet_addr
 #include <cstdlib>     // For exit()
 #include <cstring>     // For memset
@@ -97,10 +96,9 @@ void Server::handleConnection(struct epoll_event *event)
 {
     Socket &listener = getListener(event->data.fd);
     std::unique_ptr<Socket> clientSocket = listener.accept();
-    addToEpoll(*clientSocket, EPOLLIN | EPOLLET);
+    addToEpoll(*clientSocket, EPOLLIN);
     clients_.insert(
         {clientSocket->getFd(), std::make_unique<Client>(std::move(clientSocket), *this, getConfig(listener))});
-    // clients_.insert({clientSocket->getFd(), Client{std::move(clientSocket), *this, getConfig(listener)}});
 }
 
 Socket &Server::getListener(int fd) const
@@ -142,8 +140,6 @@ const ServerConfig &Server::getConfig(int fd) const
 
 void Server::handleRequest(struct epoll_event *event)
 {
-    std::cout << "Handling request...\n";
-
     int client_fd = event->data.fd;
 
     Client &client = getClient(client_fd);
@@ -154,7 +150,7 @@ void Server::responseReady(int client_fd) const
 {
     std::cout << "Response ready for client fd: " << client_fd << '\n';
     struct epoll_event ev{};
-    ev.events = EPOLLOUT | EPOLLET;
+    ev.events = EPOLLOUT;
     ev.data.fd = client_fd;
     if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, client_fd, &ev) == -1)
     {
