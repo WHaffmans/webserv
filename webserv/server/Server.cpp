@@ -138,7 +138,7 @@ const ServerConfig &Server::getConfig(int fd) const
     throw std::runtime_error("Config not found for fd: " + std::to_string(fd));
 }
 
-void Server::handleRequest(struct epoll_event *event)
+void Server::handleRequest(struct epoll_event *event) const
 {
     int client_fd = event->data.fd;
 
@@ -172,7 +172,7 @@ void Server::eventLoop()
         }
         for (int i = 0; i < nfds; ++i)
         {
-            epoll_event &event = events[i];
+            epoll_event &event = events[i]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
             if ((event.events & EPOLLERR) > 0 || (event.events & EPOLLHUP) > 0)
             {
                 std::cerr << "Epoll error on fd " << event.data.fd << '\n';

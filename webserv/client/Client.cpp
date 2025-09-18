@@ -13,7 +13,7 @@ Client::~Client()
     server.removeFromEpoll(*client_socket_);
 };
 
-int Client::parseHeaderforContentLength(const std::string &request)
+int Client::parseHeaderforContentLength(const std::string &request) //NOLINT
 {
     std::string header = "Content-Length: ";
     size_t pos = request.find(header);
@@ -33,8 +33,9 @@ int Client::parseHeaderforContentLength(const std::string &request)
 
 void Client::request()
 {
-    char buffer[9] = {};
-    ssize_t bytesRead = client_socket_->recv(buffer, sizeof(buffer) - 1);
+    char buffer[9] = {}; // NOLINT(cppcoreguidelines-avoid-c-arrays)
+    ssize_t bytesRead =
+        client_socket_->recv(buffer, sizeof(buffer) - 1); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
     if (bytesRead < 0)
     {
         perror("Read error");
@@ -46,8 +47,8 @@ void Client::request()
         return;
     }
 
-    buffer[bytesRead] = '\0'; // Null-terminate the buffer
-    requestBuffer_ += buffer;
+    buffer[bytesRead] = '\0'; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+    requestBuffer_ += buffer; // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
     if (header_.empty())
     {
         auto headerEnd = requestBuffer_.find("\r\n\r\n");

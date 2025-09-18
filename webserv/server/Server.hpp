@@ -31,7 +31,7 @@ class Server
     void removeFromEpoll(const Socket &socket) const ;
     void setupServerSocket(const ServerConfig &config);
     void handleConnection(struct epoll_event *event);
-    void handleRequest(struct epoll_event *event);
+    void handleRequest(struct epoll_event *event) const;
     void responseReady(int client_fd) const;
     void eventLoop();
     Socket &getListener(int fd) const;
