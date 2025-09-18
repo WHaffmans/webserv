@@ -15,18 +15,6 @@ int main(int argc, char **argv)
         return 1;
     }
     ConfigManager::getInstance().init(argv[1]); // NOLINT
-
-    const auto &serverConfigs = ConfigManager::getInstance().getServerConfigs();
-    for (const auto &serverConfig : serverConfigs)
-    {
-        std::cout << "Server " << serverConfig.getHost() << " listening on port: " << serverConfig.getPort() << '\n';
-
-        for (const auto &path : serverConfig.getLocationPaths())
-        {
-            std::cout << "  Location: " << path << '\n';
-        }
-    }
-
     Server server(ConfigManager::getInstance());
     server.start();
 

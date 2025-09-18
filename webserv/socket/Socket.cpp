@@ -25,7 +25,7 @@ Socket::Socket() : _fd(socket(AF_INET, SOCK_STREAM, 0))
     setNonBlocking();
 }
 
-Socket::Socket(int fd) : _fd(fd) // NOLINT readability-identifier-naming
+Socket::Socket(int fd) : _fd(fd) // NOLINT(readability-identifier-naming)
 {
     if (_fd == -1)
     {
