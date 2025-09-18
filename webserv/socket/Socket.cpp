@@ -1,3 +1,4 @@
+#include <memory>
 #include <webserv/socket/Socket.hpp>
 
 #include <stdexcept>
@@ -21,6 +22,7 @@ Socket::Socket() : _fd(socket(AF_INET, SOCK_STREAM, 0))
         _fd = -1;
         throw std::runtime_error("setsockopt failed");
     }
+    setNonBlocking();
 }
 
 Socket::Socket(int fd) : _fd(fd) // NOLINT readability-identifier-naming
@@ -29,6 +31,7 @@ Socket::Socket(int fd) : _fd(fd) // NOLINT readability-identifier-naming
     {
         throw std::runtime_error("Invalid file descriptor");
     }
+    setNonBlocking();
 }
 
 Socket::~Socket()
@@ -54,20 +57,20 @@ void Socket::bind(const std::string &host, const int port) const
     address.sin_addr.s_addr = inet_addr(host.c_str());
     address.sin_port = htons(port);
 
-    if (::bind(_fd, (struct sockaddr *)&address, sizeof(address)) < 0) // NOLINT cppcoreguidelines-pro-type-cstyle-cast
+    if (::bind(_fd, (struct sockaddr *)&address, sizeof(address)) < 0) // NOLINT(cppcoreguidelines-pro-type-cstyle-cast
     {
         throw std::runtime_error("Bind failed");
     }
 }
 
-Socket Socket::accept() const
+std::unique_ptr<Socket> Socket::accept() const
 {
     int client_fd = ::accept(_fd, nullptr, nullptr);
     if (client_fd < 0)
     {
         throw std::runtime_error("Accept failed");
     }
-    return {client_fd};
+    return std::make_unique<Socket>(client_fd);
 }
 
 ssize_t Socket::recv(void *buf, size_t len) const
@@ -86,4 +89,9 @@ void Socket::setNonBlocking() const
     {
         throw std::runtime_error("Failed to set non-blocking mode");
     }
+}
+
+int Socket::getFd() const
+{
+    return _fd;
 }

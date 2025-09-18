@@ -1,6 +1,7 @@
 #pragma once
 
-#include <functional>
+#include "webserv/socket/Socket.hpp"
+#include <memory>
 #include <webserv/config/ServerConfig.hpp>
 #include <webserv/server/Server.hpp>
 
@@ -9,13 +10,21 @@ class Server;
 class Client
 {
   public:
-    Client(int client_fd, Server &server, const ServerConfig &server_config);
-    void request(const std::string &req);
-    std::string getResponse() const;
+    Client(std::unique_ptr<Socket> socket, Server &server, const ServerConfig &server_config);
+    
+    Client(const Client &other) = delete;                // Disable copy constructor
+    Client &operator=(const Client &other) = delete;     // Disable copy assignment
+    Client(Client &&other) noexcept = delete;            // Move constructor
+    Client &operator=(Client &&other) noexcept = delete; // Move assignment
+    
+    ~Client();
 
+    
+    void request();
+    [[nodiscard]] std::string getResponse() const;
 
   private:
-    int client_fd;
-    std::reference_wrapper<Server> server;
-    std::reference_wrapper<const ServerConfig> server_config;
+    std::unique_ptr<Socket> client_socket_;
+    const Server &server;
+    const ServerConfig &server_config;
 };
