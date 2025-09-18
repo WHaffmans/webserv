@@ -8,8 +8,9 @@ Checks: >
   -modernize-use-trailing-return-type,
   -modernize-avoid-c-arrays,
   -cppcoreguidelines-avoid-magic-numbers,
-  -readability-magic-numbers
-  -cppcoreguidelines-pro-type-vararg
+  -readability-magic-numbers,
+  -cppcoreguidelines-pro-type-vararg,
+  -readability-identifier-length,
 
 CheckOptions:
   - key: modernize-use-auto.MinTypeNameLength
