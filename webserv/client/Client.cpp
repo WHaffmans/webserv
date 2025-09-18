@@ -7,14 +7,33 @@ Client::Client(std::unique_ptr<Socket> socket, Server &server, const ServerConfi
 {
 }
 
-Client::~Client(){
+Client::~Client()
+{
     std::cout << "Client destructor called for fd: " << client_socket_->getFd() << '\n';
     server.removeFromEpoll(*client_socket_);
 };
 
+int Client::parseHeaderforContentLength(const std::string &request)
+{
+    std::string header = "Content-Length: ";
+    size_t pos = request.find(header);
+    std::cout << "Parsing header for Content-Length...\n" << header << '\n';
+    if (pos != std::string::npos)
+    {
+        size_t start = pos + header.length();
+        size_t end = request.find("\r\n", start);
+        if (end != std::string::npos)
+        {
+            std::string lengthStr = request.substr(start, end - start);
+            return std::atoi(lengthStr.c_str());
+        }
+    }
+    return -1; // Not found
+}
+
 void Client::request()
 {
-    char buffer[1024] = {};
+    char buffer[9] = {};
     ssize_t bytesRead = client_socket_->recv(buffer, sizeof(buffer) - 1);
     if (bytesRead < 0)
     {
@@ -28,12 +47,35 @@ void Client::request()
     }
 
     buffer[bytesRead] = '\0'; // Null-terminate the buffer
-    std::cout << "Received request:\n" << buffer << '\n';
-
-    // Handle the request (placeholder implementation)
-    server.responseReady(client_socket_->getFd());
+    requestBuffer_ += buffer;
+    if (header_.empty())
+    {
+        auto headerEnd = requestBuffer_.find("\r\n\r\n");
+        if (headerEnd != std::string::npos)
+        {
+            header_ = requestBuffer_.substr(0, headerEnd + 4);
+            contentLength_ = parseHeaderforContentLength(header_);
+            if (contentLength_ == -1)
+            {
+                std::cout << "Received complete request:\n" << requestBuffer_ << "\n=== HEADER FINISHED\n";
+                server.responseReady(client_socket_->getFd());
+            }
+            requestBuffer_.erase(0, headerEnd + 4);
+            return;
+        }
+    }
+    else
+    {
+        content_ += requestBuffer_;
+        if (content_.size() >= contentLength_)
+        {
+            std::cout << "Received complete request:\n" << header_ << content_ << "\n=== FULL REQUEST FINISHED\n";
+            server.responseReady(client_socket_->getFd());
+            requestBuffer_.clear();
+            contentLength_ = -1;
+        }
+    }
 }
-
 
 std::string Client::getResponse() const
 {
