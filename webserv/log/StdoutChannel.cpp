@@ -5,7 +5,7 @@
 void StdoutChannel::log(LogLevel &logLevel, const std::string &message,
                         const std::map<std::string, std::string> &context)
 {
-    std::string prefix = "[" + logLevelToString(logLevel) + "] ";
+    std::string prefix = "[" + logLevelToColoredString(logLevel) + "] ";
     std::cout << prefix;
     std::cout << message;
     if (!context.empty())

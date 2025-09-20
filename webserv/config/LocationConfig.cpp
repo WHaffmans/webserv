@@ -1,5 +1,6 @@
 #include <webserv/config/LocationConfig.hpp>
 #include <webserv/config/utils.hpp>
+#include <webserv/log/Log.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -30,12 +31,12 @@ void LocationConfig::parseDirectives(const std::string &declarations)
             if (directive == "autoindex")
             {
                 autoIndex = (value == "on");
-                std::cout << "Set autoindex to " << (autoIndex ? "on" : "off") << '\n';
+                LOG_INFO("Set autoindex to " + std::string(autoIndex ? "on" : "off"));
             }
             else if (directive == "index")
             {
                 indexFile = value;
-                std::cout << "Set index file to " << indexFile << '\n';
+                LOG_INFO("Set index file to " + indexFile);
             }
             else
             {

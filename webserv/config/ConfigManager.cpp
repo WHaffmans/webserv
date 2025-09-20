@@ -1,6 +1,7 @@
 #include <webserv/config/ConfigManager.hpp>
 #include <webserv/config/ServerConfig.hpp>
 #include <webserv/config/utils.hpp>
+#include <webserv/log/Log.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -18,7 +19,6 @@ ConfigManager::~ConfigManager()
 ConfigManager &ConfigManager::getInstance()
 {
     static ConfigManager instance;
-    std::cout << "ConfigManager instance" << '\n';
     return instance;
 }
 
@@ -26,9 +26,10 @@ void ConfigManager::init(const std::string &filePath)
 {
     if (_initialized)
     {
+        LOG_WARN("ConfigManager is already initialized.");
         throw std::runtime_error("ConfigManager is already initialized.");
     }
-    std::cout << "Initializing ConfigManager with file: " << filePath << '\n';
+    LOG_INFO("Initializing ConfigManager with file: " + filePath);
     parseConfigFile(filePath);
     _initialized = true;
 }
@@ -70,7 +71,7 @@ void removeComments(std::string &str)
 void ConfigManager::parseConfigFile(const std::string &filePath)
 {
     // Placeholder for actual file parsing logic
-    std::cout << "Parsing configuration file: " << filePath << '\n';
+    LOG_INFO("Parsing configuration file: " + filePath);
     // Implement the parsing logic here
 
     std::ifstream file(filePath);
@@ -111,7 +112,7 @@ void ConfigManager::parseConfigFile(const std::string &filePath)
     }
 
     // parseGlobalDeclarations(globalDeclarations); // Implement this function to handle global config
-    std::cout << "Global Declarations:\n" << globalDeclarations << '\n';
+    LOG_INFO("Global Declarations...");
     file.close();
 }
 

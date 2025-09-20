@@ -11,16 +11,19 @@
 #include <unistd.h>     // For close()
 #include <vector>
 #include <webserv/server/Server.hpp>
+#include <webserv/log/Log.hpp>
 
 Server::Server(const ConfigManager &configManager) : epoll_fd_(epoll_create1(0)), configManager_(configManager)
 {
     const auto &serverConfigs = configManager.getServerConfigs();
     if (serverConfigs.empty())
     {
+        LOG_FATAL("No server configurations available.");
         throw std::runtime_error("No server configurations available.");
     }
     if (epoll_fd_ == -1)
     {
+        LOG_FATAL("epoll_create1 failed");
         throw std::runtime_error("epoll_create1 failed");
     }
 }
@@ -35,7 +38,7 @@ Server::~Server()
 
 void Server::start()
 {
-    std::cout << "Starting servers...\n";
+    LOG_INFO("Starting servers...");
     // 1. Load server configurations
 
     for (const auto &config : configManager_.getServerConfigs())
@@ -44,6 +47,7 @@ void Server::start()
     }
     if (fdToConfig_.empty())
     {
+        LOG_FATAL("No server sockets created.");
         throw std::runtime_error("No server sockets created.");
     }
 
@@ -58,6 +62,7 @@ void Server::addToEpoll(const Socket &socket, uint32_t events) const
     event.data.fd = fd;
     if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, fd, &event) == -1)
     {
+        LOG_ERROR("epoll_ctl ADD failed for fd: " + std::to_string(fd));
         throw std::runtime_error("epoll_ctl ADD failed");
     }
 }
@@ -67,6 +72,7 @@ void Server::removeFromEpoll(const Socket &socket) const
     int filedes = socket.getFd();
     if (epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, filedes, nullptr) == -1)
     {
+        LOG_ERROR("epoll_ctl DEL failed for fd: " + std::to_string(filedes));
         throw std::runtime_error("epoll_ctl DEL failed");
     }
 }
@@ -84,11 +90,11 @@ void Server::setupServerSocket(const ServerConfig &config)
 
         listeners_.push_back(std::move(serverSocket));
         fdToConfig_.insert({server_fd, std::cref(config)});
-        std::cout << "Server listening on " << config.getHost() << ":" << config.getPort() << "...\n";
+        LOG_INFO("Server listening on " + config.getHost() + ":" + std::to_string(config.getPort()) + "...");
     }
     catch (const std::exception &e)
     {
-        std::cerr << "Error setting up server socket: " << e.what() << '\n';
+        LOG_ERROR("Error setting up server socket: " + std::string(e.what()));
     }
 }
 
@@ -110,6 +116,7 @@ Socket &Server::getListener(int fd) const
             return *listener;
         }
     }
+    LOG_ERROR("Listener not found for fd: " + std::to_string(fd));
     throw std::runtime_error("Listener not found for fd: " + std::to_string(fd));
 }
 
@@ -120,6 +127,7 @@ Client &Server::getClient(int fd) const
     {
         return *(it->second);
     }
+    LOG_ERROR("Client not found for fd: " + std::to_string(fd));
     throw std::runtime_error("Client not found for fd: " + std::to_string(fd));
 }
 
@@ -135,6 +143,7 @@ const ServerConfig &Server::getConfig(int fd) const
     {
         return (it->second.get());
     }
+    LOG_ERROR("Config not found for fd: " + std::to_string(fd));
     throw std::runtime_error("Config not found for fd: " + std::to_string(fd));
 }
 
@@ -148,19 +157,20 @@ void Server::handleRequest(struct epoll_event *event) const
 
 void Server::responseReady(int client_fd) const
 {
-    std::cout << "Response ready for client fd: " << client_fd << '\n';
+    LOG_INFO("Response ready for client fd: " + std::to_string(client_fd));
     struct epoll_event ev{};
     ev.events = EPOLLOUT;
     ev.data.fd = client_fd;
     if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, client_fd, &ev) == -1)
     {
+        LOG_ERROR("epoll_ctl MOD failed for fd: " + std::to_string(client_fd));
         throw std::runtime_error("epoll_ctl MOD failed");
     }
 }
 
 void Server::eventLoop()
 {
-    std::cout << "Entering event loop...\n";
+    LOG_INFO("Entering event loop...");
     const int MAX_EVENTS = 10;
     struct epoll_event events[MAX_EVENTS]; // NOLINT
     while (true)
@@ -168,6 +178,7 @@ void Server::eventLoop()
         int nfds = epoll_wait(epoll_fd_, events, MAX_EVENTS, -1); // NOLINT
         if (nfds == -1)
         {
+            LOG_ERROR("epoll_wait failed");
             throw std::runtime_error("epoll_wait failed");
         }
         for (int i = 0; i < nfds; ++i)
@@ -175,7 +186,7 @@ void Server::eventLoop()
             epoll_event &event = events[i]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
             if ((event.events & EPOLLERR) > 0 || (event.events & EPOLLHUP) > 0)
             {
-                std::cerr << "Epoll error on fd " << event.data.fd << '\n';
+                LOG_ERROR("Epoll error on fd " + std::to_string(event.data.fd));
                 removeFromEpoll(getListener(event.data.fd));
                 close(event.data.fd);
             }
@@ -189,14 +200,19 @@ void Server::eventLoop()
             }
             else if ((event.events & EPOLLOUT) > 0)
             {
-                std::cout << "Attempting to send data to fd: " << event.data.fd << '\n';
+                LOG_INFO("Attempting to send data to fd: " + std::to_string(event.data.fd));
                 Client &client = getClient(event.data.fd);
                 std::string response = client.getResponse();
                 const char *httpResponse = response.c_str();
                 ssize_t bytesSent = send(event.data.fd, httpResponse, strlen(httpResponse), 0);
                 if (bytesSent < 0)
                 {
-                    perror("Send error");
+                    LOG_ERROR("Send failed for fd: " + std::to_string(event.data.fd) + " with error: " + std::strerror(errno));
+                    
+                }
+                else
+                {
+                    LOG_INFO("Sent " + std::to_string(bytesSent) + " bytes to fd: " + std::to_string(event.data.fd));
                 }
                 clients_.erase(event.data.fd);
             }

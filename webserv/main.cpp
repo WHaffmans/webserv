@@ -17,7 +17,13 @@ int main(int argc, char **argv)
     }
     ConfigManager::getInstance().init(argv[1]); // NOLINT
     Server server(ConfigManager::getInstance());
-    LOG_INFO("HALLO WERELD!");
+    LOG_TRACE("Trace message example.");
+    LOG_INFO("Info message example.");
+    LOG_DEBUG("Debug message example.");
+    LOG_WARN("Warning message example.");
+    LOG_ERROR("Error message example.");
+    LOG_FATAL("Fatal message example.");
+
     Log::info("test log message: server starting...", {{"port", "8080"}, {"mode", "production"}});
     server.start();
 
