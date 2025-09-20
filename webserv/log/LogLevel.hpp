@@ -1,7 +1,9 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <string>
+#include <string_view>
 
 enum class LogLevel : uint8_t
 {
@@ -25,30 +27,43 @@ constexpr const char *ERROR_COLOR = "\033[31m";   // Red
 constexpr const char *FATAL_COLOR = "\033[1;31m"; // Bold red
 } // namespace LogColors
 
+// Constexpr bidirectional mapping
+struct LogLevelMapping
+{
+    LogLevel level;
+    std::string_view name;
+    const char *color;
+};
+
+constexpr std::array<LogLevelMapping, 6> LOG_LEVEL_MAP = {{
+    { .level = LogLevel::LOGLVL_TRACE, .name = "TRACE", .color = LogColors::TRACE_COLOR },
+    { .level = LogLevel::LOGLVL_DEBUG, .name = "DEBUG", .color = LogColors::DEBUG_COLOR },
+    { .level = LogLevel::LOGLVL_INFO,  .name = "INFO",  .color = LogColors::INFO_COLOR },
+    { .level = LogLevel::LOGLVL_WARN,  .name = "WARN",  .color = LogColors::WARN_COLOR },
+    { .level = LogLevel::LOGLVL_ERROR, .name = "ERROR", .color = LogColors::ERROR_COLOR },
+    { .level = LogLevel::LOGLVL_FATAL, .name = "FATAL", .color = LogColors::FATAL_COLOR }
+}};
+
 inline std::string logLevelToString(LogLevel level)
 {
-    switch (level)
+    for (const auto &mapping : LOG_LEVEL_MAP)
     {
-    case LogLevel::LOGLVL_TRACE: return "TRACE";
-    case LogLevel::LOGLVL_DEBUG: return "DEBUG";
-    case LogLevel::LOGLVL_INFO: return "INFO";
-    case LogLevel::LOGLVL_WARN: return "WARN";
-    case LogLevel::LOGLVL_ERROR: return "ERROR";
-    case LogLevel::LOGLVL_FATAL: return "FATAL";
+        if (mapping.level == level)
+        {
+            return std::string(mapping.name);
+        }
     }
     return "UNKNOWN";
 }
 
 inline const char *logLevelToColor(LogLevel level)
 {
-    switch (level)
+    for (const auto &mapping : LOG_LEVEL_MAP)
     {
-    case LogLevel::LOGLVL_TRACE: return LogColors::TRACE_COLOR;
-    case LogLevel::LOGLVL_DEBUG: return LogColors::DEBUG_COLOR;
-    case LogLevel::LOGLVL_INFO: return LogColors::INFO_COLOR;
-    case LogLevel::LOGLVL_WARN: return LogColors::WARN_COLOR;
-    case LogLevel::LOGLVL_ERROR: return LogColors::ERROR_COLOR;
-    case LogLevel::LOGLVL_FATAL: return LogColors::FATAL_COLOR;
+        if (mapping.level == level)
+        {
+            return mapping.color;
+        }
     }
     return LogColors::RESET;
 }
@@ -60,29 +75,12 @@ inline std::string logLevelToColoredString(LogLevel level)
 
 inline LogLevel stringToLogLevel(const std::string &level)
 {
-    if (level == "TRACE")
+    for (const auto &mapping : LOG_LEVEL_MAP)
     {
-        return LogLevel::LOGLVL_TRACE;
-    }
-    if (level == "DEBUG")
-    {
-        return LogLevel::LOGLVL_DEBUG;
-    }
-    if (level == "INFO")
-    {
-        return LogLevel::LOGLVL_INFO;
-    }
-    if (level == "WARN")
-    {
-        return LogLevel::LOGLVL_WARN;
-    }
-    if (level == "ERROR")
-    {
-        return LogLevel::LOGLVL_ERROR;
-    }
-    if (level == "FATAL")
-    {
-        return LogLevel::LOGLVL_FATAL;
+        if (mapping.name == level)
+        {
+            return mapping.level;
+        }
     }
     return LogLevel::LOGLVL_INFO; // Default fallback
 }
