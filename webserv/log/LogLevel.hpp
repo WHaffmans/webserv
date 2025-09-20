@@ -5,6 +5,10 @@
 #include <string>
 #include <string_view>
 
+// TODO LOG_LEVEL_MAP should not be in the global namespace, but i do think this is the nice way? lets refactor this to
+// the log class or use a seperate namespace
+
+
 enum class LogLevel : uint8_t
 {
     LOGLVL_TRACE = 0,
