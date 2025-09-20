@@ -87,10 +87,101 @@ classDiagram
         -map<string,string> directives
     }
 
+    class HttpRequest {
+        +HttpRequest()
+        +parse(string) bool
+        +getMethod() string
+        +getPath() string
+        +getVersion() string
+        +getHeader(string) string
+        +getHeaders() map<string,string>
+        +getBody() string
+        +hasHeader(string) bool
+        +isComplete() bool
+        -string method
+        -string path
+        -string version
+        -map<string,string> headers
+        -string body
+        -bool complete
+    }
+
+    class HttpResponse {
+        +HttpResponse()
+        +setStatus(int)
+        +setHeader(string, string)
+        +setBody(string)
+        +toString() string
+        +sendFile(string)
+        +sendError(int)
+        -int status_code
+        -string status_message
+        -map<string,string> headers
+        -string body
+    }
+
+    class Router {
+        +Router(ServerConfig&)
+        +route(HttpRequest&) HttpResponse
+        +handleGet(HttpRequest&) HttpResponse
+        +handlePost(HttpRequest&) HttpResponse
+        +handleDelete(HttpRequest&) HttpResponse
+        +serveFile(string) HttpResponse
+        +listDirectory(string) HttpResponse
+        +matchLocation(string) LocationConfig&
+        -ServerConfig& config
+    }
+
+    class CgiHandler {
+        +CgiHandler(LocationConfig&)
+        +execute(HttpRequest&) HttpResponse
+        +setupEnvironment(HttpRequest&)
+        +executeScript(string, HttpRequest&) string
+        +setTimeout(int)
+        -LocationConfig& location
+        -map<string,string> env_vars
+        -int timeout
+    }
+
+    class ConfigValidator {
+        +validate(ConfigManager&) bool
+        +validateServerConfig(ServerConfig&) bool
+        +validateLocationConfig(LocationConfig&) bool
+        +checkPortConflicts() bool
+        +checkPathExists(string) bool
+        +validateDirective(string, string) bool
+        -vector<string> errors
+        -vector<string> warnings
+    }
+
+    class Logger {
+        +info(string)
+        +warn(string)
+        +error(string)
+        +debug(string)
+        +setLevel(LogLevel)
+        -LogLevel level
+        -ofstream logFile
+    }
+
+    class MimeTypeHandler {
+        +getMimeType(string) string
+        +loadMimeTypes()
+        -map<string,string> mimeTypes
+    }
+
     Server "1" o-- "1..*" Socket : listens on
     Server "1" o-- "0..*" Client : manages
     Server "1" -- "1" ConfigManager : uses
     Client "1" *-- "1" Socket : owns
     Client "1" -- "1" Server : references
     Client "1" -- "1" ServerConfig : references
+    Client "1" -- "1" HttpRequest : processes
+    Client "1" -- "1" HttpResponse : generates
     ServerConfig "1" o-- "*" LocationConfig : has
+    Router "1" -- "1" ServerConfig : uses
+    Router "1" -- "*" CgiHandler : may use
+    CgiHandler "1" -- "1" LocationConfig : uses
+    ConfigManager "1" -- "1" ConfigValidator : validates with
+    Router "1" -- "1" MimeTypeHandler : uses
+    Server "1" -- "1" Logger : logs to
