@@ -1,13 +1,13 @@
 #pragma once
 
+#include <webserv/config/LocationConfig.hpp>
+
 #include <map>
 #include <string>
 #include <vector>
 
-#include <webserv/config/LocationConfig.hpp>
-
 class ServerConfig
-{ 
+{
   public:
     ServerConfig(const std::string &serverBlock);
 
@@ -20,6 +20,7 @@ class ServerConfig
     [[nodiscard]] const std::vector<std::string> &getIndexFiles() const { return index_files; }
     [[nodiscard]] const LocationConfig &getLocation(const std::string &path) const;
     [[nodiscard]] std::vector<std::string> getLocationPaths() const;
+
     void setServerFD(int fd) { server_fd = fd; }
     [[nodiscard]] int getServerFD() const { return server_fd; }
 

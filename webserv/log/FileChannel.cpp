@@ -1,13 +1,11 @@
 #include "webserv/log/LogLevel.hpp"
+
 #include <webserv/log/FileChannel.hpp>
 
 #include <chrono>
 #include <iostream>
 
-
-FileChannel::FileChannel(const std::string &filename)
-    : filename_(filename),
-      fileStream_(filename, std::ios::trunc)
+FileChannel::FileChannel(const std::string &filename) : filename_(filename), fileStream_(filename, std::ios::trunc)
 {
     if (!fileStream_.is_open())
     {
@@ -23,8 +21,7 @@ FileChannel::~FileChannel()
     }
 }
 
-void FileChannel::log(LogLevel &logLevel, const std::string &message,
-                      const std::map<std::string, std::string> &context)
+void FileChannel::log(LogLevel &logLevel, const std::string &message, const std::map<std::string, std::string> &context)
 {
     if (!fileStream_.is_open())
     {
@@ -39,7 +36,7 @@ void FileChannel::log(LogLevel &logLevel, const std::string &message,
 
     // Format the log message
     fileStream_ << "[" << std::put_time(tm, "%Y-%m-%d %H:%M:%S") << "] "
-                 << "[" << logLevelToString(logLevel) << "] " << message << '\n';
+                << "[" << logLevelToString(logLevel) << "] " << message << '\n';
 
     // Log the context if it exists
     if (!context.empty())
@@ -52,4 +49,3 @@ void FileChannel::log(LogLevel &logLevel, const std::string &message,
     }
     fileStream_ << std::flush;
 }
-

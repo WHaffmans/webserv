@@ -5,6 +5,13 @@ project(webserv)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Enable parallel compilation
+include(ProcessorCount)
+ProcessorCount(N)
+if(NOT N EQUAL 0)
+    set(CMAKE_BUILD_PARALLEL_LEVEL ${N})
+endif()
+
 # Add source files
 file(GLOB_RECURSE SOURCES
     "${PROJECT_SOURCE_DIR}/webserv/*.cpp"

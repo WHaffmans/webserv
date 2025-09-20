@@ -1,9 +1,9 @@
+#include "ServerConfig.hpp"
+
 #include <webserv/config/LocationConfig.hpp>
-#include <webserv/config/ServerConfig.hpp>
 #include <webserv/config/utils.hpp>
 #include <webserv/log/Log.hpp>
 
-#include <iostream>
 #include <sstream>
 #include <string>
 
@@ -54,7 +54,7 @@ void ServerConfig::parseServerBlock(const std::string &block)
 
 void ServerConfig::parseDirectives(const std::string &declarations)
 {
-    LOG_INFO("Parsing server directives" );
+    LOG_INFO("Parsing server directives");
     std::string line;
     std::istringstream stream(declarations);
     while (std::getline(stream, line))

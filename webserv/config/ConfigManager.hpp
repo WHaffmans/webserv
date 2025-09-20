@@ -1,9 +1,9 @@
 #pragma once
 
+#include <webserv/config/ServerConfig.hpp>
+
 #include <string>
 #include <vector>
-
-#include <webserv/config/ServerConfig.hpp>
 
 class ConfigManager
 {

@@ -1,12 +1,13 @@
 #pragma once
 
+#include <webserv/log/Channel.hpp>
+#include <webserv/log/LogLevel.hpp>
+
 #include <chrono>
 #include <map>
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <webserv/log/Channel.hpp>
-#include <webserv/log/LogLevel.hpp>
 
 #define LOG(level, message) Log::static_log((level), (message), __FILE__, __LINE__, __FUNCTION__, "file", {})
 

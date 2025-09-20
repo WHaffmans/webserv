@@ -29,18 +29,12 @@ inline std::string logLevelToString(LogLevel level)
 {
     switch (level)
     {
-    case LogLevel::LOGLVL_TRACE:
-        return "TRACE";
-    case LogLevel::LOGLVL_DEBUG:
-        return "DEBUG";
-    case LogLevel::LOGLVL_INFO:
-        return "INFO";
-    case LogLevel::LOGLVL_WARN:
-        return "WARN";
-    case LogLevel::LOGLVL_ERROR:
-        return "ERROR";
-    case LogLevel::LOGLVL_FATAL:
-        return "FATAL";
+    case LogLevel::LOGLVL_TRACE: return "TRACE";
+    case LogLevel::LOGLVL_DEBUG: return "DEBUG";
+    case LogLevel::LOGLVL_INFO: return "INFO";
+    case LogLevel::LOGLVL_WARN: return "WARN";
+    case LogLevel::LOGLVL_ERROR: return "ERROR";
+    case LogLevel::LOGLVL_FATAL: return "FATAL";
     }
     return "UNKNOWN";
 }
@@ -49,18 +43,12 @@ inline const char *logLevelToColor(LogLevel level)
 {
     switch (level)
     {
-    case LogLevel::LOGLVL_TRACE:
-        return LogColors::TRACE_COLOR;
-    case LogLevel::LOGLVL_DEBUG:
-        return LogColors::DEBUG_COLOR;
-    case LogLevel::LOGLVL_INFO:
-        return LogColors::INFO_COLOR;
-    case LogLevel::LOGLVL_WARN:
-        return LogColors::WARN_COLOR;
-    case LogLevel::LOGLVL_ERROR:
-        return LogColors::ERROR_COLOR;
-    case LogLevel::LOGLVL_FATAL:
-        return LogColors::FATAL_COLOR;
+    case LogLevel::LOGLVL_TRACE: return LogColors::TRACE_COLOR;
+    case LogLevel::LOGLVL_DEBUG: return LogColors::DEBUG_COLOR;
+    case LogLevel::LOGLVL_INFO: return LogColors::INFO_COLOR;
+    case LogLevel::LOGLVL_WARN: return LogColors::WARN_COLOR;
+    case LogLevel::LOGLVL_ERROR: return LogColors::ERROR_COLOR;
+    case LogLevel::LOGLVL_FATAL: return LogColors::FATAL_COLOR;
     }
     return LogColors::RESET;
 }

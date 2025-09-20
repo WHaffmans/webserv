@@ -1,12 +1,14 @@
 #pragma once
 
 #include "webserv/config/ServerConfig.hpp"
-#include <functional>
-#include <memory>
-#include <unordered_map>
+
 #include <webserv/client/Client.hpp>
 #include <webserv/config/ConfigManager.hpp>
 #include <webserv/socket/Socket.hpp>
+
+#include <functional>
+#include <memory>
+#include <unordered_map>
 
 class Client;
 
@@ -28,7 +30,7 @@ class Server
 
     void start();
     void addToEpoll(const Socket &socket, uint32_t events) const;
-    void removeFromEpoll(const Socket &socket) const ;
+    void removeFromEpoll(const Socket &socket) const;
     void setupServerSocket(const ServerConfig &config);
     void handleConnection(struct epoll_event *event);
     void handleRequest(struct epoll_event *event) const;
@@ -38,7 +40,6 @@ class Server
     Client &getClient(int fd) const;
     const ServerConfig &getConfig(int fd) const;
     const ServerConfig &getConfig(const Socket &socket) const;
-
 
   private:
     int epoll_fd_;

@@ -1,1 +1,38 @@
 BasedOnStyle: Microsoft
+
+# Include ordering
+SortIncludes: CaseSensitive
+IncludeBlocks: Regroup
+IncludeCategories:
+  # Main header (current file's header)
+  - Regex: '^".*\.hpp"$'
+    Priority: 1
+    SortPriority: 1
+    CaseSensitive: true
+  # Project headers
+  - Regex: '^<webserv/.*\.hpp>$'
+    Priority: 2
+    SortPriority: 2
+    CaseSensitive: true
+  # System C++ headers
+  - Regex: '^<[a-z_]+>$'
+    Priority: 3
+    SortPriority: 3
+    CaseSensitive: true
+  # System C headers
+  - Regex: '^<.*\.h>$'
+    Priority: 4
+    SortPriority: 4
+    CaseSensitive: true
+  # Third-party libraries
+  - Regex: '^<.*>$'
+    Priority: 5
+    SortPriority: 5
+    CaseSensitive: true
+
+# Allow simple functions and if statements on one line
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLoopsOnASingleLine: true
+AllowShortBlocksOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: true

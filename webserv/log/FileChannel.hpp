@@ -3,9 +3,9 @@
 #include <webserv/log/Channel.hpp>
 #include <webserv/log/LogLevel.hpp>
 
-#include <string>
 #include <fstream>
 #include <map>
+#include <string>
 
 class FileChannel : public Channel
 {
@@ -24,4 +24,4 @@ class FileChannel : public Channel
   private:
     std::string filename_;
     std::ofstream fileStream_;
-};  
+};

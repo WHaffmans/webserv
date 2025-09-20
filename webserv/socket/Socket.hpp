@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+
 #include <sys/types.h>
 
 class Socket
@@ -10,8 +11,8 @@ class Socket
     Socket();
     Socket(int fd); // NOLINT readability-identifier-naming
 
-    Socket(const Socket &other) = delete;                // Disable copy constructor
-    Socket &operator=(const Socket &other) = delete;     // Disable copy assignment
+    Socket(const Socket &other) = delete;                 // Disable copy constructor
+    Socket &operator=(const Socket &other) = delete;      // Disable copy assignment
     Socket(Socket &&other) noexcept = default;            // Move constructor
     Socket &operator=(Socket &&other) noexcept = default; // Move assignment
 

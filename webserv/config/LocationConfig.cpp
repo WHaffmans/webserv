@@ -2,7 +2,6 @@
 #include <webserv/config/utils.hpp>
 #include <webserv/log/Log.hpp>
 
-#include <iostream>
 #include <sstream>
 #include <string>
 

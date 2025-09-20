@@ -1,17 +1,18 @@
 #include "webserv/socket/Socket.hpp"
-#include <arpa/inet.h> // For inet_addr
-#include <cstdlib>     // For exit()
-#include <cstring>     // For memset
-#include <fcntl.h>     // For fcntl()"
-#include <iostream>
+
+#include <webserv/log/Log.hpp>
+#include <webserv/server/Server.hpp>
+
+#include <cstring> // For memset
 #include <memory>
+#include <vector>
+
+#include <arpa/inet.h>  // For inet_addr
+#include <fcntl.h>      // For fcntl()
 #include <netinet/in.h> // For sockaddr_in
 #include <sys/epoll.h>
 #include <sys/socket.h> // For socket functions
 #include <unistd.h>     // For close()
-#include <vector>
-#include <webserv/server/Server.hpp>
-#include <webserv/log/Log.hpp>
 
 Server::Server(const ConfigManager &configManager) : epoll_fd_(epoll_create1(0)), configManager_(configManager)
 {
@@ -207,8 +208,8 @@ void Server::eventLoop()
                 ssize_t bytesSent = send(event.data.fd, httpResponse, strlen(httpResponse), 0);
                 if (bytesSent < 0)
                 {
-                    LOG_ERROR("Send failed for fd: " + std::to_string(event.data.fd) + " with error: " + std::strerror(errno));
-                    
+                    LOG_ERROR("Send failed for fd: " + std::to_string(event.data.fd) +
+                              " with error: " + std::strerror(errno));
                 }
                 else
                 {

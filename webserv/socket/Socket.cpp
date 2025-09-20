@@ -1,14 +1,14 @@
-#include <memory>
-#include <webserv/socket/Socket.hpp>
 #include <webserv/log/Log.hpp>
+#include <webserv/socket/Socket.hpp>
 
+#include <memory>
 #include <stdexcept>
-#include <unistd.h> // For close()
 
 #include <arpa/inet.h>  // For inet_addr
 #include <fcntl.h>      // For fcntl()"
 #include <netinet/in.h> // For sockaddr_in
 #include <sys/socket.h>
+#include <unistd.h> // For close()
 
 Socket::Socket() : _fd(socket(AF_INET, SOCK_STREAM, 0))
 {
@@ -32,7 +32,7 @@ Socket::Socket(int fd) : _fd(fd) // NOLINT(readability-identifier-naming)
 {
     if (_fd == -1)
     {
-        LOG_ERROR("Invalid file descriptor");   
+        LOG_ERROR("Invalid file descriptor");
         throw std::runtime_error("Invalid file descriptor");
     }
     setNonBlocking();

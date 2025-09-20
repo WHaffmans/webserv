@@ -8,13 +8,9 @@
 #include <sstream>
 #include <stdexcept>
 
-ConfigManager::ConfigManager() : _initialized(false)
-{
-}
+ConfigManager::ConfigManager() : _initialized(false) {}
 
-ConfigManager::~ConfigManager()
-{
-}
+ConfigManager::~ConfigManager() {}
 
 ConfigManager &ConfigManager::getInstance()
 {

@@ -1,7 +1,9 @@
 #include "webserv/socket/Socket.hpp"
-#include <iostream>
+
 #include <webserv/client/Client.hpp>
 #include <webserv/log/Log.hpp>
+
+#include <iostream>
 
 Client::Client(std::unique_ptr<Socket> socket, Server &server, const ServerConfig &server_config)
     : client_socket_(std::move(socket)), server(std::ref(server)), server_config(std::cref(server_config))
@@ -14,7 +16,7 @@ Client::~Client()
     server.removeFromEpoll(*client_socket_);
 };
 
-int Client::parseHeaderforContentLength(const std::string &request) //NOLINT
+int Client::parseHeaderforContentLength(const std::string &request) // NOLINT
 {
     std::string header = "Content-Length: ";
     size_t pos = request.find(header);

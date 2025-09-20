@@ -1,9 +1,10 @@
-#include <chrono>
-#include <filesystem>
-#include <iostream>
 #include <webserv/log/FileChannel.hpp>
 #include <webserv/log/Log.hpp>
 #include <webserv/log/StdoutChannel.hpp>
+
+#include <chrono>
+#include <filesystem>
+#include <iostream>
 
 Log::Log()
 {
@@ -52,6 +53,7 @@ void Log::log(LogLevel level, const std::string &message, const std::string &fil
     if (it != channels_.end())
     {
         std::string extendedMessage;
+        extendedMessage += message + " | ";
         if (!file.empty())
         {
             extendedMessage += std::filesystem::path(file).filename().string();
@@ -64,7 +66,7 @@ void Log::log(LogLevel level, const std::string &message, const std::string &fil
         {
             extendedMessage += " (" + function + ")";
         }
-        extendedMessage += " | " + message;
+        // extendedMessage += " | " + message;
         it->second->log(level, extendedMessage, context);
     }
 }

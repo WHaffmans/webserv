@@ -2,7 +2,4 @@
 *.a
 build
 .cache
-
-
-
 webserv.log
