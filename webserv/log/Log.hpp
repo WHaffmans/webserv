@@ -1,6 +1,6 @@
 #pragma once
 
-#include "webserv/log/Channel.hpp"
+#include <webserv/log/Channel.hpp>
 #include <map>
 #include <memory>
 #include <string>
