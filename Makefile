@@ -15,7 +15,7 @@ $(BUILD_DIR):
 # Build targets with specific build types
 release: $(BUILD_DIR)
 	$(CMAKE) -B $(BUILD_DIR) $(CMAKE_FLAGS) -DCMAKE_BUILD_TYPE=Release
-	$(CMAKE_BUILD) $(BUILD_DIR) --target webserv
+	$(CMAKE_BUILD) $(BUILD_DIR) --target webserv --parallel
 
 debug: $(BUILD_DIR)
 	$(CMAKE) -B $(BUILD_DIR) $(CMAKE_FLAGS) -DCMAKE_BUILD_TYPE=Debug
