@@ -19,7 +19,7 @@ class Socket
     ~Socket();
 
     void listen(int backlog) const;
-    void bind(const std::string &host, const int port) const;
+    void bind(const std::string &host, int port) const;
     [[nodiscard]] std::unique_ptr<Socket> accept() const;
     ssize_t recv(void *buf, size_t len) const;
     ssize_t send(const void *buf, size_t len) const;
