@@ -31,6 +31,6 @@ class Client
     std::string header_;
     std::string content_;
     std::unique_ptr<Socket> client_socket_;
-    const Server &server;
-    const ServerConfig &server_config;
+    const Server &server_;
+    const ServerConfig &server_config_;
 };

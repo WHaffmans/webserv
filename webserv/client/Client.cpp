@@ -6,14 +6,14 @@
 #include <iostream>
 
 Client::Client(std::unique_ptr<Socket> socket, Server &server, const ServerConfig &server_config)
-    : client_socket_(std::move(socket)), server(std::ref(server)), server_config(std::cref(server_config))
+    : client_socket_(std::move(socket)), server_(std::ref(server)), server_config_(std::cref(server_config))
 {
 }
 
 Client::~Client()
 {
     LOG_INFO("Client destructor called for fd: " + std::to_string(client_socket_->getFd()));
-    server.removeFromEpoll(*client_socket_);
+    server_.removeFromEpoll(*client_socket_);
 };
 
 int Client::parseHeaderforContentLength(const std::string &request) // NOLINT
@@ -62,7 +62,7 @@ void Client::request()
             if (contentLength_ == -1)
             {
                 LOG_INFO("Received complete request:\n" + requestBuffer_ + "\n=== HEADER FINISHED\n");
-                server.responseReady(client_socket_->getFd());
+                server_.responseReady(client_socket_->getFd());
             }
             requestBuffer_.erase(0, headerEnd + 4);
             return;
@@ -74,7 +74,7 @@ void Client::request()
         if (content_.size() >= contentLength_)
         {
             LOG_INFO("Received complete request:\n" + header_ + content_ + "\n=== FULL REQUEST FINISHED\n");
-            server.responseReady(client_socket_->getFd());
+            server_.responseReady(client_socket_->getFd());
             requestBuffer_.clear();
             contentLength_ = -1;
         }
@@ -84,7 +84,7 @@ void Client::request()
 std::string Client::getResponse() const
 {
     std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 32\r\n\r\nHello, World!";
-    response += " Server port " + std::to_string(server_config.getPort()) + "\r\n";
+    response += " Server port " + std::to_string(server_config_.getPort()) + "\r\n";
     LOG_DEBUG("Sending response:\n" + response);
     return response;
 }

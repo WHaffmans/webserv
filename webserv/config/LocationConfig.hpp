@@ -9,10 +9,10 @@ class LocationConfig
     LocationConfig(const std::string &locationBlock);
 
   private:
-    std::string path;
-    bool autoIndex;
-    std::string indexFile;
-    std::map<std::string, std::string> directives;
+    std::string path_;
+    bool autoIndex_;
+    std::string indexFile_;
+    std::map<std::string, std::string> directives_;
 
     void parseLocationBlock(const std::string &block);
     void parseDirectives(const std::string &declarations);

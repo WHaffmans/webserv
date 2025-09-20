@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+
 class ConfigManager
 {
   public:
@@ -15,13 +16,13 @@ class ConfigManager
 
     void init(const std::string &filePath);
     static ConfigManager &getInstance();
-    const std::vector<ServerConfig> &getServerConfigs() const { return serverConfigs; }
+    const std::vector<ServerConfig> &getServerConfigs() const { return serverConfigs_; }
 
   private:
-    bool _initialized;
+    bool initialized_;
     ConfigManager();
     ~ConfigManager();
-    std::vector<ServerConfig> serverConfigs;
+    std::vector<ServerConfig> serverConfigs_;
 
     void parseConfigFile(const std::string &filePath);
     // void parseGlobalDeclarations(const std::string &declarations);

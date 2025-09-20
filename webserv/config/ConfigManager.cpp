@@ -8,7 +8,7 @@
 #include <sstream>
 #include <stdexcept>
 
-ConfigManager::ConfigManager() : _initialized(false) {}
+ConfigManager::ConfigManager() : initialized_(false) {}
 
 ConfigManager::~ConfigManager() {}
 
@@ -20,14 +20,14 @@ ConfigManager &ConfigManager::getInstance()
 
 void ConfigManager::init(const std::string &filePath)
 {
-    if (_initialized)
+    if (initialized_)
     {
         LOG_WARN("ConfigManager is already initialized.");
         throw std::runtime_error("ConfigManager is already initialized.");
     }
     LOG_INFO("Initializing ConfigManager with file: " + filePath);
     parseConfigFile(filePath);
-    _initialized = true;
+    initialized_ = true;
 }
 
 void removeEmptyLines(std::string &str)
@@ -103,7 +103,7 @@ void ConfigManager::parseConfigFile(const std::string &filePath)
         }
         // Optionally parse the server block here
         std::string serverBlock = content.substr(bracePos + 1, closeBrace - bracePos - 1);
-        serverConfigs.emplace_back(serverBlock);
+        serverConfigs_.emplace_back(serverBlock);
         pos = closeBrace + 1;
     }
 

@@ -7,7 +7,7 @@
 #include <sstream>
 #include <string>
 
-ServerConfig::ServerConfig(std::string const &serverBlock) : port(80)
+ServerConfig::ServerConfig(std::string const &serverBlock) : port_(80)
 {
     parseServerBlock(serverBlock);
 }
@@ -44,7 +44,7 @@ void ServerConfig::parseServerBlock(const std::string &block)
         // Optionally parse the server block here
         std::string locationBlock = block.substr(bracePos + 1, closeBrace - bracePos - 1);
         LOG_INFO("Added location: " + locationPath);
-        locations.emplace(locationPath, locationBlock);
+        locations_.emplace(locationPath, locationBlock);
         pos = closeBrace + 1;
     }
 
@@ -69,40 +69,40 @@ void ServerConfig::parseDirectives(const std::string &declarations)
             if (directive == "listen")
             {
 
-                port = std::stoi(value);
-                if (port < 1 || port > 65535)
+                port_ = std::stoi(value);
+                if (port_ < 1 || port_ > 65535)
                 {
-                    throw std::runtime_error("Invalid port number: " + std::to_string(port));
+                    throw std::runtime_error("Invalid port number: " + std::to_string(port_));
                 }
-                LOG_INFO("Set port to " + std::to_string(port));
+                LOG_INFO("Set port to " + std::to_string(port_));
             }
             else if (directive == "root")
             {
-                root = value;
-                LOG_INFO("Set root to " + root);
+                root_ = value;
+                LOG_INFO("Set root to " + root_);
             }
             else if (directive == "host")
             {
-                host = value;
-                LOG_INFO("Set host to " + host);
+                host_ = value;
+                LOG_INFO("Set host to " + host_);
             }
             else if (directive == "cgi_pass")
             {
-                cgi_pass = value;
-                LOG_INFO("Set cgi_pass to " + cgi_pass);
+                cgi_pass_ = value;
+                LOG_INFO("Set cgi_pass to " + cgi_pass_);
             }
             else if (directive == "cgi_ext")
             {
-                cgi_ext = value;
-                LOG_INFO("Set cgi_ext to " + cgi_ext);
+                cgi_ext_ = value;
+                LOG_INFO("Set cgi_ext to " + cgi_ext_);
             }
             else if (directive == "index")
             {
-                index_files.clear();
+                index_files_.clear();
                 std::string indexFile;
                 while (lineStream >> indexFile)
                 {
-                    index_files.push_back(indexFile);
+                    index_files_.push_back(indexFile);
                     LOG_INFO("Added index file: " + indexFile);
                 }
             }
@@ -111,7 +111,7 @@ void ServerConfig::parseDirectives(const std::string &declarations)
                 int statusCode = std::stoi(value);
                 std::string errorPagePath;
                 lineStream >> errorPagePath;
-                error_page[statusCode] = errorPagePath;
+                error_page_[statusCode] = errorPagePath;
                 LOG_INFO("Set error_page for status " + std::to_string(statusCode) + " to " + errorPagePath);
             }
             else
@@ -124,9 +124,9 @@ void ServerConfig::parseDirectives(const std::string &declarations)
 
 const LocationConfig &ServerConfig::getLocation(const std::string &path) const
 {
-    if (locations.count(path) > 0) // NOLINT
+    if (locations_.count(path) > 0) // NOLINT
     {
-        return locations.at(path);
+        return locations_.at(path);
     }
     LOG_ERROR("Location not found: " + path);
     throw std::runtime_error("Location not found: " + path);
@@ -135,8 +135,8 @@ const LocationConfig &ServerConfig::getLocation(const std::string &path) const
 std::vector<std::string> ServerConfig::getLocationPaths() const
 {
     std::vector<std::string> paths;
-    paths.reserve(locations.size());
-    for (const auto &pair : locations)
+    paths.reserve(locations_.size());
+    for (const auto &pair : locations_)
     {
         paths.push_back(pair.first);
     }

@@ -5,7 +5,7 @@
 #include <sstream>
 #include <string>
 
-LocationConfig::LocationConfig(const std::string &locationBlock) : autoIndex(false)
+LocationConfig::LocationConfig(const std::string &locationBlock) : autoIndex_(false)
 {
     parseLocationBlock(locationBlock);
 }
@@ -29,17 +29,17 @@ void LocationConfig::parseDirectives(const std::string &declarations)
             lineStream >> value;
             if (directive == "autoindex")
             {
-                autoIndex = (value == "on");
-                LOG_INFO("Set autoindex to " + std::string(autoIndex ? "on" : "off"));
+                autoIndex_ = (value == "on");
+                LOG_INFO("Set autoindex to " + std::string(autoIndex_ ? "on" : "off"));
             }
             else if (directive == "index")
             {
-                indexFile = value;
-                LOG_INFO("Set index file to " + indexFile);
+                indexFile_ = value;
+                LOG_INFO("Set index file to " + indexFile_);
             }
             else
             {
-                directives[directive] = value;
+                directives_[directive] = value;
             }
         }
     }

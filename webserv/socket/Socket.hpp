@@ -27,5 +27,5 @@ class Socket
     [[nodiscard]] int getFd() const;
 
   private:
-    int _fd;
+    int fd_;
 };
