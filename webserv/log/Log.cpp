@@ -10,10 +10,27 @@ Log::Log()
 {
     // get start time
     start_time_ = std::chrono::steady_clock::now();
-    channels_.insert({"stdout", std::unique_ptr<Channel>(new StdoutChannel())});
+    
 }
 
-void Log::setFile(const std::string &filename)
+void Log::setStdoutChannel(LogLevel logLevel)
+{
+    Log &log = getInstance();
+    if (log.channels_.contains("stdout"))
+    {
+        log.channels_.erase("stdout");
+    }
+    try
+    {
+        log.channels_.insert({"stdout", std::unique_ptr<Channel>(new StdoutChannel(logLevel))});
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Failed to set stdout log channel: " << e.what() << '\n';
+    }
+}
+
+void Log::setFileChannel(const std::string &filename, LogLevel logLevel)
 {
     Log &log = getInstance();
     if (log.channels_.contains("file"))
@@ -22,7 +39,7 @@ void Log::setFile(const std::string &filename)
     }
     try
     {
-        log.channels_.insert({"file", std::unique_ptr<Channel>(new FileChannel(filename))});
+        log.channels_.insert({"file", std::unique_ptr<Channel>(new FileChannel(filename, logLevel))});
     }
     catch (const std::exception &e)
     {
@@ -39,18 +56,16 @@ Log &Log::getInstance()
 void Log::log(LogLevel level, const std::string &message, const std::string &channel,
               const std::map<std::string, std::string> &context)
 {
-    auto it = channels_.find(channel);
-    if (it != channels_.end())
+    for (auto &it : channels_)
     {
-        it->second->log(level, message, context);
+        it.second->log(level, message, context);
     }
 }
 void Log::log(LogLevel level, const std::string &message, const std::string &file, int line,
               const std::string &function, const std::string &channel,
               const std::map<std::string, std::string> &context)
 {
-    auto it = channels_.find(channel);
-    if (it != channels_.end())
+   for (auto &it : channels_)
     {
         std::string extendedMessage;
         extendedMessage += message + " | ";
@@ -67,7 +82,7 @@ void Log::log(LogLevel level, const std::string &message, const std::string &fil
             extendedMessage += " (" + function + ")";
         }
         // extendedMessage += " | " + message;
-        it->second->log(level, extendedMessage, context);
+        it.second->log(level, extendedMessage, context);
     }
 }
 

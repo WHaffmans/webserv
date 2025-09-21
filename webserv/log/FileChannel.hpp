@@ -10,7 +10,7 @@
 class FileChannel : public Channel
 {
   public:
-    FileChannel(const std::string &filename);
+    FileChannel(const std::string &filename, LogLevel logLevel = LogLevel::LOGLVL_TRACE);
 
     FileChannel(const FileChannel &other) = delete;
     FileChannel(const FileChannel &&other) = delete;

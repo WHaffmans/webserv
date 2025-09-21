@@ -16,7 +16,8 @@ int main(int argc, char **argv)
         std::cerr << "Usage: " << argv[0] << " <config_file_path>\n"; // NOLINT
         return 1;
     }
-    Log::setFile("webserv.log");
+    Log::setFileChannel("webserv.log", LogLevel::LOGLVL_WARN);
+    Log::setStdoutChannel(LogLevel::LOGLVL_TRACE);
     ConfigManager::getInstance().init(argv[1]); // NOLINT
     Server server(ConfigManager::getInstance());
     server.start();

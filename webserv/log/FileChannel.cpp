@@ -5,7 +5,8 @@
 #include <chrono>
 #include <iostream>
 
-FileChannel::FileChannel(const std::string &filename) : filename_(filename), fileStream_(filename, std::ios::trunc)
+FileChannel::FileChannel(const std::string &filename, LogLevel logLevel)
+    : Channel(logLevel), filename_(filename), fileStream_(filename, std::ios::trunc)
 {
     if (!fileStream_.is_open())
     {
@@ -23,6 +24,10 @@ FileChannel::~FileChannel()
 
 void FileChannel::log(LogLevel &logLevel, const std::string &message, const std::map<std::string, std::string> &context)
 {
+    if (logLevel < logLevel_)
+    {
+        return;
+    }
     if (!fileStream_.is_open())
     {
         std::cerr << "Log file is not open: " << filename_ << '\n';
