@@ -43,7 +43,7 @@ void ServerConfig::parseServerBlock(const std::string &block)
         }
         // Optionally parse the server block here
         std::string locationBlock = block.substr(bracePos + 1, closeBrace - bracePos - 1);
-        LOG_INFO("Added location: " + locationPath);
+        LOG_TRACE("Added location: " + locationPath);
         locations_.emplace(locationPath, locationBlock);
         pos = closeBrace + 1;
     }
@@ -74,27 +74,27 @@ void ServerConfig::parseDirectives(const std::string &declarations)
                 {
                     throw std::runtime_error("Invalid port number: " + std::to_string(port_));
                 }
-                LOG_INFO("Set port to " + std::to_string(port_));
+                LOG_TRACE("Set port to " + std::to_string(port_));
             }
             else if (directive == "root")
             {
                 root_ = value;
-                LOG_INFO("Set root to " + root_);
+                LOG_TRACE("Set root to " + root_);
             }
             else if (directive == "host")
             {
                 host_ = value;
-                LOG_INFO("Set host to " + host_);
+                LOG_TRACE("Set host to " + host_);
             }
             else if (directive == "cgi_pass")
             {
                 cgi_pass_ = value;
-                LOG_INFO("Set cgi_pass to " + cgi_pass_);
+                LOG_TRACE("Set cgi_pass to " + cgi_pass_);
             }
             else if (directive == "cgi_ext")
             {
                 cgi_ext_ = value;
-                LOG_INFO("Set cgi_ext to " + cgi_ext_);
+                LOG_TRACE("Set cgi_ext to " + cgi_ext_);
             }
             else if (directive == "index")
             {
@@ -103,7 +103,7 @@ void ServerConfig::parseDirectives(const std::string &declarations)
                 while (lineStream >> indexFile)
                 {
                     index_files_.push_back(indexFile);
-                    LOG_INFO("Added index file: " + indexFile);
+                    LOG_TRACE("Added index file: " + indexFile);
                 }
             }
             else if (directive == "error_page")
@@ -111,8 +111,7 @@ void ServerConfig::parseDirectives(const std::string &declarations)
                 int statusCode = std::stoi(value);
                 std::string errorPagePath;
                 lineStream >> errorPagePath;
-                error_page_[statusCode] = errorPagePath;
-                LOG_INFO("Set error_page for status " + std::to_string(statusCode) + " to " + errorPagePath);
+                LOG_TRACE("Set error_page for status " + std::to_string(statusCode) + " to " + errorPagePath);
             }
             else
             {

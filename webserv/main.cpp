@@ -1,8 +1,8 @@
-#include "webserv/log/Log.hpp"
-
 #include <webserv/config/ConfigManager.hpp>
 #include <webserv/config/LocationConfig.hpp>
 #include <webserv/config/ServerConfig.hpp>
+#include <webserv/log/Log.hpp>
+#include <webserv/log/LogLevel.hpp>
 #include <webserv/server/Server.hpp>
 
 #include <iostream>

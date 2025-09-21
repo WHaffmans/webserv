@@ -1,3 +1,4 @@
+#include "webserv/log/LogLevel.hpp"
 #include "webserv/socket/Socket.hpp"
 
 #include <webserv/client/Client.hpp>
@@ -12,7 +13,7 @@ Client::Client(std::unique_ptr<Socket> socket, Server &server, const ServerConfi
 
 Client::~Client()
 {
-    LOG_INFO("Client destructor called for fd: " + std::to_string(client_socket_->getFd()));
+    LOG_DEBUG("Client destructor called for fd: " + std::to_string(client_socket_->getFd()));
     server_.removeFromEpoll(*client_socket_);
 };
 
