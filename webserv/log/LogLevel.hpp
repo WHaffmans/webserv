@@ -6,8 +6,8 @@
 #include <string_view>
 
 // TODO LOG_LEVEL_MAP should not be in the global namespace, but i do think this is the nice way? lets refactor this to
-// the log class or use a seperate namespace
-
+// the log class or use a seperate namespace or put everything in a log namespace except for the class, then everything
+// has Log::
 
 enum class LogLevel : uint8_t
 {
@@ -39,14 +39,13 @@ struct LogLevelMapping
     const char *color;
 };
 
-constexpr std::array<LogLevelMapping, 6> LOG_LEVEL_MAP = {{
-    { .level = LogLevel::LOGLVL_TRACE, .name = "TRACE", .color = LogColors::TRACE_COLOR },
-    { .level = LogLevel::LOGLVL_DEBUG, .name = "DEBUG", .color = LogColors::DEBUG_COLOR },
-    { .level = LogLevel::LOGLVL_INFO,  .name = "INFO",  .color = LogColors::INFO_COLOR },
-    { .level = LogLevel::LOGLVL_WARN,  .name = "WARN",  .color = LogColors::WARN_COLOR },
-    { .level = LogLevel::LOGLVL_ERROR, .name = "ERROR", .color = LogColors::ERROR_COLOR },
-    { .level = LogLevel::LOGLVL_FATAL, .name = "FATAL", .color = LogColors::FATAL_COLOR }
-}};
+constexpr std::array<LogLevelMapping, 6> LOG_LEVEL_MAP = {
+    {{.level = LogLevel::LOGLVL_TRACE, .name = "TRACE", .color = LogColors::TRACE_COLOR},
+     {.level = LogLevel::LOGLVL_DEBUG, .name = "DEBUG", .color = LogColors::DEBUG_COLOR},
+     {.level = LogLevel::LOGLVL_INFO, .name = "INFO", .color = LogColors::INFO_COLOR},
+     {.level = LogLevel::LOGLVL_WARN, .name = "WARN", .color = LogColors::WARN_COLOR},
+     {.level = LogLevel::LOGLVL_ERROR, .name = "ERROR", .color = LogColors::ERROR_COLOR},
+     {.level = LogLevel::LOGLVL_FATAL, .name = "FATAL", .color = LogColors::FATAL_COLOR}}};
 
 inline std::string logLevelToString(LogLevel level)
 {
