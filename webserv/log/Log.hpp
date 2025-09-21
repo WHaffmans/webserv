@@ -9,6 +9,21 @@
 #include <string>
 #include <unordered_map>
 
+
+/*
+TODO ACTUALLY WE USE C++20 SO WE CAN USE std::source_location TO AUTOMATICALLY CAPTURE FILE, LINE, FUNCTION
+
+#include <source_location>
+
+void log(LogLevel level, const std::string& message,
+         std::source_location location = std::source_location::current()) {
+    std::cout << "File: " << location.file_name() << std::endl;
+    std::cout << "Line: " << location.line() << std::endl;
+    std::cout << "Function: " << location.function_name() << std::endl;
+}
+
+No macros needed!!!!
+*/
 #define LOG(level, message) Log::static_log((level), (message), __FILE__, __LINE__, __FUNCTION__, "file", {})
 
 #define LOG_TRACE(message) LOG(LogLevel::LOGLVL_TRACE, message)
