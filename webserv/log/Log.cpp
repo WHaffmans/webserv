@@ -30,7 +30,7 @@ void Log::setStdoutChannel(LogLevel logLevel)
     }
 }
 
-void Log::setFileChannel(const std::string &filename, LogLevel logLevel)
+void Log::setFileChannel(const std::string &filename, std::ios_base::openmode mode, LogLevel logLevel)
 {
     Log &log = getInstance();
     if (log.channels_.contains("file"))
@@ -39,7 +39,7 @@ void Log::setFileChannel(const std::string &filename, LogLevel logLevel)
     }
     try
     {
-        log.channels_.insert({"file", std::unique_ptr<Channel>(new FileChannel(filename, logLevel))});
+        log.channels_.insert({"file", std::unique_ptr<Channel>(new FileChannel(filename, mode, logLevel))});
     }
     catch (const std::exception &e)
     {

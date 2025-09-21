@@ -16,8 +16,9 @@ int main(int argc, char **argv)
         std::cerr << "Usage: " << argv[0] << " <config_file_path>\n"; // NOLINT
         return 1;
     }
-    Log::setFileChannel("webserv.log", LogLevel::LOGLVL_WARN);
-    Log::setStdoutChannel(LogLevel::LOGLVL_TRACE);
+    Log::setFileChannel("webserv.log", std::ios_base::app, LogLevel::LOGLVL_TRACE);
+    Log::setStdoutChannel(LogLevel::LOGLVL_INFO);
+    LOG_INFO("\n======================\nStarting webserv...\n======================\n");
     ConfigManager::getInstance().init(argv[1]); // NOLINT
     Server server(ConfigManager::getInstance());
     server.start();

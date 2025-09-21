@@ -28,9 +28,9 @@ class Log
     Log &operator=(const Log &other) = delete;
     Log &&operator=(const Log &&other) = delete;
 
-    static void setFileChannel(const std::string &filename, LogLevel logLevel = LogLevel::LOGLVL_TRACE);
+    static void setFileChannel(const std::string &filename, std::ios_base::openmode mode = std::ios_base::app, LogLevel logLevel = LogLevel::LOGLVL_TRACE);
     static void setStdoutChannel(LogLevel logLevel = LogLevel::LOGLVL_TRACE);
-    
+
     void log(LogLevel level, const std::string &message, const std::string &channel = "stdout",
              const std::map<std::string, std::string> &context = {});
 

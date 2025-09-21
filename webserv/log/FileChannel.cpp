@@ -3,10 +3,11 @@
 #include <webserv/log/FileChannel.hpp>
 
 #include <chrono>
+#include <ios>
 #include <iostream>
 
-FileChannel::FileChannel(const std::string &filename, LogLevel logLevel)
-    : Channel(logLevel), filename_(filename), fileStream_(filename, std::ios::trunc)
+FileChannel::FileChannel(const std::string &filename, std::ios_base::openmode mode, LogLevel logLevel)
+    : Channel(logLevel), filename_(filename), fileStream_(filename, mode)
 {
     if (!fileStream_.is_open())
     {
