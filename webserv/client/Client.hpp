@@ -4,7 +4,7 @@
 
 #include <webserv/config/ServerConfig.hpp>
 #include <webserv/server/Server.hpp>
-
+#include <webserv/http/HttpRequest.hpp>
 #include <memory>
 
 class Server;
@@ -25,11 +25,12 @@ class Client
     [[nodiscard]] std::string getResponse() const;
 
   private:
+    std::unique_ptr<HttpRequest> httpRequest_ = nullptr;
     int parseHeaderforContentLength(const std::string &request);
-    int contentLength_{-1};
-    std::string requestBuffer_;
-    std::string header_;
-    std::string content_;
+    // int contentLength_{-1};
+    // std::string requestBuffer_;
+    // std::string header_;
+    // std::string content_;
     std::unique_ptr<Socket> client_socket_;
     const Server &server_;
     const ServerConfig &server_config_;

@@ -6,8 +6,10 @@
 #include <iostream>
 
 Client::Client(std::unique_ptr<Socket> socket, Server &server, const ServerConfig &server_config)
-    : client_socket_(std::move(socket)), server_(std::ref(server)), server_config_(std::cref(server_config))
+    : client_socket_(std::move(socket)), server_(std::ref(server)), server_config_(std::cref(server_config)), 
+      httpRequest_(std::make_unique<HttpRequest>(&server_config, this))
 {
+
 }
 
 Client::~Client()
@@ -16,23 +18,6 @@ Client::~Client()
     server_.removeFromEpoll(*client_socket_);
 };
 
-int Client::parseHeaderforContentLength(const std::string &request) // NOLINT
-{
-    std::string header = "Content-Length: ";
-    size_t pos = request.find(header);
-    Log::debug("Parsing header for Content-Length...\n" + header);
-    if (pos != std::string::npos)
-    {
-        size_t start = pos + header.length();
-        size_t end = request.find("\r\n", start);
-        if (end != std::string::npos)
-        {
-            std::string lengthStr = request.substr(start, end - start);
-            return std::atoi(lengthStr.c_str());
-        }
-    }
-    return -1; // Not found
-}
 
 void Client::request()
 {
@@ -51,33 +36,15 @@ void Client::request()
     }
 
     buffer[bytesRead] = '\0'; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-    requestBuffer_ += buffer; // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
-    if (header_.empty())
-    {
-        auto headerEnd = requestBuffer_.find("\r\n\r\n");
-        if (headerEnd != std::string::npos)
-        {
-            header_ = requestBuffer_.substr(0, headerEnd + 4);
-            contentLength_ = parseHeaderforContentLength(header_);
-            if (contentLength_ == -1)
-            {
-                Log::info("Received complete request:\n" + requestBuffer_ + "\n=== HEADER FINISHED\n");
-                server_.responseReady(client_socket_->getFd());
-            }
-            requestBuffer_.erase(0, headerEnd + 4);
-            return;
-        }
+    httpRequest_->receiveData(buffer, static_cast<size_t>(bytesRead));
+
+    if(httpRequest_->getState() == HttpRequest::State::Complete) {
+        Log::info("Received complete request:\n" + httpRequest_->getHeaders() + httpRequest_->getBody() + "\n=== FULL REQUEST FINISHED\n");
+        server_.responseReady(client_socket_->getFd());
+        httpRequest_->reset();
     }
-    else
-    {
-        content_ += requestBuffer_;
-        if (content_.size() >= contentLength_)
-        {
-            Log::info("Received complete request:\n" + header_ + content_ + "\n=== FULL REQUEST FINISHED\n");
-            server_.responseReady(client_socket_->getFd());
-            requestBuffer_.clear();
-            contentLength_ = -1;
-        }
+    else {
+        Log::debug("Received partial request:\n" + httpRequest_->getHeaders() + httpRequest_->getBody() + "\n=== PARTIAL REQUEST\n");
     }
 }
 
