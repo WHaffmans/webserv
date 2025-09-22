@@ -68,6 +68,34 @@
             "detail": "Build and run AddressSanitizer version"
         },
         {
+            "label": "Format Code",
+            "type": "shell",
+            "command": "find webserv -name '*.cpp' -o -name '*.hpp' | xargs clang-format -i",
+            "group": "build",
+            "detail": "Format all C++ source and header files using clang-format",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "Check Format",
+            "type": "shell",
+            "command": "find webserv -name '*.cpp' -o -name '*.hpp' | xargs clang-format --dry-run --Werror",
+            "group": "test",
+            "detail": "Check if all files are properly formatted (without modifying them)",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            }
+        },
+        {
             "label": "Clean",
             "type": "shell",
             "command": "make",

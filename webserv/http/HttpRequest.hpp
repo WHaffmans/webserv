@@ -7,6 +7,7 @@
 #include <string>
 
 class Client;
+
 class HttpRequest
 {
   public:

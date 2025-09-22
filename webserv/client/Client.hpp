@@ -3,8 +3,9 @@
 #include "webserv/socket/Socket.hpp"
 
 #include <webserv/config/ServerConfig.hpp>
-#include <webserv/server/Server.hpp>
 #include <webserv/http/HttpRequest.hpp>
+#include <webserv/server/Server.hpp>
+
 #include <memory>
 
 class Server;

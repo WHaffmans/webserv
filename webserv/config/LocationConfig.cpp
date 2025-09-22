@@ -14,6 +14,7 @@ void LocationConfig::parseLocationBlock(const std::string &block)
 {
     parseDirectives(block);
 }
+
 void LocationConfig::parseDirectives(const std::string &declarations)
 {
     std::istringstream stream(declarations);

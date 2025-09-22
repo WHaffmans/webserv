@@ -1,14 +1,15 @@
+#include <webserv/client/Client.hpp>
+#include <webserv/config/ServerConfig.hpp>
+#include <webserv/http/HttpConstants.hpp>
 #include <webserv/http/HttpRequest.hpp>
 #include <webserv/log/Log.hpp>
-#include <webserv/config/ServerConfig.hpp>
-#include <webserv/client/Client.hpp>
-#include <webserv/http/HttpConstants.hpp>
 
 HttpRequest::HttpRequest(const ServerConfig *serverConfig, const Client *client)
     : serverConfig_(serverConfig), client_(client)
 {
     Log::trace("HttpRequest constructor called");
 }
+
 HttpRequest::~HttpRequest()
 {
     Log::trace("HttpRequest destructor called");

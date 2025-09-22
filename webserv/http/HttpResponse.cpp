@@ -1,5 +1,3 @@
 #include <webserv/http/HttpResponse.hpp>
 
-HttpResponse::HttpResponse()
-{
-}
+HttpResponse::HttpResponse() {}

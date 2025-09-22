@@ -4,4 +4,4 @@ class HttpResponse
 {
   public:
     HttpResponse();
-};  
+};

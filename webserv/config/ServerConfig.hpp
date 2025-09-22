@@ -12,16 +12,24 @@ class ServerConfig
     ServerConfig(const std::string &serverBlock);
 
     [[nodiscard]] const std::string &getHost() const { return host_; }
+
     [[nodiscard]] int getPort() const { return port_; }
+
     [[nodiscard]] const std::string &getRoot() const { return root_; }
+
     [[nodiscard]] const std::string &getCgiPass() const { return cgi_pass_; }
+
     [[nodiscard]] const std::string &getCgiExt() const { return cgi_ext_; }
+
     [[nodiscard]] const std::map<int, std::string> &getErrorPages() const { return error_page_; }
+
     [[nodiscard]] const std::vector<std::string> &getIndexFiles() const { return index_files_; }
+
     [[nodiscard]] const LocationConfig &getLocation(const std::string &path) const;
     [[nodiscard]] std::vector<std::string> getLocationPaths() const;
 
     void setServerFD(int fd) { server_fd_ = fd; }
+
     [[nodiscard]] int getServerFD() const { return server_fd_; }
 
   private:

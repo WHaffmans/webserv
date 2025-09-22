@@ -54,6 +54,7 @@ void Socket::listen(int backlog) const
         throw std::runtime_error("Listen failed");
     }
 }
+
 void Socket::bind(const std::string &host, const int port) const
 {
 

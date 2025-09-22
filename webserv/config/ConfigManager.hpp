@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 
-
 class ConfigManager
 {
   public:
@@ -16,7 +15,8 @@ class ConfigManager
 
     void init(const std::string &filePath);
     static ConfigManager &getInstance();
-    const std::vector<ServerConfig> &getServerConfigs() const { return serverConfigs_; }
+
+    [[nodiscard]] const std::vector<ServerConfig> &getServerConfigs() const { return serverConfigs_; }
 
   private:
     bool initialized_;

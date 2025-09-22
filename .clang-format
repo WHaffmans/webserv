@@ -36,3 +36,6 @@ AllowShortIfStatementsOnASingleLine: true
 AllowShortLoopsOnASingleLine: true
 AllowShortBlocksOnASingleLine: Empty
 AllowShortCaseLabelsOnASingleLine: true
+
+# Add empty line between function definitions
+SeparateDefinitionBlocks: Always

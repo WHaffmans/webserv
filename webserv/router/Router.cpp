@@ -1,5 +1,3 @@
 #include <webserv/router/Router.hpp>
 
-Router::Router()
-{
-}
+Router::Router() {}
