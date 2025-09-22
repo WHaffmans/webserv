@@ -13,7 +13,7 @@ Client::Client(std::unique_ptr<Socket> socket, Server &server, const ServerConfi
 
 Client::~Client()
 {
-    LOG_DEBUG("Client destructor called for fd: " + std::to_string(client_socket_->getFd()));
+    Log::debug("Client destructor called for fd: " + std::to_string(client_socket_->getFd()));
     server_.removeFromEpoll(*client_socket_);
 };
 
@@ -21,7 +21,7 @@ int Client::parseHeaderforContentLength(const std::string &request) // NOLINT
 {
     std::string header = "Content-Length: ";
     size_t pos = request.find(header);
-    LOG_DEBUG("Parsing header for Content-Length...\n" + header);
+    Log::debug("Parsing header for Content-Length...\n" + header);
     if (pos != std::string::npos)
     {
         size_t start = pos + header.length();
@@ -62,7 +62,7 @@ void Client::request()
             contentLength_ = parseHeaderforContentLength(header_);
             if (contentLength_ == -1)
             {
-                LOG_INFO("Received complete request:\n" + requestBuffer_ + "\n=== HEADER FINISHED\n");
+                Log::info("Received complete request:\n" + requestBuffer_ + "\n=== HEADER FINISHED\n");
                 server_.responseReady(client_socket_->getFd());
             }
             requestBuffer_.erase(0, headerEnd + 4);
@@ -74,7 +74,7 @@ void Client::request()
         content_ += requestBuffer_;
         if (content_.size() >= contentLength_)
         {
-            LOG_INFO("Received complete request:\n" + header_ + content_ + "\n=== FULL REQUEST FINISHED\n");
+            Log::info("Received complete request:\n" + header_ + content_ + "\n=== FULL REQUEST FINISHED\n");
             server_.responseReady(client_socket_->getFd());
             requestBuffer_.clear();
             contentLength_ = -1;
@@ -86,6 +86,6 @@ std::string Client::getResponse() const
 {
     std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 32\r\n\r\nHello, World!";
     response += " Server port " + std::to_string(server_config_.getPort()) + "\r\n";
-    LOG_DEBUG("Sending response:\n" + response);
+    Log::debug("Sending response:\n" + response);
     return response;
 }

@@ -15,7 +15,7 @@ ServerConfig::ServerConfig(std::string const &serverBlock) : port_(80)
 void ServerConfig::parseServerBlock(const std::string &block)
 {
     // Placeholder for actual server block parsing logic
-    LOG_INFO("Parsing server block...");
+    Log::info("Parsing server block...");
 
     // Placeholder for actual file parsing logic
 
@@ -43,7 +43,7 @@ void ServerConfig::parseServerBlock(const std::string &block)
         }
         // Optionally parse the server block here
         std::string locationBlock = block.substr(bracePos + 1, closeBrace - bracePos - 1);
-        LOG_TRACE("Added location: " + locationPath);
+        Log::trace("Added location: " + locationPath);
         locations_.emplace(locationPath, locationBlock);
         pos = closeBrace + 1;
     }
@@ -54,7 +54,7 @@ void ServerConfig::parseServerBlock(const std::string &block)
 
 void ServerConfig::parseDirectives(const std::string &declarations)
 {
-    LOG_INFO("Parsing server directives");
+    Log::info("Parsing server directives");
     std::string line;
     std::istringstream stream(declarations);
     while (std::getline(stream, line))
@@ -74,27 +74,27 @@ void ServerConfig::parseDirectives(const std::string &declarations)
                 {
                     throw std::runtime_error("Invalid port number: " + std::to_string(port_));
                 }
-                LOG_TRACE("Set port to " + std::to_string(port_));
+                Log::trace("Set port to " + std::to_string(port_));
             }
             else if (directive == "root")
             {
                 root_ = value;
-                LOG_TRACE("Set root to " + root_);
+                Log::trace("Set root to " + root_);
             }
             else if (directive == "host")
             {
                 host_ = value;
-                LOG_TRACE("Set host to " + host_);
+                Log::trace("Set host to " + host_);
             }
             else if (directive == "cgi_pass")
             {
                 cgi_pass_ = value;
-                LOG_TRACE("Set cgi_pass to " + cgi_pass_);
+                Log::trace("Set cgi_pass to " + cgi_pass_);
             }
             else if (directive == "cgi_ext")
             {
                 cgi_ext_ = value;
-                LOG_TRACE("Set cgi_ext to " + cgi_ext_);
+                Log::trace("Set cgi_ext to " + cgi_ext_);
             }
             else if (directive == "index")
             {
@@ -103,7 +103,7 @@ void ServerConfig::parseDirectives(const std::string &declarations)
                 while (lineStream >> indexFile)
                 {
                     index_files_.push_back(indexFile);
-                    LOG_TRACE("Added index file: " + indexFile);
+                    Log::trace("Added index file: " + indexFile);
                 }
             }
             else if (directive == "error_page")
@@ -111,11 +111,11 @@ void ServerConfig::parseDirectives(const std::string &declarations)
                 int statusCode = std::stoi(value);
                 std::string errorPagePath;
                 lineStream >> errorPagePath;
-                LOG_TRACE("Set error_page for status " + std::to_string(statusCode) + " to " + errorPagePath);
+                Log::trace("Set error_page for status " + std::to_string(statusCode) + " to " + errorPagePath);
             }
             else
             {
-                LOG_WARN("Unknown directive: " + directive);
+                Log::warning("Unknown directive: " + directive);
             }
         }
     }
@@ -127,7 +127,7 @@ const LocationConfig &ServerConfig::getLocation(const std::string &path) const
     {
         return locations_.at(path);
     }
-    LOG_ERROR("Location not found: " + path);
+    Log::error("Location not found: " + path);
     throw std::runtime_error("Location not found: " + path);
 }
 

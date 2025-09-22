@@ -5,12 +5,12 @@
 #include <chrono>
 #include <filesystem>
 #include <iostream>
+#include <source_location>
 
 Log::Log()
 {
     // get start time
     start_time_ = std::chrono::steady_clock::now();
-    
 }
 
 void Log::setStdoutChannel(LogLevel logLevel)
@@ -53,34 +53,18 @@ Log &Log::getInstance()
     return instance;
 }
 
-void Log::log(LogLevel level, const std::string &message, const std::string &channel,
-              const std::map<std::string, std::string> &context)
+void Log::log(LogLevel level, const std::string &message, const std::map<std::string, std::string> &context,
+              const std::source_location &location)
 {
     for (auto &it : channels_)
     {
-        it.second->log(level, message, context);
-    }
-}
-void Log::log(LogLevel level, const std::string &message, const std::string &file, int line,
-              const std::string &function, const std::string &channel,
-              const std::map<std::string, std::string> &context)
-{
-   for (auto &it : channels_)
-    {
         std::string extendedMessage;
-        extendedMessage += message + " | ";
-        if (!file.empty())
-        {
-            extendedMessage += std::filesystem::path(file).filename().string();
-        }
-        if (line != -1)
-        {
-            extendedMessage += ":" + std::to_string(line);
-        }
-        if (!function.empty())
-        {
-            extendedMessage += " (" + function + ")";
-        }
+        extendedMessage += message + "\n\t| ";
+
+        extendedMessage += std::filesystem::path(location.file_name()).filename().string();
+        extendedMessage += ":" + std::to_string(location.line()) + ":" + std::to_string(location.column());
+        extendedMessage += " (" + std::string(location.function_name()) + ")";
+
         // extendedMessage += " | " + message;
         it.second->log(level, extendedMessage, context);
     }
@@ -94,39 +78,38 @@ int Log::getElapsedTime()
     return static_cast<int>(elapsed);
 }
 
-void Log::static_log(LogLevel level, const std::string &message, const std::string &file, int line,
-                     const std::string &function, const std::string &channel,
-                     const std::map<std::string, std::string> &context)
+void Log::trace(const std::string &message, const std::map<std::string, std::string> &context,
+                const std::source_location &location)
 {
-    getInstance().log(level, message, file, line, function, channel, context);
+    getInstance().log(LogLevel::LOGLVL_TRACE, message, context, location);
 }
 
-void Log::trace(const std::string &message, const std::map<std::string, std::string> &context)
+void Log::debug(const std::string &message, const std::map<std::string, std::string> &context,
+                const std::source_location &location)
 {
-    getInstance().log(LogLevel::LOGLVL_TRACE, message, "stdout", context);
+    getInstance().log(LogLevel::LOGLVL_DEBUG, message, context, location);
 }
 
-void Log::debug(const std::string &message, const std::map<std::string, std::string> &context)
+void Log::info(const std::string &message, const std::map<std::string, std::string> &context,
+               const std::source_location &location)
 {
-    getInstance().log(LogLevel::LOGLVL_DEBUG, message, "stdout", context);
+    getInstance().log(LogLevel::LOGLVL_INFO, message, context, location);
 }
 
-void Log::info(const std::string &message, const std::map<std::string, std::string> &context)
+void Log::warning(const std::string &message, const std::map<std::string, std::string> &context,
+                     const std::source_location &location)
 {
-    getInstance().log(LogLevel::LOGLVL_INFO, message, "stdout", context);
+    getInstance().log(LogLevel::LOGLVL_WARN, message, context, location);
 }
 
-void Log::warning(const std::string &message, const std::map<std::string, std::string> &context)
+void Log::error(const std::string &message, const std::map<std::string, std::string> &context,
+                const std::source_location &location)
 {
-    getInstance().log(LogLevel::LOGLVL_WARN, message, "stdout", context);
+    getInstance().log(LogLevel::LOGLVL_ERROR, message, context, location);
 }
 
-void Log::error(const std::string &message, const std::map<std::string, std::string> &context)
+void Log::fatal(const std::string &message, const std::map<std::string, std::string> &context,
+                const std::source_location &location)
 {
-    getInstance().log(LogLevel::LOGLVL_ERROR, message, "stdout", context);
-}
-
-void Log::fatal(const std::string &message, const std::map<std::string, std::string> &context)
-{
-    getInstance().log(LogLevel::LOGLVL_FATAL, message, "stdout", context);
+    getInstance().log(LogLevel::LOGLVL_FATAL, message, context, location);
 }

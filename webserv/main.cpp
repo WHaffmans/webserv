@@ -18,7 +18,7 @@ int main(int argc, char **argv)
     }
     Log::setFileChannel("webserv.log", std::ios_base::app, LogLevel::LOGLVL_TRACE);
     Log::setStdoutChannel(LogLevel::LOGLVL_INFO);
-    LOG_INFO("\n======================\nStarting webserv...\n======================\n");
+    Log::info("\n======================\nStarting webserv...\n======================\n");
     ConfigManager::getInstance().init(argv[1]); // NOLINT
     Server server(ConfigManager::getInstance());
     server.start();

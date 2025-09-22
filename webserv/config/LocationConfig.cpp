@@ -30,12 +30,12 @@ void LocationConfig::parseDirectives(const std::string &declarations)
             if (directive == "autoindex")
             {
                 autoIndex_ = (value == "on");
-                LOG_INFO("Set autoindex to " + std::string(autoIndex_ ? "on" : "off"));
+                Log::info("Set autoindex to " + std::string(autoIndex_ ? "on" : "off"));
             }
             else if (directive == "index")
             {
                 indexFile_ = value;
-                LOG_INFO("Set index file to " + indexFile_);
+                Log::info("Set index file to " + indexFile_);
             }
             else
             {

@@ -14,7 +14,7 @@ Socket::Socket() : fd_(socket(AF_INET, SOCK_STREAM, 0))
 {
     if (fd_ == -1)
     {
-        LOG_ERROR("Socket creation failed");
+        Log::error("Socket creation failed");
         throw std::runtime_error("Socket creation failed");
     }
     int opt = 1;
@@ -22,7 +22,7 @@ Socket::Socket() : fd_(socket(AF_INET, SOCK_STREAM, 0))
     {
         close(fd_);
         fd_ = -1;
-        LOG_ERROR("setsockopt failed");
+        Log::error("setsockopt failed");
         throw std::runtime_error("setsockopt failed");
     }
     setNonBlocking();
@@ -32,7 +32,7 @@ Socket::Socket(int fd) : fd_(fd) // NOLINT(readability-identifier-naming)
 {
     if (fd_ == -1)
     {
-        LOG_ERROR("Invalid file descriptor");
+        Log::error("Invalid file descriptor");
         throw std::runtime_error("Invalid file descriptor");
     }
     setNonBlocking();
@@ -50,7 +50,7 @@ void Socket::listen(int backlog) const
 {
     if (::listen(fd_, backlog) < 0)
     {
-        LOG_ERROR("Listen failed");
+        Log::error("Listen failed");
         throw std::runtime_error("Listen failed");
     }
 }
@@ -73,7 +73,7 @@ std::unique_ptr<Socket> Socket::accept() const
     int client_fd = ::accept(fd_, nullptr, nullptr);
     if (client_fd < 0)
     {
-        LOG_ERROR("Accept failed");
+        Log::error("Accept failed");
         throw std::runtime_error("Accept failed");
     }
     return std::make_unique<Socket>(client_fd);
@@ -93,7 +93,7 @@ void Socket::setNonBlocking() const
 {
     if (fcntl(fd_, F_SETFL, O_NONBLOCK) < 0)
     {
-        LOG_ERROR("Failed to set non-blocking mode");
+        Log::error("Failed to set non-blocking mode");
         throw std::runtime_error("Failed to set non-blocking mode");
     }
 }

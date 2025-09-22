@@ -22,10 +22,10 @@ void ConfigManager::init(const std::string &filePath)
 {
     if (initialized_)
     {
-        LOG_WARN("ConfigManager is already initialized.");
+        Log::warning("ConfigManager is already initialized.");
         throw std::runtime_error("ConfigManager is already initialized.");
     }
-    LOG_INFO("Initializing ConfigManager with file: " + filePath);
+    Log::info("Initializing ConfigManager with file: " + filePath);
     parseConfigFile(filePath);
     initialized_ = true;
 }
@@ -67,7 +67,7 @@ void removeComments(std::string &str)
 void ConfigManager::parseConfigFile(const std::string &filePath)
 {
     // Placeholder for actual file parsing logic
-    LOG_INFO("Parsing configuration file: " + filePath);
+    Log::info("Parsing configuration file: " + filePath);
     // Implement the parsing logic here
 
     std::ifstream file(filePath);
@@ -108,7 +108,7 @@ void ConfigManager::parseConfigFile(const std::string &filePath)
     }
 
     // parseGlobalDeclarations(globalDeclarations); // Implement this function to handle global config
-    LOG_INFO("Global Declarations...");
+    Log::info("Global Declarations...");
     file.close();
 }
 
