@@ -80,5 +80,5 @@ class Log
          {.level = Log::Level::Error, .name = "ERROR", .color = "\033[31m"},
          {.level = Log::Level::Fatal, .name = "FATAL", .color = "\033[1;31m"}}};
 
-    constexpr static const char* RESET_COLOR = "\033[0m";
+    constexpr static const char *RESET_COLOR = "\033[0m";
 };
