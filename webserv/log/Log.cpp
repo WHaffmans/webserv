@@ -5,6 +5,7 @@
 #include <chrono>
 #include <filesystem>
 #include <iostream>
+#include <memory>
 #include <source_location>
 
 Log::Log()
@@ -22,7 +23,7 @@ void Log::setStdoutChannel(Log::Level logLevel)
     }
     try
     {
-        log.channels_.insert({"stdout", std::unique_ptr<Channel>(new StdoutChannel(logLevel))});
+        log.channels_["stdout"] = std::make_unique<StdoutChannel>(logLevel);
     }
     catch (const std::exception &e)
     {
@@ -39,7 +40,7 @@ void Log::setFileChannel(const std::string &filename, std::ios_base::openmode mo
     }
     try
     {
-        log.channels_.insert({"file", std::unique_ptr<Channel>(new FileChannel(filename, mode, logLevel))});
+        log.channels_["file"] = std::make_unique<FileChannel>(filename, mode, logLevel);
     }
     catch (const std::exception &e)
     {
@@ -135,12 +136,12 @@ const char *Log::logLevelToColor(Log::Level level)
             return mapping.color;
         }
     }
-    return "\033[0m"; // Default to reset
+    return RESET_COLOR; // Default to reset
 }
 
 std::string Log::logLevelToColoredString(Log::Level level)
 {
-    return std::string(Log::logLevelToColor(level)) + Log::logLevelToString(level) + "\033[0m";
+    return std::string(Log::logLevelToColor(level)) + Log::logLevelToString(level) + RESET_COLOR;
 }
 
 Log::Level Log::stringToLogLevel(const std::string &level)

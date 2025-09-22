@@ -1,4 +1,11 @@
 #include <webserv/log/Channel.hpp>
 
+Log::Level Channel::getLogLevel() const
+{
+    return logLevel_;
+}
 
-Channel::Channel(Log::Level logLevel) : logLevel_(logLevel) {}
+void Channel::setLogLevel(Log::Level level)
+{
+    logLevel_ = level;
+}

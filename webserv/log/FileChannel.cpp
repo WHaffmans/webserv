@@ -8,8 +8,9 @@
 #include <iostream>
 
 FileChannel::FileChannel(const std::string &filename, std::ios_base::openmode mode, Log::Level logLevel)
-    : Channel(logLevel), filename_(filename), fileStream_(filename, mode)
+    : filename_(filename), fileStream_(filename, mode)
 {
+    setLogLevel(logLevel);
     if (!fileStream_.is_open())
     {
         std::cerr << "Failed to open log file: " << filename << '\n';
@@ -24,9 +25,10 @@ FileChannel::~FileChannel()
     }
 }
 
-void FileChannel::log(Log::Level &logLevel, const std::string &message, const std::map<std::string, std::string> &context)
+void FileChannel::log(const Log::Level &logLevel, const std::string &message,
+                      const std::map<std::string, std::string> &context)
 {
-    if (logLevel < logLevel_)
+    if (logLevel < getLogLevel())
     {
         return;
     }
@@ -48,11 +50,18 @@ void FileChannel::log(Log::Level &logLevel, const std::string &message, const st
     // Log the context if it exists
     if (!context.empty())
     {
-        fileStream_ << "Context:" << '\n';
+        fileStream_ << "\n\t| Context: {";
+        bool first = true;
         for (const auto &[key, value] : context)
         {
-            fileStream_ << "  " << key << ": " << value << '\n';
+            if (!first)
+            {
+                fileStream_ << ", ";
+            }
+            fileStream_ << key << ": " << value;
+            first = false;
         }
+        fileStream_ << "}\n";
     }
     fileStream_ << std::flush;
 }

@@ -3,19 +3,19 @@
 #include <webserv/log/Channel.hpp>
 #include <webserv/log/Log.hpp>
 
-
 #include <iomanip>
 #include <iostream>
 #include <map>
 
-StdoutChannel::StdoutChannel(Log::Level logLevel) : Channel(logLevel) {}
+StdoutChannel::StdoutChannel(Log::Level logLevel)
+{
+    setLogLevel(logLevel);
+}
 
-StdoutChannel::~StdoutChannel() {}
-
-void StdoutChannel::log(Log::Level &logLevel, const std::string &message,
+void StdoutChannel::log(const Log::Level &logLevel, const std::string &message,
                         const std::map<std::string, std::string> &context)
 {
-    if (logLevel < logLevel_)
+    if (logLevel < getLogLevel())
     {
         return;
     }
@@ -25,12 +25,18 @@ void StdoutChannel::log(Log::Level &logLevel, const std::string &message,
     std::cout << message;
     if (!context.empty())
     {
-        std::cout << " Context: {";
+        std::cout << "\n\t| Context: {";
+        bool first = true;
         for (const auto &[key, value] : context)
         {
-            std::cout << key << ": " << value << ", ";
+            if (!first)
+            {
+                std::cout << ", ";
+            }
+            std::cout << key << ": " << value;
+            first = false;
         }
-        std::cout << "}";
+        std::cout << "}\n";
     }
-    std::cout << "\n";
+    std::cout << "\n" << std::flush;
 }

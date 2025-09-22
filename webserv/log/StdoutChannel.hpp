@@ -8,12 +8,12 @@ class StdoutChannel : public Channel
     StdoutChannel(Log::Level logLevel = Log::Level::Trace);
 
     StdoutChannel(const StdoutChannel &other) = delete;
-    StdoutChannel(const StdoutChannel &&other) = delete;
+    StdoutChannel(StdoutChannel &&other) = delete;
     StdoutChannel &operator=(const StdoutChannel &other) = delete;
-    StdoutChannel &&operator=(const StdoutChannel &&other) = delete;
+    StdoutChannel &operator=(StdoutChannel &&other) = delete;
 
-    ~StdoutChannel();
+    ~StdoutChannel() override = default;
 
-    void log(Log::Level &logLevel, const std::string &message,
+    void log(const Log::Level &logLevel, const std::string &message,
              const std::map<std::string, std::string> &context = {}) override;
 };
