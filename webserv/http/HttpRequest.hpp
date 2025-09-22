@@ -36,6 +36,10 @@ class HttpRequest
 
   private:
     void parseBuffer();
+    [[nodiscard]] bool parseBufferforRequestLine();
+    [[nodiscard]] bool parseBufferforHeaders();
+    [[nodiscard]] bool parseBufferforBody();
+
     void parseContentLength();
     const ServerConfig *serverConfig_;
     const Client *client_;
