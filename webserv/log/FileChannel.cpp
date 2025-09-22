@@ -1,5 +1,3 @@
-
-
 #include <webserv/log/FileChannel.hpp>
 #include <webserv/log/Log.hpp>
 

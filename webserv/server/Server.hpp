@@ -1,9 +1,8 @@
 #pragma once
 
-#include "webserv/config/ServerConfig.hpp"
-
 #include <webserv/client/Client.hpp>
 #include <webserv/config/ConfigManager.hpp>
+#include <webserv/config/ServerConfig.hpp>
 #include <webserv/socket/Socket.hpp>
 
 #include <functional>

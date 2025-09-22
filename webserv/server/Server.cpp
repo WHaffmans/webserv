@@ -1,7 +1,6 @@
-#include "webserv/socket/Socket.hpp"
-
 #include <webserv/log/Log.hpp>
 #include <webserv/server/Server.hpp>
+#include <webserv/socket/Socket.hpp>
 
 #include <cstring> // For memset
 #include <memory>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "webserv/config/ServerConfig.hpp"
+#include <webserv/config/ServerConfig.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -42,6 +42,7 @@ class HttpRequest
     [[nodiscard]] bool parseBufferforBody();
 
     void parseContentLength();
+
     const ServerConfig *serverConfig_;
     const Client *client_;
 

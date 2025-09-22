@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+// TODO remove implementation details from header
 class ServerConfig
 {
   public:

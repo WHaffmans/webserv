@@ -1,7 +1,6 @@
-#include "webserv/log/StdoutChannel.hpp"
-
 #include <webserv/log/Channel.hpp>
 #include <webserv/log/Log.hpp>
+#include <webserv/log/StdoutChannel.hpp>
 
 #include <iomanip>
 #include <iostream>
