@@ -1,7 +1,7 @@
 #pragma once
 
 #include <webserv/log/Channel.hpp>
-#include <webserv/log/LogLevel.hpp>
+
 
 #include <fstream>
 #include <map>
@@ -10,7 +10,7 @@
 class FileChannel : public Channel
 {
   public:
-    FileChannel(const std::string &filename, std::ios_base::openmode mode, LogLevel logLevel = LogLevel::LOGLVL_TRACE);
+    FileChannel(const std::string &filename, std::ios_base::openmode mode, Log::Level logLevel = Log::Level::Trace);
 
     FileChannel(const FileChannel &other) = delete;
     FileChannel(const FileChannel &&other) = delete;
@@ -18,7 +18,7 @@ class FileChannel : public Channel
     FileChannel &&operator=(const FileChannel &&other) = delete;
 
     ~FileChannel();
-    void log(LogLevel &logLevel, const std::string &message,
+    void log(Log::Level &logLevel, const std::string &message,
              const std::map<std::string, std::string> &context = {}) override;
 
   private:

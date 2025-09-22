@@ -5,7 +5,7 @@
 class StdoutChannel : public Channel
 {
   public:
-    StdoutChannel(LogLevel logLevel = LogLevel::LOGLVL_TRACE);
+    StdoutChannel(Log::Level logLevel = Log::Level::Trace);
 
     StdoutChannel(const StdoutChannel &other) = delete;
     StdoutChannel(const StdoutChannel &&other) = delete;
@@ -14,6 +14,6 @@ class StdoutChannel : public Channel
 
     ~StdoutChannel();
 
-    void log(LogLevel &logLevel, const std::string &message,
+    void log(Log::Level &logLevel, const std::string &message,
              const std::map<std::string, std::string> &context = {}) override;
 };

@@ -1,4 +1,3 @@
-#include "webserv/log/LogLevel.hpp"
 #include "webserv/socket/Socket.hpp"
 
 #include <webserv/client/Client.hpp>

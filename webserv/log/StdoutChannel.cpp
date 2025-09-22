@@ -2,17 +2,17 @@
 
 #include <webserv/log/Channel.hpp>
 #include <webserv/log/Log.hpp>
-#include <webserv/log/LogLevel.hpp>
+
 
 #include <iomanip>
 #include <iostream>
 #include <map>
 
-StdoutChannel::StdoutChannel(LogLevel logLevel) : Channel(logLevel) {}
+StdoutChannel::StdoutChannel(Log::Level logLevel) : Channel(logLevel) {}
 
 StdoutChannel::~StdoutChannel() {}
 
-void StdoutChannel::log(LogLevel &logLevel, const std::string &message,
+void StdoutChannel::log(Log::Level &logLevel, const std::string &message,
                         const std::map<std::string, std::string> &context)
 {
     if (logLevel < logLevel_)
@@ -20,7 +20,7 @@ void StdoutChannel::log(LogLevel &logLevel, const std::string &message,
         return;
     }
     std::cout << "[" << std::setw(3) << std::setfill('0') << Log::getElapsedTime() << "] ";
-    std::string prefix = "[" + logLevelToColoredString(logLevel) + "] ";
+    std::string prefix = "[" + Log::logLevelToColoredString(logLevel) + "] ";
     std::cout << prefix;
     std::cout << message;
     if (!context.empty())
