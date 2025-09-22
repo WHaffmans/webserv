@@ -1,5 +1,8 @@
 #include <webserv/http/HttpRequest.hpp>
 #include <webserv/log/Log.hpp>
+#include <webserv/config/ServerConfig.hpp>
+#include <webserv/client/Client.hpp>
+#include <webserv/http/HttpConstants.hpp>
 
 HttpRequest::HttpRequest(const ServerConfig *serverConfig, const Client *client)
     : serverConfig_(serverConfig), client_(client)
@@ -42,15 +45,15 @@ void HttpRequest::receiveData(const char *data, size_t length)
 void HttpRequest::parseContentLength()
 {
     // Parse headers to find Content-Length
-    size_t pos = headers_.find("Content-Length:");
+    size_t pos = headers_.find(Http::Header::CONTENT_LENGTH);
     if (pos != std::string::npos)
     {
-        pos += 15;
+        pos += Http::Header::CONTENT_LENGTH.size() + Http::Protocol::HEADER_SEPARATOR.size();
         while (pos < headers_.size() && (headers_[pos] == ' ' || headers_[pos] == '\t'))
         {
             ++pos; // Skip whitespace
         }
-        size_t endPos = headers_.find("\r\n", pos);
+        size_t endPos = headers_.find(Http::Protocol::CRLF, pos);
         std::string contentLengthValue = headers_.substr(pos, endPos - pos);
         contentLength_ = std::stoul(contentLengthValue);
     }
@@ -94,14 +97,14 @@ void HttpRequest::parseBuffer()
 bool HttpRequest::parseBufferforRequestLine()
 {
     Log::trace("HttpRequest::parseBufferforRequestLine() called");
-    size_t pos = buffer_.find("\r\n");
+    size_t pos = buffer_.find(Http::Protocol::CRLF);
     if (pos == std::string::npos)
     {
         Log::debug("HttpRequest::parseBuffer() in state RequestLine waiting for more data");
         return false; // Wait for more data
     }
     requestLine_ = buffer_.substr(0, pos);
-    buffer_.erase(0, pos + 2);
+    buffer_.erase(0, pos + Http::Protocol::CRLF.size());
     state_ = State::Headers;
 
     return true;
@@ -110,14 +113,14 @@ bool HttpRequest::parseBufferforRequestLine()
 bool HttpRequest::parseBufferforHeaders()
 {
     Log::trace("HttpRequest::parseBufferforHeaders() called");
-    size_t pos = buffer_.find("\r\n\r\n");
+    size_t pos = buffer_.find(Http::Protocol::DOUBLE_CRLF);
     if (pos == std::string::npos)
     {
         Log::debug("HttpRequest::parseBuffer() in state Headers waiting for more data");
         return false; // Wait for more data
     }
-    headers_ = buffer_.substr(0, pos + 2); // Include the last \r\n
-    buffer_.erase(0, pos + 4);
+    headers_ = buffer_.substr(0, pos + Http::Protocol::CRLF.size()); // Include the last \r\n
+    buffer_.erase(0, pos + Http::Protocol::DOUBLE_CRLF.size());
     parseContentLength();
 
     if (contentLength_ > 0)
