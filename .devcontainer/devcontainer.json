@@ -1,0 +1,78 @@
+{
+    "name": "C++ Development Container",
+    "dockerFile": "Dockerfile",
+    
+    // Configure tool-specific properties
+    "customizations": {
+        "vscode": {
+            // Essential C++ development extensions
+            "extensions": [
+                "ms-vscode.cpptools-extension-pack",
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-themes", 
+                "ms-vscode.cmake-tools",
+                "xaver.clang-format",
+                "usernamehw.errorlens",
+                "llvm-vs-code-extensions.vscode-clangd",
+                "ms-vscode.hexeditor",
+                "eamodio.gitlens",
+                "ms-vscode-remote.remote-containers"
+            ],
+            
+            // Container-specific VS Code settings
+            "settings": {
+                "C_Cpp.default.compilerPath": "/usr/bin/clang++",
+                "C_Cpp.default.cStandard": "c17",
+                "C_Cpp.default.cppStandard": "c++20",
+                "C_Cpp.default.intelliSenseMode": "linux-clang-x64",
+                "cmake.configureOnOpen": false,
+                "clang-format.executable": "/usr/bin/clang-format",
+                "editor.formatOnSave": true,
+                "[cpp]": {
+                    "editor.defaultFormatter": "xaver.clang-format"
+                },
+                "[c]": {
+                    "editor.defaultFormatter": "xaver.clang-format"  
+                },
+                "files.associations": {
+                    "*.hpp": "cpp",
+                    "*.tpp": "cpp"
+                }
+            }
+        }
+    },
+
+    // Container configuration
+    "workspaceFolder": "/workspace",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+    
+    // Development user setup
+    "remoteUser": "vscode",
+    
+    // Container lifecycle hooks
+    "postCreateCommand": "echo 'Container ready for C++ development!'",
+    
+    // Port forwarding for web server testing
+    "forwardPorts": [8080, 3000],
+    "portsAttributes": {
+        "8080": {
+            "label": "WebServ Server",
+            "onAutoForward": "notify"
+        },
+        "3000": {
+            "label": "Development Server", 
+            "onAutoForward": "silent"
+        }
+    },
+    
+    // Container features
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {},
+        "ghcr.io/devcontainers/features/github-cli:1": {}
+    },
+
+    // Mount points for better performance
+    "mounts": [
+        "source=webserv-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+    ]
+}
