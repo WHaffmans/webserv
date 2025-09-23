@@ -36,15 +36,23 @@ void Client::request()
 
     if (httpRequest_->getState() == HttpRequest::State::Complete)
     {
-        Log::info("Received complete request:\n" + httpRequest_->getHeaders() + httpRequest_->getBody() +
-                  "\n=== FULL REQUEST FINISHED\n");
+        Log::info("Received complete request", {
+                                                   {"request_method", httpRequest_->getMethod()},
+                                                   {"request_target", httpRequest_->getTarget()},
+                                                   {"http_version", httpRequest_->getHttpVersion()},
+                                                   {"headers", httpRequest_->getHeaders().toString()},
+                                                   {"body", httpRequest_->getBody()},
+                                               });
         server_.responseReady(client_socket_->getFd());
         httpRequest_->reset();
     }
     else
     {
-        Log::debug("Received partial request:\n" + httpRequest_->getHeaders() + httpRequest_->getBody() +
-                   "\n=== PARTIAL REQUEST\n");
+        Log::debug("Received partial request",
+                   {
+                       {"current_state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
+                       {"buffer_length", std::to_string(bytesRead)},
+                   });
     }
 }
 
