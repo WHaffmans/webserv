@@ -47,20 +47,6 @@ void FileChannel::log(const Log::Level &logLevel, const std::string &message,
                 << "[" << Log::logLevelToString(logLevel) << "] " << message << '\n';
 
     // Log the context if it exists
-    if (!context.empty())
-    {
-        fileStream_ << "\n\t| Context: {";
-        bool first = true;
-        for (const auto &[key, value] : context)
-        {
-            if (!first)
-            {
-                fileStream_ << ", ";
-            }
-            fileStream_ << key << ": " << value;
-            first = false;
-        }
-        fileStream_ << "}\n";
-    }
+    fileStream_ << printContext(context);
     fileStream_ << std::flush;
 }

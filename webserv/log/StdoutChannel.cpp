@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <iostream>
 #include <map>
+#include <ostream>
 
 StdoutChannel::StdoutChannel(Log::Level logLevel)
 {
@@ -18,24 +19,11 @@ void StdoutChannel::log(const Log::Level &logLevel, const std::string &message,
     {
         return;
     }
-    std::cout << "[" << std::setw(3) << std::setfill('0') << Log::getElapsedTime() << "] ";
+    std::ostream &out = (logLevel >= Log::Level::Warn) ? std::cerr : std::cout;
+    out << "[" << std::setw(3) << std::setfill('0') << Log::getElapsedTime() << "] ";
     std::string prefix = "[" + Log::logLevelToColoredString(logLevel) + "] ";
-    std::cout << prefix;
-    std::cout << message;
-    if (!context.empty())
-    {
-        std::cout << "\n\t| Context: {";
-        bool first = true;
-        for (const auto &[key, value] : context)
-        {
-            if (!first)
-            {
-                std::cout << ", ";
-            }
-            std::cout << key << ": " << value;
-            first = false;
-        }
-        std::cout << "}\n";
-    }
-    std::cout << "\n" << std::flush;
+    out << prefix;
+    out << message << '\n';
+    out << printContext(context);
+    out << std::flush;
 }

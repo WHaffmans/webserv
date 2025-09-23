@@ -19,6 +19,7 @@ class Channel
 
   protected:
     [[nodiscard]] Log::Level getLogLevel() const;
+    [[nodiscard]] static std::string printContext(const std::map<std::string, std::string> &context);
     void setLogLevel(Log::Level level);
 
   private:
