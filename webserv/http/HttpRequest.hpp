@@ -1,5 +1,7 @@
 #pragma once
 
+#include "webserv/http/HttpHeaders.hpp"
+
 #include <webserv/config/ServerConfig.hpp>
 
 #include <cstddef>
@@ -16,6 +18,7 @@ class HttpRequest
         RequestLine,
         Headers,
         Body,
+        Chunked,
         Complete
     };
 
@@ -28,9 +31,12 @@ class HttpRequest
     ~HttpRequest();
 
     [[nodiscard]] State getState() const;
-    [[nodiscard]] const std::string &getHeaders() const;
+    [[nodiscard]] const HttpHeaders &getHeaders() const;
     [[nodiscard]] const std::string &getBody() const;
-    [[nodiscard]] size_t getContentLength() const;
+
+    [[nodiscard]] const std::string &getMethod() const { return method_; }
+    [[nodiscard]] const std::string &getTarget() const { return target_; }
+    [[nodiscard]] const std::string &getHttpVersion() const { return httpVersion_; }
 
     void receiveData(const char *data, size_t length);
     void reset();
@@ -39,7 +45,9 @@ class HttpRequest
     void parseBuffer();
     [[nodiscard]] bool parseBufferforRequestLine();
     [[nodiscard]] bool parseBufferforHeaders();
+    [[nodiscard]] bool parseHeaderLine();
     [[nodiscard]] bool parseBufferforBody();
+    [[nodiscard]] bool parseBufferforChunkedBody();
 
     void parseContentLength();
 
@@ -48,10 +56,14 @@ class HttpRequest
 
     State state_ = State::RequestLine;
 
-    std::string buffer_;
+    HttpHeaders headers_;
 
-    std::string requestLine_;
-    std::string headers_;
+    std::string buffer_;
     std::string body_;
-    size_t contentLength_ = 0;
+    std::string method_;
+    std::string target_;
+    std::string httpVersion_;
+    // std::string requestLine_;
+    // std::string headers_;
+    // size_t contentLength_ = 0;
 };

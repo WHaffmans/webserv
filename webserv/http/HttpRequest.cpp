@@ -4,24 +4,27 @@
 #include <webserv/http/HttpRequest.hpp>
 #include <webserv/log/Log.hpp>
 
+#include <sstream>
+#include <vector>
+
 HttpRequest::HttpRequest(const ServerConfig *serverConfig, const Client *client)
     : serverConfig_(serverConfig), client_(client)
 {
-    Log::trace("HttpRequest constructor called");
+    Log::trace(LOCATION);
 }
 
 HttpRequest::~HttpRequest()
 {
-    Log::trace("HttpRequest destructor called");
+    Log::trace(LOCATION);
 }
 
 HttpRequest::State HttpRequest::getState() const
 {
-    Log::trace("HttpRequest::getState() called");
+    Log::trace(LOCATION);
     return state_;
 }
 
-const std::string &HttpRequest::getHeaders() const
+const HttpHeaders &HttpRequest::getHeaders() const
 {
     return headers_;
 }
@@ -31,37 +34,11 @@ const std::string &HttpRequest::getBody() const
     return body_;
 }
 
-size_t HttpRequest::getContentLength() const
-{
-    return contentLength_;
-}
-
 void HttpRequest::receiveData(const char *data, size_t length)
 {
-    Log::trace("HttpRequest::receiveData() called");
+    Log::trace(LOCATION);
     buffer_.append(data, length);
     parseBuffer();
-}
-
-void HttpRequest::parseContentLength()
-{
-    // Parse headers to find Content-Length
-    size_t pos = headers_.find(Http::Header::CONTENT_LENGTH);
-    if (pos != std::string::npos)
-    {
-        pos += Http::Header::CONTENT_LENGTH.size() + Http::Protocol::HEADER_SEPARATOR.size();
-        while (pos < headers_.size() && (headers_[pos] == ' ' || headers_[pos] == '\t'))
-        {
-            ++pos; // Skip whitespace
-        }
-        size_t endPos = headers_.find(Http::Protocol::CRLF, pos);
-        std::string contentLengthValue = headers_.substr(pos, endPos - pos);
-        contentLength_ = std::stoul(contentLengthValue);
-    }
-    else
-    {
-        contentLength_ = 0; // No body expected
-    }
 }
 
 void HttpRequest::parseBuffer()
@@ -88,6 +65,12 @@ void HttpRequest::parseBuffer()
                 return; // Wait for more data
             }
             break;
+        case State::Chunked:
+            if (!parseBufferforChunkedBody())
+            {
+                return; // Wait for more data
+            }
+            break;
         case State::Complete:
             Log::debug("HttpRequest::parseBuffer() request is complete");
             return; // Request is complete
@@ -97,57 +80,125 @@ void HttpRequest::parseBuffer()
 
 bool HttpRequest::parseBufferforRequestLine()
 {
-    Log::trace("HttpRequest::parseBufferforRequestLine() called");
+    Log::trace(LOCATION);
     size_t pos = buffer_.find(Http::Protocol::CRLF);
     if (pos == std::string::npos)
     {
-        Log::debug("HttpRequest::parseBuffer() in state RequestLine waiting for more data");
-        return false; // Wait for more data
+        Log::debug("RequestLine waiting for more data : " + LOCATION);
+        return false;
     }
-    requestLine_ = buffer_.substr(0, pos);
+    std::string requestLine_ = buffer_.substr(0, pos);
+
     buffer_.erase(0, pos + Http::Protocol::CRLF.size());
     state_ = State::Headers;
 
+    std::vector<std::string> parts;
+    std::string part;
+    std::stringstream ss(requestLine_);
+    while (ss >> part)
+    {
+        parts.push_back(part);
+    }
+    if (parts.size() != 3)
+    {
+        Log::warning("Invalid request line: " + requestLine_);
+        state_ = State::Complete; // Mark as complete to avoid further processing
+        return true;
+    }
+    method_ = parts[0];
+    target_ = parts[1];
+    httpVersion_ = parts[2];
+    Log::debug("Parsed Request Line: Method=" + method_ + " Target=" + target_ + " Version=" + httpVersion_);
     return true;
 }
 
 bool HttpRequest::parseBufferforHeaders()
 {
-    Log::trace("HttpRequest::parseBufferforHeaders() called");
+    Log::trace(LOCATION);
     size_t pos = buffer_.find(Http::Protocol::DOUBLE_CRLF);
     if (pos == std::string::npos)
     {
-        Log::debug("HttpRequest::parseBuffer() in state Headers waiting for more data");
+        Log::debug("Headers waiting for more data: " + LOCATION);
         return false; // Wait for more data
     }
-    headers_ = buffer_.substr(0, pos + Http::Protocol::CRLF.size()); // Include the last \r\n
+    // headers_ = buffer_.substr(0, pos + Http::Protocol::CRLF.size()); // Include the last \r\n
+    headers_.parse(buffer_.substr(0, pos + Http::Protocol::CRLF.size()));
     buffer_.erase(0, pos + Http::Protocol::DOUBLE_CRLF.size());
-    parseContentLength();
+    // parseContentLength();
 
-    if (contentLength_ > 0)
+    if (this->headers_.getContentLength() > 0)
     {
         state_ = State::Body;
+        return true;
     }
-    else
+    if (this->headers_.has("Transfer-Encoding") && this->headers_.get("Transfer-Encoding") == "chunked")
     {
-        Log::debug("HttpRequest::parseBuffer() in state Headers no body to read");
-        state_ = State::Complete;
-        return false; // No body to read
+        state_ = State::Chunked;
+        return true;
     }
 
+    Log::debug("HttpRequest::parseBuffer() in state Headers no body to read");
+    state_ = State::Complete;
+    return false; // No body to read
+}
+
+bool HttpRequest::parseBufferforChunkedBody()
+{
+    Log::trace(LOCATION);
+    while (true)
+    {
+        size_t pos = buffer_.find(Http::Protocol::CRLF);
+        if (pos == std::string::npos)
+        {
+            Log::debug("Chunked body waiting for more data: " + LOCATION);
+            return false;
+        }
+        std::string chunkSizeStr = buffer_.substr(0, pos);
+        size_t chunkSize = 0;
+        try
+        {
+            chunkSize = std::stoul(chunkSizeStr, nullptr, 16);
+        }
+        catch (const std::exception &e)
+        {
+            Log::warning("Invalid chunk size: " + chunkSizeStr + " (" + e.what() + ")");
+            state_ = State::Complete; // Mark as complete to avoid further processing
+            return true;
+        }
+        if (chunkSize == 0)
+        {
+            state_ = State::Complete; // Last chunk
+            buffer_.erase(0, pos + Http::Protocol::CRLF.size());
+            return true;
+        }
+        // TODO: Copilot added this but I don't understand why it's needed
+        // if (buffer_.size() < pos + Http::Protocol::CRLF.size() + chunkSize + Http::Protocol::CRLF.size())
+        // {
+        //     Log::debug("Chunked body waiting for more data: " + LOCATION);
+        //     return false; // Wait for more data
+        // }
+        body_ += buffer_.substr(pos + Http::Protocol::CRLF.size(), chunkSize);
+        buffer_.erase(0, pos + Http::Protocol::CRLF.size() + chunkSize + Http::Protocol::CRLF.size());
+    }
     return true;
 }
 
 bool HttpRequest::parseBufferforBody()
 {
-    Log::trace("HttpRequest::parseBufferforBody() called");
-    if (buffer_.size() < contentLength_)
+    if (!headers_.getContentLength().has_value())
     {
-        Log::debug("HttpRequest::parseBuffer() in state Body waiting for more data");
+        Log::warning("HttpRequest::parseBuffer() in state Body but no Content-Length header found");
+        state_ = State::Complete;
+        return true;
+    }
+    Log::trace(LOCATION);
+    if (buffer_.size() < *headers_.getContentLength())
+    {
+        Log::debug("Body waiting for more data: " + LOCATION);
         return false; // Wait for more data
     }
-    body_ = buffer_.substr(0, contentLength_);
-    buffer_.erase(0, contentLength_);
+    body_ = buffer_.substr(0, *headers_.getContentLength());
+    buffer_.erase(0, *headers_.getContentLength());
     state_ = State::Complete;
 
     return true;
@@ -155,11 +206,11 @@ bool HttpRequest::parseBufferforBody()
 
 void HttpRequest::reset()
 {
-    Log::trace("HttpRequest::reset() called");
+    Log::trace(LOCATION);
     state_ = State::RequestLine;
     buffer_.clear();
-    requestLine_.clear();
-    headers_.clear();
+    // requestLine_.clear();
+    // headers_.clear();
     body_.clear();
-    contentLength_ = 0;
+    // contentLength_ = 0;
 }
