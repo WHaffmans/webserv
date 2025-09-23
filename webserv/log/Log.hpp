@@ -2,14 +2,31 @@
 
 #include <array>
 #include <chrono>
+#include <cstring>
 #include <map>
 #include <memory>
-#include <source_location>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 
 class Channel; // Forward declaration
+
+constexpr const char *extractFilename(const char *path)
+{
+    const char *filename = path;
+    while (*path != '\0')
+    {
+        if (*path == '/' || *path == '\\')
+        {
+            filename = path + 1; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+        }
+        ++path; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    }
+    return filename;
+}
+
+#define LOCATION                                                                                                       \
+    (std::string(extractFilename(__FILE__)) + ":" + std::to_string(__LINE__) + " (" + std::string(__FUNCTION__) + ")")
 
 class Log
 {
@@ -29,8 +46,7 @@ class Log
     Log &operator=(const Log &other) = delete;
     Log &operator=(Log &&other) = delete;
 
-    void log(Level level, const std::string &message, const std::map<std::string, std::string> &context,
-             const std::source_location &location);
+    void log(Level level, const std::string &message, const std::map<std::string, std::string> &context);
 
     static void setFileChannel(const std::string &filename, std::ios_base::openmode mode = std::ios_base::app,
                                Level logLevel = Level::Trace);
@@ -38,18 +54,12 @@ class Log
 
     static int getElapsedTime();
 
-    static void trace(const std::string &message, const std::map<std::string, std::string> &context = {},
-                      const std::source_location &location = std::source_location::current());
-    static void debug(const std::string &message, const std::map<std::string, std::string> &context = {},
-                      const std::source_location &location = std::source_location::current());
-    static void info(const std::string &message, const std::map<std::string, std::string> &context = {},
-                     const std::source_location &location = std::source_location::current());
-    static void warning(const std::string &message, const std::map<std::string, std::string> &context = {},
-                        const std::source_location &location = std::source_location::current());
-    static void error(const std::string &message, const std::map<std::string, std::string> &context = {},
-                      const std::source_location &location = std::source_location::current());
-    static void fatal(const std::string &message, const std::map<std::string, std::string> &context = {},
-                      const std::source_location &location = std::source_location::current());
+    static void trace(const std::string &message, const std::map<std::string, std::string> &context = {});
+    static void debug(const std::string &message, const std::map<std::string, std::string> &context = {});
+    static void info(const std::string &message, const std::map<std::string, std::string> &context = {});
+    static void warning(const std::string &message, const std::map<std::string, std::string> &context = {});
+    static void error(const std::string &message, const std::map<std::string, std::string> &context = {});
+    static void fatal(const std::string &message, const std::map<std::string, std::string> &context = {});
 
     static std::string logLevelToString(Level level);
     static const char *logLevelToColor(Level level);

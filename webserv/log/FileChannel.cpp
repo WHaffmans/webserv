@@ -4,6 +4,7 @@
 #include <chrono>
 #include <ios>
 #include <iostream>
+#include <iomanip>
 
 FileChannel::FileChannel(const std::string &filename, std::ios_base::openmode mode, Log::Level logLevel)
     : filename_(filename), fileStream_(filename, mode)

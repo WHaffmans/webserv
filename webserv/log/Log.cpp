@@ -6,7 +6,6 @@
 #include <filesystem>
 #include <iostream>
 #include <memory>
-#include <source_location>
 
 Log::Log()
 {
@@ -54,20 +53,12 @@ Log &Log::getInstance()
     return instance;
 }
 
-void Log::log(Log::Level level, const std::string &message, const std::map<std::string, std::string> &context,
-              const std::source_location &location)
-{
+void Log::log(Log::Level level, const std::string &message, const std::map<std::string, std::string> &context)
+{ 
     for (auto &it : channels_)
     {
-        std::string extendedMessage;
-        extendedMessage += message + "\n\t| ";
-
-        extendedMessage += std::filesystem::path(location.file_name()).filename().string();
-        extendedMessage += ":" + std::to_string(location.line()) + ":" + std::to_string(location.column());
-        extendedMessage += " (" + std::string(location.function_name()) + ")";
-
         // extendedMessage += " | " + message;
-        it.second->log(level, extendedMessage, context);
+        it.second->log(level, message, context);
     }
 }
 
@@ -79,40 +70,34 @@ int Log::getElapsedTime()
     return static_cast<int>(elapsed);
 }
 
-void Log::trace(const std::string &message, const std::map<std::string, std::string> &context,
-                const std::source_location &location)
+void Log::trace(const std::string &message, const std::map<std::string, std::string> &context)
 {
-    getInstance().log(Log::Level::Trace, message, context, location);
+    getInstance().log(Log::Level::Trace, message, context);
 }
 
-void Log::debug(const std::string &message, const std::map<std::string, std::string> &context,
-                const std::source_location &location)
+void Log::debug(const std::string &message, const std::map<std::string, std::string> &context)
 {
-    getInstance().log(Log::Level::Debug, message, context, location);
+    getInstance().log(Log::Level::Debug, message, context);
 }
 
-void Log::info(const std::string &message, const std::map<std::string, std::string> &context,
-               const std::source_location &location)
+void Log::info(const std::string &message, const std::map<std::string, std::string> &context)
 {
-    getInstance().log(Log::Level::Info, message, context, location);
+    getInstance().log(Log::Level::Info, message, context);
 }
 
-void Log::warning(const std::string &message, const std::map<std::string, std::string> &context,
-                  const std::source_location &location)
+void Log::warning(const std::string &message, const std::map<std::string, std::string> &context)
 {
-    getInstance().log(Log::Level::Warn, message, context, location);
+    getInstance().log(Log::Level::Warn, message, context);
 }
 
-void Log::error(const std::string &message, const std::map<std::string, std::string> &context,
-                const std::source_location &location)
+void Log::error(const std::string &message, const std::map<std::string, std::string> &context)
 {
-    getInstance().log(Log::Level::Error, message, context, location);
+    getInstance().log(Log::Level::Error, message, context);
 }
 
-void Log::fatal(const std::string &message, const std::map<std::string, std::string> &context,
-                const std::source_location &location)
+void Log::fatal(const std::string &message, const std::map<std::string, std::string> &context)
 {
-    getInstance().log(Log::Level::Fatal, message, context, location);
+    getInstance().log(Log::Level::Fatal, message, context);
 }
 
 std::string Log::logLevelToString(Log::Level level)

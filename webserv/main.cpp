@@ -18,7 +18,7 @@ int main(int argc, char **argv)
     Log::setFileChannel("webserv.log", std::ios_base::app, Log::Level::Trace);
     Log::setStdoutChannel(Log::Level::Trace);
     Log::info("\n======================\nStarting webserv...\n======================\n");
-    Log::warning("Testing context", {{"key1", "value1"}, {"key2", "value2"}});
+    
     ConfigManager::getInstance().init(argv[1]); // NOLINT
     Server server(ConfigManager::getInstance());
     server.start();
