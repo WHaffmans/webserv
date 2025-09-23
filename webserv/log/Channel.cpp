@@ -1,6 +1,7 @@
 #include <webserv/log/Channel.hpp>
-#include <sstream>
+
 #include <iomanip>
+#include <sstream>
 
 Log::Level Channel::getLogLevel() const
 {
@@ -17,21 +18,24 @@ std::string Channel::printContext(const std::map<std::string, std::string> &cont
     std::stringstream ss;
     if (!context.empty())
     {
-        bool first = true;
         for (const auto &[key, value] : context)
         {
-            if (!first)
+            if (value.find('\n') != std::string::npos)
             {
 
-                ss << "\n";
+                ss << "\t| " << std::right << std::setfill(' ') << "\e[1m" << key << "\e[0m" << " : \n";
+                    std::istringstream valueStream(value);
+                    std::string line;
+                    while (std::getline(valueStream, line))
+                    {
+                        ss << std::setw(10) << "\t\t| " << line << "\n";
+                    }
+                continue;
             }
-            ss << "\t| " << std::setw(15) << std::right << std::setfill(' ') << key << " : " << value;
-
-            first = false;
+            ss << "\t| " << std::right << std::setfill(' ') << "\e[1m" << key << "\e[0m" << " : " << value << "\n";
         }
-        ss << "\n\n";
-
+        ss << "\n";
     }
-    
+
     return ss.str();
 }
