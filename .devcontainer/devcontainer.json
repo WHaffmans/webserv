@@ -15,7 +15,6 @@
                 "usernamehw.errorlens",
                 "llvm-vs-code-extensions.vscode-clangd",
                 "ms-vscode.hexeditor",
-                "eamodio.gitlens",
                 "ms-vscode-remote.remote-containers"
             ],
             
@@ -37,7 +36,13 @@
                 "files.associations": {
                     "*.hpp": "cpp",
                     "*.tpp": "cpp"
+                },
+                "vscode" : {
+                    "settings" : {
+                        "remote.SSH.forwardAgent": true
+                    }
                 }
+
             }
         }
     },
@@ -68,7 +73,11 @@
     // Container features
     "features": {
         "ghcr.io/devcontainers/features/git:1": {},
-        "ghcr.io/devcontainers/features/github-cli:1": {}
+        "ghcr.io/devcontainers/features/github-cli:1": {},
+        "ghcr.io/devcontainers/features/sshd:1": {
+            "version": "latest",
+            "forwardPorts": [22]
+        }
     },
 
     // Mount points for better performance

@@ -118,6 +118,14 @@
             "args": ["re"],
             "group": "build",
             "detail": "Full clean and rebuild"
+        },
+        {
+            "label": "Clean All Environments",
+            "type": "shell",
+            "command": "rm",
+            "args": ["-rf", "build", "build-*"],
+            "group": "build",
+            "detail": "Clean build directories from all environments"
         }
     ]
 }

@@ -1,5 +1,11 @@
 # Variables
-BUILD_DIR = build
+# Detect if we're in a dev container or local development
+ifeq ($(shell whoami),vscode)
+    BUILD_DIR = build-container
+else
+    BUILD_DIR = build-local
+endif
+
 CMAKE = cmake
 CMAKE_BUILD = cmake --build
 CMAKE_FLAGS = -DCMAKE_EXPORT_COMPILE_COMMANDS=ON

@@ -1,5 +1,7 @@
 *.o
 *.a
 build
+build-*
 .cache
 webserv.log
+compile_commands.json
