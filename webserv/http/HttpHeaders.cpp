@@ -2,7 +2,6 @@
 
 #include "webserv/config/utils.hpp"
 #include "webserv/http/HttpConstants.hpp"
-#include "webserv/log/Log.hpp"
 
 #include <algorithm>
 
