@@ -29,14 +29,9 @@ class ServerConfig
     [[nodiscard]] const LocationConfig &getLocation(const std::string &path) const;
     [[nodiscard]] std::vector<std::string> getLocationPaths() const;
 
-    void setServerFD(int fd) { server_fd_ = fd; }
-
-    [[nodiscard]] int getServerFD() const { return server_fd_; }
-
   private:
     std::string host_;
     int port_;
-    int server_fd_;
     std::string root_;
     std::string cgi_pass_;
     std::string cgi_ext_;
