@@ -1,6 +1,20 @@
 #include <webserv/config/utils.hpp>
 
+#include <stdexcept>
 #include <string>
+
+namespace utils
+{
+size_t stoul(const std::string &str, int base)
+{
+    size_t idx = 0;
+    unsigned long value = std::stoul(str, &idx, base);
+    if (idx != str.length())
+    {
+        throw std::invalid_argument("Invalid characters in number: " + str);
+    }
+    return value;
+}
 
 std::string trim(const std::string &str)
 {
@@ -48,5 +62,6 @@ size_t findCorrespondingClosingBrace(const std::string &str, size_t openPos)
             return i;
         }
     }
-    return std::string::npos; // No matching closing brace found
+    return std::string::npos;
 }
+} // namespace utils
