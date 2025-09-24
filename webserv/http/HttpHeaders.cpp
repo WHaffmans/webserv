@@ -3,6 +3,8 @@
 #include "webserv/config/utils.hpp"
 #include "webserv/http/HttpConstants.hpp"
 
+#include <algorithm>
+
 std::optional<size_t> HttpHeaders::getContentLength() const
 {
     const auto &value = get("Content-Length");
@@ -20,9 +22,12 @@ std::optional<size_t> HttpHeaders::getContentLength() const
     }
 }
 
-void HttpHeaders::add(const std::string &name, const std::string &value)
+void HttpHeaders::add(const std::string &name, const std::string &value) // NOLINT(bugprone-easily-swappable-parameters)
 {
-    headers_[name] = value;
+
+    std::string lower = name;
+    std::ranges::transform(lower, lower.begin(), ::tolower);
+    headers_[lower] = value;
 }
 
 void HttpHeaders::remove(const std::string &name)
