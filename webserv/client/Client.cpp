@@ -42,17 +42,19 @@ void Client::request()
     buffer[bytesRead] = '\0'; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
     httpRequest_->receiveData(buffer, static_cast<size_t>(bytesRead));
 
-    if (httpRequest_->getState() == HttpRequest::State::Complete)
+    if (httpRequest_->getState() == HttpRequest::State::Complete ||
+        httpRequest_->getState() == HttpRequest::State::ParseError)
     {
-        Log::info("Received complete request", {
-                                                   {"request_method", httpRequest_->getMethod()},
-                                                   {"request_target", httpRequest_->getTarget()},
-                                                   {"http_version", httpRequest_->getHttpVersion()},
-                                                   {"headers", httpRequest_->getHeaders().toString()},
-                                                   {"body", httpRequest_->getBody()},
-                                               });
+        Log::info("Received complete request",
+                  {
+                      {"request_method", httpRequest_->getMethod()},
+                      {"request_target", httpRequest_->getTarget()},
+                      {"http_version", httpRequest_->getHttpVersion()},
+                      {"headers", httpRequest_->getHeaders().toString()},
+                      {"body", httpRequest_->getBody()},
+                      {"state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
+                  });
         server_.responseReady(client_socket_->getFd());
-        httpRequest_->reset();
     }
     else
     {
@@ -66,8 +68,20 @@ void Client::request()
 
 std::string Client::getResponse() const
 {
-    std::string response = "HTTP/1.1 200 OK\r\nContent-Length: 32\r\n\r\nHello, World!";
-    response += " Server port " + std::to_string(server_config_.getPort()) + "\r\n";
+    Log::trace(LOCATION);
+    std::string response = "HTTP/1.1 ";
+    if (httpRequest_->getState() == HttpRequest::State::ParseError)
+    {
+        response += "400 Bad Request\r\n";
+    }
+    else
+    {
+        response += "200 OK\r\n";
+    }
+    // further validation can be added here
+    response += "Content-Length: 18\r\n\r\n";
+    response += "Server port " + std::to_string(server_config_.getPort()) + "\r\n";
+
     Log::debug("Sending response:\n" + response);
     return response;
 }

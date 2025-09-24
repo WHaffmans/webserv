@@ -16,20 +16,7 @@ std::optional<size_t> HttpHeaders::getContentLength() const
     {
         return std::nullopt;
     }
-    if (value.find_first_not_of("0123456789") != std::string::npos)
-    {
-        Log::warning("Non-numeric Content-Length header value: " + value);
-        return std::nullopt;
-    }
-    try
-    {
-        return utils::stoul(value);
-    }
-    catch (...)
-    {
-        Log::warning("Invalid Content-Length header value: " + value);
-        return std::nullopt;
-    }
+    return utils::stoul(value);
 }
 
 std::optional<std::string> HttpHeaders::getContentType() const

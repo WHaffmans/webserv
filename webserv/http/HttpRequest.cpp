@@ -1,3 +1,5 @@
+#include "webserv/config/utils.hpp"
+
 #include <webserv/http/HttpConstants.hpp> // for CRLF, DOUBLE_CRLF
 #include <webserv/http/HttpRequest.hpp>
 #include <webserv/log/Log.hpp> // for Log, LOCATION
@@ -47,36 +49,45 @@ void HttpRequest::parseBuffer()
 {
     while (true)
     {
-        switch (state_)
+        try
         {
-        case State::RequestLine:
-            if (!parseBufferforRequestLine())
+            switch (state_)
             {
-                return; // Wait for more data
+            case State::RequestLine:
+                if (!parseBufferforRequestLine())
+                {
+                    return; // Wait for more data
+                }
+                break;
+            case State::Headers:
+                if (!parseBufferforHeaders())
+                {
+                    return; // Wait for more data
+                }
+                break;
+            case State::Body:
+                if (!parseBufferforBody())
+                {
+                    return; // Wait for more data
+                }
+                break;
+            case State::Chunked:
+                if (!parseBufferforChunkedBody())
+                {
+                    return; // Wait for more data
+                }
+                break;
+            case State::Complete:
+                Log::debug("HttpRequest::parseBuffer() request is complete");
+                return; // Request is complete
+            case State::ParseError: Log::warning("Parse error occurred, stopping further processing"); return;
             }
-            break;
-        case State::Headers:
-            if (!parseBufferforHeaders())
-            {
-                return; // Wait for more data
-            }
-            break;
-        case State::Body:
-            if (!parseBufferforBody())
-            {
-                return; // Wait for more data
-            }
-            break;
-        case State::Chunked:
-            if (!parseBufferforChunkedBody())
-            {
-                return; // Wait for more data
-            }
-            break;
-        case State::Complete:
-            Log::debug("HttpRequest::parseBuffer() request is complete");
-            return; // Request is complete
-        case State::ParseError: Log::warning("Parse error occurred, stopping further processing"); return;
+        }
+        catch (...)
+        {
+            Log::error("Exception during parsing, marking request as ParseError");
+            state_ = State::ParseError;
+            return;
         }
     }
 }
@@ -124,10 +135,8 @@ bool HttpRequest::parseBufferforHeaders()
         Log::debug("Headers waiting for more data: " + LOCATION);
         return false; // Wait for more data
     }
-    // headers_ = buffer_.substr(0, pos + Http::Protocol::CRLF.size()); // Include the last \r\n
     headers_.parse(buffer_.substr(0, pos + Http::Protocol::CRLF.size()));
     buffer_.erase(0, pos + Http::Protocol::DOUBLE_CRLF.size());
-    // parseContentLength();
 
     if (this->headers_.getContentLength().value_or(0) > 0)
     {
@@ -156,17 +165,9 @@ bool HttpRequest::parseBufferforChunkedBody()
             return false;
         }
         std::string chunkSizeStr = buffer_.substr(0, pos);
-        size_t chunkSize = 0;
-        try
-        {
-            chunkSize = std::stoul(chunkSizeStr, nullptr, 16);
-        }
-        catch (const std::exception &e)
-        {
-            Log::warning("Invalid chunk size: " + chunkSizeStr + " (" + e.what() + ")");
-            state_ = State::ParseError; // Mark as complete to avoid further processing
-            return true;
-        }
+        Log::debug("Chunk size string: " + chunkSizeStr);
+        size_t chunkSize = utils::stoul(chunkSizeStr, 16);
+        Log::warning("Invalid chunk size: " + chunkSizeStr);
         if (chunkSize == 0)
         {
             state_ = State::Complete; // Last chunk

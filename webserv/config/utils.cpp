@@ -1,3 +1,4 @@
+
 #include <webserv/config/utils.hpp>
 
 #include <stdexcept>
@@ -7,11 +8,15 @@ namespace utils
 {
 size_t stoul(const std::string &str, int base)
 {
+    if (str.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos)
+    {
+        throw std::invalid_argument("Invalid number: " + str);
+    }
     size_t idx = 0;
     unsigned long value = std::stoul(str, &idx, base);
     if (idx != str.length())
     {
-        throw std::invalid_argument("Invalid characters in number: " + str);
+        throw std::invalid_argument("Invalid number with extra characters: " + str);
     }
     return value;
 }
