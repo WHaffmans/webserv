@@ -1,14 +1,14 @@
 #pragma once
 
-#include "webserv/http/HttpHeaders.hpp"
-
 #include <webserv/config/ServerConfig.hpp>
+#include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
 
-#include <cstddef>
-#include <cstdint>
-#include <string>
+#include <cstddef> // for size_t
+#include <cstdint> // for uint8_t
+#include <string>  // for string, basic_string
 
 class Client;
+class ServerConfig;
 
 class HttpRequest
 {
@@ -36,7 +36,9 @@ class HttpRequest
     [[nodiscard]] const std::string &getBody() const;
 
     [[nodiscard]] const std::string &getMethod() const { return method_; }
+
     [[nodiscard]] const std::string &getTarget() const { return target_; }
+
     [[nodiscard]] const std::string &getHttpVersion() const { return httpVersion_; }
 
     void receiveData(const char *data, size_t length);

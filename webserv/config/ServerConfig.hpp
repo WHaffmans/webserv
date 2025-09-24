@@ -1,7 +1,6 @@
 #pragma once
 
 #include <webserv/config/LocationConfig.hpp>
-
 #include <map>
 #include <string>
 #include <vector>

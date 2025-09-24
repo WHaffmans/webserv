@@ -1,17 +1,20 @@
-#include <webserv/log/Log.hpp>
+#include <webserv/log/Log.hpp>               // for Log
 #include <webserv/server/Server.hpp>
-#include <webserv/socket/Socket.hpp>
-
-#include <cstring> // For memset
-#include <memory>
-#include <vector>
-
-#include <arpa/inet.h>  // For inet_addr
-#include <fcntl.h>      // For fcntl()
-#include <netinet/in.h> // For sockaddr_in
-#include <sys/epoll.h>
-#include <sys/socket.h> // For socket functions
-#include <unistd.h>     // For close()
+#include <webserv/socket/Socket.hpp>         // for Socket
+#include <sys/epoll.h>                       // for epoll_event, epoll_ctl, EPOLLIN, EPOLLOUT, epoll_create1, epoll_wait, EPOLLERR, EPOLLHUP, EPOLL_CTL_ADD, EPOLL_CTL_DEL, EPOLL_CTL_MOD
+#include <sys/socket.h>                      // for send, SOMAXCONN
+#include <unistd.h>                          // for close
+#include <errno.h>                           // for errno
+#include <sys/types.h>                       // for ssize_t
+#include <webserv/client/Client.hpp>         // for Client
+#include <webserv/config/ConfigManager.hpp>  // for ConfigManager
+#include <cstring>                           // for strerror, strlen
+#include <memory>                            // for unique_ptr, allocator, make_unique
+#include <vector>                            // for vector
+#include <exception>                         // for exception
+#include <stdexcept>                         // for runtime_error
+#include <string>                            // for operator+, to_string, basic_string, char_traits, string
+#include <utility>                           // for move, pair
 
 Server::Server(const ConfigManager &configManager) : epoll_fd_(epoll_create1(0)), configManager_(configManager)
 {

@@ -1,7 +1,6 @@
 #include <webserv/config/LocationConfig.hpp>
 #include <webserv/config/utils.hpp>
 #include <webserv/log/Log.hpp>
-
 #include <sstream>
 #include <string>
 

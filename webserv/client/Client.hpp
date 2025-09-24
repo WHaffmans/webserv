@@ -1,14 +1,17 @@
 #pragma once
 
-#include "webserv/socket/Socket.hpp"
-
-#include <webserv/config/ServerConfig.hpp>
-#include <webserv/http/HttpRequest.hpp>
+#include <webserv/config/ServerConfig.hpp> // for ServerConfig
+#include <webserv/http/HttpRequest.hpp>    // for HttpRequest
 #include <webserv/server/Server.hpp>
+#include <webserv/socket/Socket.hpp>
 
-#include <memory>
+#include <memory> // for unique_ptr
+#include <string> // for string
+
+#include <stddef.h> // for size_t
 
 class Server;
+class Socket;
 
 class Client
 {

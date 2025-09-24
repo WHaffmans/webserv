@@ -1,9 +1,11 @@
-#include "webserv/http/HttpHeaders.hpp"
+#include <webserv/config/utils.hpp>       // for trim
+#include <webserv/http/HttpConstants.hpp> // for CRLF
+#include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
 
-#include "webserv/config/utils.hpp"
-#include "webserv/http/HttpConstants.hpp"
+#include <algorithm> // for __transform_fn, transform
+#include <utility>   // for pair
 
-#include <algorithm>
+#include <ctype.h> // for tolower
 
 std::optional<size_t> HttpHeaders::getContentLength() const
 {

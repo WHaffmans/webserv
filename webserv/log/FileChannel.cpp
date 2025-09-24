@@ -1,10 +1,11 @@
 #include <webserv/log/FileChannel.hpp>
-#include <webserv/log/Log.hpp>
+#include <webserv/log/Log.hpp>  // for Log
+#include <chrono>               // for system_clock
+#include <iostream>             // for cerr
+#include <iomanip>              // for operator<<, put_time
+#include <ctime>                // for localtime, tm
 
-#include <chrono>
-#include <ios>
-#include <iostream>
-#include <iomanip>
+struct tm;
 
 FileChannel::FileChannel(const std::string &filename, std::ios_base::openmode mode, Log::Level logLevel)
     : filename_(filename), fileStream_(filename, mode)

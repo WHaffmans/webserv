@@ -1,11 +1,12 @@
-#include <webserv/client/Client.hpp>
-#include <webserv/config/ServerConfig.hpp>
-#include <webserv/http/HttpConstants.hpp>
+#include <webserv/http/HttpConstants.hpp>  // for CRLF, DOUBLE_CRLF
 #include <webserv/http/HttpRequest.hpp>
-#include <webserv/log/Log.hpp>
+#include <webserv/log/Log.hpp>             // for Log, LOCATION
+#include <sstream>                         // for basic_stringstream, basic_istream, stringstream
+#include <vector>                          // for vector
+#include <exception>                       // for exception
+#include <optional>                        // for optional, operator>
 
-#include <sstream>
-#include <vector>
+class ServerConfig;
 
 HttpRequest::HttpRequest(const ServerConfig *serverConfig, const Client *client)
     : serverConfig_(serverConfig), client_(client)

@@ -2,14 +2,18 @@
 
 #include <webserv/client/Client.hpp>
 #include <webserv/config/ConfigManager.hpp>
-#include <webserv/config/ServerConfig.hpp>
-#include <webserv/socket/Socket.hpp>
+#include <webserv/config/ServerConfig.hpp> // for ServerConfig
+#include <webserv/socket/Socket.hpp>       // for Socket
 
-#include <functional>
-#include <memory>
-#include <unordered_map>
+#include <functional>    // for reference_wrapper
+#include <memory>        // for unique_ptr
+#include <unordered_map> // for unordered_map
+#include <vector>        // for vector
+
+#include <stdint.h> // for uint32_t
 
 class Client;
+class ConfigManager;
 
 class Server
 {

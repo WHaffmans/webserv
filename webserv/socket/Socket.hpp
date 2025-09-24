@@ -1,9 +1,9 @@
 #pragma once
 
-#include <memory>
-#include <string>
-
-#include <sys/types.h>
+#include <sys/types.h>  // for ssize_t
+#include <stddef.h>     // for size_t
+#include <memory>       // for unique_ptr
+#include <string>       // for string
 
 class Socket
 {

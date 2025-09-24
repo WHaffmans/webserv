@@ -1,11 +1,13 @@
-#include <webserv/log/FileChannel.hpp>
+#include <webserv/log/Channel.hpp>     // for Channel
+#include <webserv/log/FileChannel.hpp> // for FileChannel
 #include <webserv/log/Log.hpp>
-#include <webserv/log/StdoutChannel.hpp>
+#include <webserv/log/StdoutChannel.hpp> // for StdoutChannel
 
-#include <chrono>
-#include <filesystem>
-#include <iostream>
-#include <memory>
+#include <chrono>    // for duration_cast, operator-, steady_clock, duration, seconds
+#include <exception> // for exception
+#include <iostream>  // for basic_ostream, operator<<, cerr
+#include <memory>    // for allocator, unique_ptr, make_unique
+#include <utility>   // for pair
 
 Log::Log()
 {
@@ -54,7 +56,7 @@ Log &Log::getInstance()
 }
 
 void Log::log(Log::Level level, const std::string &message, const std::map<std::string, std::string> &context)
-{ 
+{
     for (auto &it : channels_)
     {
         // extendedMessage += " | " + message;
