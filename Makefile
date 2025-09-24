@@ -1,15 +1,27 @@
 # Variables
-# Detect if we're in a dev container or local development
-ifeq ($(shell whoami),vscode)
-    BUILD_DIR = build-container
-else
-    BUILD_DIR = build-local
-endif
-
+BUILD_DIR = build
 CMAKE = cmake
 CMAKE_BUILD = cmake --build
 CMAKE_FLAGS = -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 CONFIG_FILE = config/default.conf
+
+# Environment detection
+ifeq ($(shell whoami),vscode)
+    CURRENT_ENV = container
+else ifneq ($(REMOTE_CONTAINERS),)
+    CURRENT_ENV = container
+else
+    CURRENT_ENV = local
+endif
+
+# Check if build directory was created in different environment
+ifneq ($(wildcard $(BUILD_DIR)/.build-env),)
+    PREVIOUS_ENV := $(shell cat $(BUILD_DIR)/.build-env 2>/dev/null || echo "unknown")
+    ifneq ($(PREVIOUS_ENV),$(CURRENT_ENV))
+        $(info Detected environment switch from $(PREVIOUS_ENV) to $(CURRENT_ENV) - cleaning build directory)
+        $(shell rm -rf $(BUILD_DIR))
+    endif
+endif
 
 # Default target
 all: release
@@ -17,19 +29,23 @@ all: release
 # Configure CMake if build directory doesn't exist
 $(BUILD_DIR):
 	$(CMAKE) -B $(BUILD_DIR) $(CMAKE_FLAGS)
+	@echo "$(CURRENT_ENV)" > $(BUILD_DIR)/.build-env
 
 # Build targets with specific build types
 release: $(BUILD_DIR)
 	$(CMAKE) -B $(BUILD_DIR) $(CMAKE_FLAGS) -DCMAKE_BUILD_TYPE=Release
 	$(CMAKE_BUILD) $(BUILD_DIR) --target webserv --parallel
+	@echo "$(CURRENT_ENV)" > $(BUILD_DIR)/.build-env
 
 debug: $(BUILD_DIR)
 	$(CMAKE) -B $(BUILD_DIR) $(CMAKE_FLAGS) -DCMAKE_BUILD_TYPE=Debug
 	$(CMAKE_BUILD) $(BUILD_DIR) --target webserv
+	@echo "$(CURRENT_ENV)" > $(BUILD_DIR)/.build-env
 
 asan: $(BUILD_DIR)
 	$(CMAKE) -B $(BUILD_DIR) $(CMAKE_FLAGS) -DCMAKE_BUILD_TYPE=ASAN
 	$(CMAKE_BUILD) $(BUILD_DIR) --target webserv
+	@echo "$(CURRENT_ENV)" > $(BUILD_DIR)/.build-env
 
 run: run_release
 

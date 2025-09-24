@@ -47,5 +47,6 @@
         "string": "cpp",
         "unordered_map": "cpp",
         "string_view": "cpp"
-    }
+    },
+    "cmake.buildDirectory": "${workspaceFolder}/build"
 }

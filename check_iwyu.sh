@@ -3,12 +3,8 @@
 # Don't exit on first error - we want to continue checking all files
 # set -e
 
-# Detect project root - try container path first, then current directory
-if [ -d "/workspace" ]; then
-    PROJECT_ROOT="/workspace"
-else
-    PROJECT_ROOT="$(pwd)"
-fi
+# Use current working directory as project root
+PROJECT_ROOT="$(pwd)"
 
 # Find the build directory - check multiple possible locations
 BUILD_DIR=""
@@ -67,13 +63,9 @@ if [ -z "$BUILD_DIR" ]; then
     echo -e "${YELLOW}🔨 Running cmake to create build directory...${NC}"
     
     cd "$PROJECT_ROOT"
-    # Try to create build directory (prefer build-container in container, build-local otherwise)
-    if [ -d "/workspace" ]; then
-        BUILD_DIR="$PROJECT_ROOT/build-container"
-    else
-        BUILD_DIR="$PROJECT_ROOT/build-local"
-    fi
-    
+
+        BUILD_DIR="$PROJECT_ROOT/build"
+
     mkdir -p "$BUILD_DIR"
     cd "$BUILD_DIR"
     cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
