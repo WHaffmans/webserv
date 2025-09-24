@@ -52,6 +52,14 @@ fi
 
 echo -e "${BLUE}🛠️  Using IWYU command: $IWYU_CMD${NC}"
 
+# Check if mapping file exists
+if [ -f "$IWYU_MAPPING" ]; then
+    echo -e "${GREEN}📋 Using IWYU mapping file: $IWYU_MAPPING${NC}"
+else
+    echo -e "${YELLOW}⚠️  No IWYU mapping file found at: $IWYU_MAPPING${NC}"
+    echo -e "${YELLOW}💡 Consider creating one for better IWYU suggestions${NC}"
+fi
+
 # Check if we found a build directory
 if [ -z "$BUILD_DIR" ]; then
     echo -e "${YELLOW}⚠️  No build directory with compile_commands.json found.${NC}"
@@ -98,13 +106,14 @@ run_iwyu_on_file() {
     
     echo -e "${BLUE}Analyzing: ${relative_path}${NC}"
     
-    # Run IWYU with compile commands  
+    # Run IWYU with compile commands and mapping file
     if "$IWYU_CMD" \
         -I"$PROJECT_ROOT" \
         -std=c++20 \
         -Xiwyu --verbose=3 \
         -Xiwyu --quoted_includes_first \
         -Xiwyu --cxx17ns \
+        -Xiwyu --mapping_file="$IWYU_MAPPING" \
         "$file" \
         2>&1 | tee "$output_file"; then
         
