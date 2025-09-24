@@ -65,7 +65,7 @@
     },
     
     // Simple post-create setup
-    "postCreateCommand": "echo 'Dev container ready! Use GitHub CLI (gh auth login) or configure Git with HTTPS for GitHub access.'",
+    "postCreateCommand": "echo 'Dev container ready! Use GitHub CLI (gh auth login) or configure Git with HTTPS for GitHub access.'"
     
     // Clean build directory and optionally build every time VS Code attaches to container
     // "postAttachCommand": "rm -rf /workspaces/webserv/build && echo 'Cleaned build directory for container environment' && (cd /workspaces/webserv && timeout 60 make debug && echo 'Initial build completed successfully' || echo 'Initial build failed or timed out - you can build manually with: make debug') &"

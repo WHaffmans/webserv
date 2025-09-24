@@ -4,10 +4,9 @@
 #include <webserv/http/HttpRequest.hpp>
 #include <webserv/log/Log.hpp> // for Log, LOCATION
 
-#include <exception> // for exception
-#include <optional>  // for optional, operator>
-#include <sstream>   // for basic_stringstream, basic_istream, stringstream
-#include <vector>    // for vector
+#include <optional> // for optional, operator>
+#include <sstream>  // for basic_stringstream, basic_istream, stringstream
+#include <vector>   // for vector
 
 class ServerConfig;
 
