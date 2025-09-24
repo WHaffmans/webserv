@@ -36,7 +36,8 @@ const std::string &HttpRequest::getBody() const
 
 void HttpRequest::receiveData(const char *data, size_t length)
 {
-    if (buffer_.size() + length > Http::Protocol::MAX_HEADER_SIZE && state_ == State::Headers) // !: This is a define but should be configurable
+    if (buffer_.size() + length > Http::Protocol::MAX_HEADER_SIZE &&
+        state_ == State::Headers) // !: This is a define but should be configurable
     {
         Log::warning("Request size exceeds maximum limit of " + std::to_string(Http::Protocol::MAX_HEADER_SIZE) +
                      " bytes");
@@ -140,11 +141,10 @@ bool HttpRequest::parseBufferforHeaders()
     }
     if (this->headers_.has("Transfer-Encoding") && this->headers_.get("Transfer-Encoding") == "chunked")
     {
+        Log::debug("HttpRequest::parseBuffer() in state Headers with chunked encoding");
         state_ = State::Chunked;
         return true;
     }
-
-    Log::debug("HttpRequest::parseBuffer() in state Headers no body to read");
     state_ = State::Complete;
     return false; // No body to read
 }
