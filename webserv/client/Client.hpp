@@ -8,7 +8,7 @@
 #include <memory> // for unique_ptr
 #include <string> // for string
 
-#include <stddef.h> // for size_t
+#include <cstddef> // for size_t
 
 class Server;
 class Socket;

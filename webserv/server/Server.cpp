@@ -12,7 +12,7 @@
 #include <utility>   // for move, pair
 #include <vector>    // for vector
 
-#include <errno.h>     // for errno
+#include <cerrno>     // for errno
 #include <sys/epoll.h> // for epoll_event, epoll_ctl, EPOLLIN, EPOLLOUT, epoll_create1, epoll_wait, EPOLLERR, EPOLLHUP, EPOLL_CTL_ADD, EPOLL_CTL_DEL, EPOLL_CTL_MOD
 #include <sys/socket.h> // for send, SOMAXCONN
 #include <sys/types.h>  // for ssize_t

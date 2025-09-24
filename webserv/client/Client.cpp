@@ -8,7 +8,7 @@
 #include <map>        // for map
 #include <utility>    // for pair, move
 
-#include <stdint.h>    // for uint8_t
+#include <cstdint>    // for uint8_t
 #include <sys/types.h> // for ssize_t
 
 Client::Client(std::unique_ptr<Socket> socket, Server &server, const ServerConfig &server_config)

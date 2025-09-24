@@ -3,11 +3,10 @@
 #include <webserv/config/utils.hpp>        // for trim, findCorrespondingClosingBrace, trimSemi
 #include <webserv/log/Log.hpp>             // for Log
 
+#include <cstddef> // for size_t
 #include <fstream> // for basic_ifstream, basic_istream, basic_filebuf, basic_ostream::operator<<, ifstream, istringstream, stringstream
 #include <sstream>   // for basic_stringstream, basic_istringstream
 #include <stdexcept> // for runtime_error
-
-#include <stddef.h> // for size_t
 
 ConfigManager::ConfigManager() : initialized_(false) {}
 

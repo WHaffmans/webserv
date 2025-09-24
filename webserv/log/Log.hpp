@@ -9,7 +9,7 @@
 #include <string_view>   // for string_view
 #include <unordered_map> // for unordered_map
 
-#include <stdint.h> // for uint8_t
+#include <cstdint> // for uint8_t
 
 class Channel; // Forward declaration
 

@@ -7,7 +7,7 @@
 #include <algorithm> // for __transform_fn, transform
 #include <utility>   // for pair
 
-#include <ctype.h> // for tolower
+#include <cctype> // for tolower
 
 std::optional<size_t> HttpHeaders::getContentLength() const
 {

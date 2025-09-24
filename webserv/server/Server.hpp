@@ -10,7 +10,7 @@
 #include <unordered_map> // for unordered_map
 #include <vector>        // for vector
 
-#include <stdint.h> // for uint32_t
+#include <cstdint> // for uint32_t
 
 class Client;
 class ConfigManager;
