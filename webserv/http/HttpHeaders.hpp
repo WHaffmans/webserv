@@ -36,6 +36,8 @@ class HttpHeaders
     std::string toString() const;
 
     std::optional<size_t> getContentLength() const;
+    std::optional<std::string> getContentType() const;
+    std::optional<std::string> getHost() const;
 
   private:
     std::unordered_map<std::string, std::string> headers_;

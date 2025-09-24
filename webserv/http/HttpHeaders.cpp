@@ -8,7 +8,7 @@
 
 std::optional<size_t> HttpHeaders::getContentLength() const
 {
-    const auto &value = get("Content-Length");
+    const auto &value = this->get("Content-Length");
     if (value.empty())
     {
         return std::nullopt;
@@ -21,6 +21,26 @@ std::optional<size_t> HttpHeaders::getContentLength() const
     {
         return std::nullopt;
     }
+}
+
+std::optional<std::string> HttpHeaders::getContentType() const
+{
+    const auto &value = this->get("Content-Type");
+    if (value.empty())
+    {
+        return std::nullopt;
+    }
+    return value;
+}
+
+std::optional<std::string> HttpHeaders::getHost() const
+{
+    const auto &value = this->get("Host");
+    if (value.empty())
+    {
+        return std::nullopt;
+    }
+    return value;
 }
 
 void HttpHeaders::add(const std::string &name, const std::string &value) // NOLINT(bugprone-easily-swappable-parameters)
