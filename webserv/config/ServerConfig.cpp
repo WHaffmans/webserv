@@ -1,12 +1,14 @@
-#include <webserv/config/LocationConfig.hpp>  // for LocationConfig
+#include <webserv/config/LocationConfig.hpp> // for LocationConfig
 #include <webserv/config/ServerConfig.hpp>
-#include <webserv/config/utils.hpp>           // for findCorrespondingClosingBrace, trim
-#include <webserv/log/Log.hpp>                // for Log, LOCATION
-#include <stddef.h>                           // for size_t
-#include <sstream>                            // for basic_istringstream, basic_istream, istringstream
-#include <string>                             // for basic_string, char_traits, operator+, allocator, string, operator==, operator>>, operator<=>, to_string, stoi, getline
-#include <stdexcept>                          // for runtime_error
-#include <utility>                            // for pair
+#include <webserv/config/utils.hpp> // for findCorrespondingClosingBrace, trim
+#include <webserv/log/Log.hpp>      // for Log, LOCATION
+
+#include <sstream>   // for basic_istringstream, basic_istream, istringstream
+#include <stdexcept> // for runtime_error
+#include <string> // for basic_string, char_traits, operator+, allocator, string, operator==, operator>>, operator<=>, to_string, stoi, getline
+#include <utility> // for pair
+
+#include <stddef.h> // for size_t
 
 ServerConfig::ServerConfig(std::string const &serverBlock) : port_(80)
 {

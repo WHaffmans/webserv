@@ -1,6 +1,7 @@
 #pragma once
 
 #include <webserv/log/Log.hpp>
+
 #include <map>
 #include <string>
 

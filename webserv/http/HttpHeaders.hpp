@@ -1,9 +1,10 @@
 #pragma once
 
-#include <stddef.h>       // for size_t
-#include <optional>       // for optional
-#include <string>         // for basic_string, string, hash
-#include <unordered_map>  // for unordered_map
+#include <optional>      // for optional
+#include <string>        // for basic_string, string, hash
+#include <unordered_map> // for unordered_map
+
+#include <stddef.h> // for size_t
 
 /**
  * @file HttpHeaders.hpp

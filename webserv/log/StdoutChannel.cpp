@@ -1,7 +1,8 @@
-#include <webserv/log/Log.hpp>  // for Log
+#include <webserv/log/Log.hpp> // for Log
 #include <webserv/log/StdoutChannel.hpp>
-#include <iomanip>              // for operator<<, setfill, setw
-#include <iostream>             // for basic_ostream, operator<<, basic_ostream::operator<<, cerr, cout, flush, ostream
+
+#include <iomanip>  // for operator<<, setfill, setw
+#include <iostream> // for basic_ostream, operator<<, basic_ostream::operator<<, cerr, cout, flush, ostream
 
 StdoutChannel::StdoutChannel(Log::Level logLevel)
 {
