@@ -36,14 +36,6 @@ const std::string &HttpRequest::getBody() const
 
 void HttpRequest::receiveData(const char *data, size_t length)
 {
-    if (buffer_.size() + length > Http::Protocol::MAX_HEADER_SIZE &&
-        state_ == State::Headers) // !: This is a define but should be configurable
-    {
-        Log::warning("Request size exceeds maximum limit of " + std::to_string(Http::Protocol::MAX_HEADER_SIZE) +
-                     " bytes");
-        state_ = State::Complete; // Mark as complete to avoid further processing
-        return;
-    }
     Log::trace(LOCATION);
     buffer_.append(data, length);
     parseBuffer();
@@ -82,6 +74,7 @@ void HttpRequest::parseBuffer()
         case State::Complete:
             Log::debug("HttpRequest::parseBuffer() request is complete");
             return; // Request is complete
+        case State::ParseError: Log::warning("Parse error occurred, stopping further processing"); return;
         }
     }
 }
@@ -110,7 +103,7 @@ bool HttpRequest::parseBufferforRequestLine()
     if (parts.size() != 3)
     {
         Log::warning("Invalid request line: " + requestLine_);
-        state_ = State::Complete; // Mark as complete to avoid further processing
+        state_ = State::ParseError; // Mark as complete to avoid further processing
         return true;
     }
     method_ = parts[0];
@@ -169,7 +162,7 @@ bool HttpRequest::parseBufferforChunkedBody()
         catch (const std::exception &e)
         {
             Log::warning("Invalid chunk size: " + chunkSizeStr + " (" + e.what() + ")");
-            state_ = State::Complete; // Mark as complete to avoid further processing
+            state_ = State::ParseError; // Mark as complete to avoid further processing
             return true;
         }
         if (chunkSize == 0)
@@ -178,7 +171,6 @@ bool HttpRequest::parseBufferforChunkedBody()
             buffer_.erase(0, pos + Http::Protocol::CRLF.size());
             return true;
         }
-        // TODO: Copilot added this but I don't understand why it's needed
         if (buffer_.size() < pos + Http::Protocol::CRLF.size() + chunkSize + Http::Protocol::CRLF.size())
         {
             Log::debug("Chunked body waiting for more data: " + LOCATION);

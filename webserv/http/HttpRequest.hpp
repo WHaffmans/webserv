@@ -19,7 +19,8 @@ class HttpRequest
         Headers,
         Body,
         Chunked,
-        Complete
+        Complete,
+        ParseError
     };
 
     HttpRequest(const ServerConfig *serverConfig, const Client *client);
