@@ -129,7 +129,7 @@ bool HttpRequest::parseBufferforHeaders()
     buffer_.erase(0, pos + Http::Protocol::DOUBLE_CRLF.size());
     // parseContentLength();
 
-    if (this->headers_.getContentLength() > 0)
+    if (this->headers_.getContentLength().value_or(0) > 0)
     {
         state_ = State::Body;
         return true;
@@ -192,7 +192,7 @@ bool HttpRequest::parseBufferforBody()
         state_ = State::Complete;
         return true;
     }
-    Log::trace(LOCATION);
+    Log::trace(LOCATION, {{"Content-Length", std::to_string(*headers_.getContentLength())}});
     if (buffer_.size() < *headers_.getContentLength())
     {
         Log::debug("Body waiting for more data: " + LOCATION);
