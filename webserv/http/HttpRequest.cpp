@@ -98,7 +98,7 @@ bool HttpRequest::parseBufferforRequestLine()
     size_t pos = buffer_.find(Http::Protocol::CRLF);
     if (pos == std::string::npos)
     {
-        Log::debug("RequestLine waiting for more data : " + LOCATION);
+        Log::debug("RequestLine waiting for more data");
         return false;
     }
     std::string requestLine_ = buffer_.substr(0, pos);
