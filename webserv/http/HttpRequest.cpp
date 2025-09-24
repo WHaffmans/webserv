@@ -36,6 +36,13 @@ const std::string &HttpRequest::getBody() const
 
 void HttpRequest::receiveData(const char *data, size_t length)
 {
+    if (buffer_.size() + length > Http::Protocol::MAX_HEADER_SIZE && state_ == State::Headers) // !: This is a define but should be configurable
+    {
+        Log::warning("Request size exceeds maximum limit of " + std::to_string(Http::Protocol::MAX_HEADER_SIZE) +
+                     " bytes");
+        state_ = State::Complete; // Mark as complete to avoid further processing
+        return;
+    }
     Log::trace(LOCATION);
     buffer_.append(data, length);
     parseBuffer();
@@ -172,11 +179,11 @@ bool HttpRequest::parseBufferforChunkedBody()
             return true;
         }
         // TODO: Copilot added this but I don't understand why it's needed
-        // if (buffer_.size() < pos + Http::Protocol::CRLF.size() + chunkSize + Http::Protocol::CRLF.size())
-        // {
-        //     Log::debug("Chunked body waiting for more data: " + LOCATION);
-        //     return false; // Wait for more data
-        // }
+        if (buffer_.size() < pos + Http::Protocol::CRLF.size() + chunkSize + Http::Protocol::CRLF.size())
+        {
+            Log::debug("Chunked body waiting for more data: " + LOCATION);
+            return false;
+        }
         body_ += buffer_.substr(pos + Http::Protocol::CRLF.size(), chunkSize);
         buffer_.erase(0, pos + Http::Protocol::CRLF.size() + chunkSize + Http::Protocol::CRLF.size());
     }
