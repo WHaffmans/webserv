@@ -5,3 +5,4 @@ build-*
 .cache
 webserv.log
 compile_commands.json
+iwyu_results/

@@ -7,6 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     # Build essentials
     build-essential \
+    # Standard clang tools (this will install the default version)
     clang \
     clang-format \
     clang-tidy \

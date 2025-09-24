@@ -1,0 +1,17 @@
+[
+  # Standard C++ library mappings
+  { include: ["<bits/std_abs.h>", "private", "<cstdlib>", "public"] },
+  { include: ["<bits/stdint-intn.h>", "private", "<cstdint>", "public"] },
+  { include: ["<bits/stdint-uintn.h>", "private", "<cstdint>", "public"] },
+  
+  # System headers
+  { include: ["<sys/socket.h>", "public", "<sys/socket.h>", "public"] },
+  { include: ["<netinet/in.h>", "public", "<netinet/in.h>", "public"] },
+  { include: ["<arpa/inet.h>", "public", "<arpa/inet.h>", "public"] },
+  
+  # Project mappings - adjust these to your actual header structure
+  { include: ["\"webserv/server/Server.hpp\"", "public", "\"webserv/server/Server.hpp\"", "public"] },
+  { include: ["\"webserv/log/Log.hpp\"", "public", "\"webserv/log/Log.hpp\"", "public"] },
+  { include: ["\"webserv/socket/Socket.hpp\"", "public", "\"webserv/socket/Socket.hpp\"", "public"] },
+  { include: ["\"webserv/client/Client.hpp\"", "public", "\"webserv/client/Client.hpp\"", "public"] }
+]
