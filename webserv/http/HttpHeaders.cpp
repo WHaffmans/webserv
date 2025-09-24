@@ -1,3 +1,5 @@
+#include "webserv/log/Log.hpp"
+
 #include <webserv/config/utils.hpp>       // for trim
 #include <webserv/http/HttpConstants.hpp> // for CRLF
 #include <webserv/http/HttpHeaders.hpp>   // for HttpHeaders
@@ -14,12 +16,18 @@ std::optional<size_t> HttpHeaders::getContentLength() const
     {
         return std::nullopt;
     }
+    if (value.find_first_not_of("0123456789") != std::string::npos)
+    {
+        Log::warning("Non-numeric Content-Length header value: " + value);
+        return std::nullopt;
+    }
     try
     {
-        return std::stoul(value);
+        return utils::stoul(value);
     }
     catch (...)
     {
+        Log::warning("Invalid Content-Length header value: " + value);
         return std::nullopt;
     }
 }
@@ -90,8 +98,8 @@ void HttpHeaders::parse(const std::string &rawHeaders)
         {
             std::string name = line.substr(0, col);
             std::string value = line.substr(col + 1);
-            name = trim(name);
-            value = trim(value);
+            name = utils::trim(name);
+            value = utils::trim(value);
             this->add(name, value);
         }
         start = end + Http::Protocol::CRLF.size();

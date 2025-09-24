@@ -36,10 +36,10 @@ void ServerConfig::parseServerBlock(const std::string &block)
             serverDeclarations += block.substr(pos);
             break;
         }
-        std::string locationPath = trim(block.substr(locationPos, bracePos - (locationPos)));
+        std::string locationPath = utils::trim(block.substr(locationPos, bracePos - (locationPos)));
         // Add global declarations before this server block
         serverDeclarations += block.substr(pos, locationPos - pos);
-        size_t closeBrace = findCorrespondingClosingBrace(block, bracePos);
+        size_t closeBrace = utils::findCorrespondingClosingBrace(block, bracePos);
         if (closeBrace == std::string::npos)
         {
             throw std::runtime_error("Malformed block in config file.");
@@ -111,7 +111,7 @@ void ServerConfig::parseDirectives(const std::string &declarations)
             }
             else if (directive == "error_page")
             {
-                int statusCode = std::stoi(value);
+                int statusCode = std::stoi("-1");
                 std::string errorPagePath;
                 lineStream >> errorPagePath;
                 Log::debug("Set error_page for status " + std::to_string(statusCode) + " to " + errorPagePath);

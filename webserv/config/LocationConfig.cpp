@@ -22,7 +22,7 @@ void LocationConfig::parseDirectives(const std::string &declarations)
     while (std::getline(stream, line))
     {
         std::string directive;
-        std::istringstream lineStream{trim(line)};
+        std::istringstream lineStream{utils::trim(line)};
         lineStream >> directive;
         if (!directive.empty())
         {

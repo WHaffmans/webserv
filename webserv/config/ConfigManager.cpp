@@ -39,9 +39,9 @@ void removeEmptyLines(std::string &str)
 
     while (std::getline(stream, line))
     {
-        if (!trim(line).empty())
+        if (!utils::trim(line).empty())
         {
-            result += trimSemi(trim(line)) + '\n';
+            result += utils::trimSemi(utils::trim(line)) + '\n';
         }
     }
     str = result;
@@ -97,7 +97,7 @@ void ConfigManager::parseConfigFile(const std::string &filePath)
         }
         // Add global declarations before this server block
         globalDeclarations += content.substr(pos, serverPos - pos);
-        size_t closeBrace = findCorrespondingClosingBrace(content, bracePos);
+        size_t closeBrace = utils::findCorrespondingClosingBrace(content, bracePos);
         if (closeBrace == std::string::npos)
         {
             throw std::runtime_error("Malformed block in config file.");
