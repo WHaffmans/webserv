@@ -20,12 +20,12 @@
             
             // Container-specific VS Code settings
             "settings": {
-                "C_Cpp.default.compilerPath": "/usr/bin/clang++",
+                "C_Cpp.default.compilerPath": "/usr/bin/clang++-12",
                 "C_Cpp.default.cStandard": "c17",
                 "C_Cpp.default.cppStandard": "c++20",
                 "C_Cpp.default.intelliSenseMode": "linux-clang-x64",
                 "cmake.configureOnOpen": false,
-                "clang-format.executable": "/usr/bin/clang-format",
+                "clang-format.executable": "/usr/bin/clang-format-12",
                 "editor.formatOnSave": true,
                 "[cpp]": {
                     "editor.defaultFormatter": "xaver.clang-format"
@@ -36,26 +36,14 @@
                 "files.associations": {
                     "*.hpp": "cpp",
                     "*.tpp": "cpp"
-                },
-                "vscode" : {
-                    "settings" : {
-                        "remote.SSH.forwardAgent": true
-                    }
                 }
-
             }
         }
     },
 
     // Container configuration
-    "workspaceFolder": "/workspace",
-    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
-    
-    // Development user setup
+    // "workspaceFolder": "/workspace",
     "remoteUser": "vscode",
-    
-    // Container lifecycle hooks
-    "postCreateCommand": "echo 'Container ready for C++ development!'",
     
     // Port forwarding for web server testing
     "forwardPorts": [8080, 3000],
@@ -70,18 +58,12 @@
         }
     },
     
-    // Container features
+    // Additional dev container features (SSH agent removed)
     "features": {
         "ghcr.io/devcontainers/features/git:1": {},
-        "ghcr.io/devcontainers/features/github-cli:1": {},
-        "ghcr.io/devcontainers/features/sshd:1": {
-            "version": "latest",
-            "forwardPorts": [22]
-        }
+        "ghcr.io/devcontainers/features/github-cli:1": {}
     },
-
-    // Mount points for better performance
-    "mounts": [
-        "source=webserv-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
-    ]
+    
+    // Simple post-create setup
+    "postCreateCommand": "echo 'Dev container ready! Use GitHub CLI (gh auth login) or configure Git with HTTPS for GitHub access.'"
 }
