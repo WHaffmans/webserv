@@ -2,6 +2,7 @@
 
 #include "webserv/config/utils.hpp"
 #include "webserv/http/HttpConstants.hpp"
+#include "webserv/log/Log.hpp"
 
 #include <algorithm>
 
@@ -37,7 +38,9 @@ void HttpHeaders::remove(const std::string &name)
 
 const std::string &HttpHeaders::get(const std::string &name) const
 {
-    auto it = headers_.find(name);
+    std::string lower = name;
+    std::ranges::transform(lower, lower.begin(), ::tolower);
+    auto it = headers_.find(lower);
     if (it != headers_.end())
     {
         return it->second;
@@ -48,7 +51,9 @@ const std::string &HttpHeaders::get(const std::string &name) const
 
 bool HttpHeaders::has(const std::string &name) const
 {
-    return headers_.contains(name);
+    std::string lower = name;
+    std::ranges::transform(lower, lower.begin(), ::tolower);
+    return headers_.contains(lower);
 }
 
 void HttpHeaders::parse(const std::string &rawHeaders)
