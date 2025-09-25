@@ -20,7 +20,7 @@ class IntDirective : public ADirective
 
     void parse(const std::string &value) override;
 
-    [[nodiscard]] std::any getValue() const override;
+    [[nodiscard]] DirectiveValueType getValue() const override;
 
   private:
     int value_ = 0;

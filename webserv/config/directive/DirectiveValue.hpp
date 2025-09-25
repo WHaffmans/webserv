@@ -1,0 +1,36 @@
+#pragma once
+
+#include <cstddef>  // for size_t
+#include <iostream> // for ostream, operator<<
+#include <string>   // for string, basic_string, char_traits, to_string
+#include <variant>  // for variant, visit, get, holds_alternative
+#include <vector>   // for vector
+#include <utility>  // for pair, move
+
+// Define all possible directive value types
+using DirectiveValueType = std::variant<int, // listen, error_page status, cgi_timeout
+                                        size_t,
+                                        bool,                       // autoindex, upload_enabled
+                                        std::string,                // host, server_name, root, cgi_pass, upload_store
+                                        std::vector<std::string>,   // index, allowed_methods, cgi_ext
+                                        std::pair<int, std::string> // error_page (status, path), redirect
+                                        >;
+
+class DirectiveValue
+{
+  public:
+    DirectiveValue(DirectiveValueType value) : value_(std::move(value)) {}
+
+    template <typename T> T get() const { return std::get<T>(value_); }
+
+    template <typename T> [[nodiscard]] bool holds() const { return std::holds_alternative<T>(value_); }
+
+    [[nodiscard]] std::string toString() const;
+    
+
+  private:
+    DirectiveValueType value_;
+};
+
+// Non-member stream operator for DirectiveValue
+std::ostream &operator<<(std::ostream &os, const DirectiveValue &dv);

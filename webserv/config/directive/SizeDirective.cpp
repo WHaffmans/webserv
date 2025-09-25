@@ -43,7 +43,7 @@ void SizeDirective::parse(const std::string &value)
     value_ *= multiplier;
 }
 
-std::any SizeDirective::getValue() const
+DirectiveValueType SizeDirective::getValue() const
 {
     return value_;
 }

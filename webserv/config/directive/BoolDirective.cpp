@@ -24,7 +24,7 @@ void BoolDirective::parse(const std::string &arg)
     }
 }
 
-std::any BoolDirective::getValue() const
+DirectiveValueType BoolDirective::getValue() const
 {
     return value_;
 }

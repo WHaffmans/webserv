@@ -163,7 +163,13 @@ void ServerConfig::parseDirectives(const std::string &declarations)
         auto directive = DirectiveFactory::createDirective(line);
         directives_.push_back(std::move(directive));
     }
-    Log::info("Parsed " + std::to_string(directives_.size()) + " directives.", {{"declarations", declarations}});
+    Log::info("Parsed " + std::to_string(directives_.size()) + " directives.");
+    for (const auto &dir : directives_)
+    {
+        std::stringstream debugStream;
+        debugStream << "Directive parsed: " << *dir;
+        Log::debug(debugStream.str());
+    }
 }
 
 DirectiveValue ServerConfig::operator[](const std::string &directive) const

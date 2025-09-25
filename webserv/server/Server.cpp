@@ -86,8 +86,10 @@ void Server::setupServerSocket(const ServerConfig &config)
 {
     try
     {
+        auto host = config["host"].get<std::string>();
+        auto port = config["listen"].get<int>();
         std::unique_ptr<Socket> serverSocket = std::make_unique<Socket>();
-        serverSocket->bind(config["host"], config["listen"]);
+        serverSocket->bind(host, port);
         serverSocket->listen(SOMAXCONN);
         int server_fd = serverSocket->getFd();
 

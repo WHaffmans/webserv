@@ -1,18 +1,10 @@
 #pragma once
 
-#include <any>
+#include <webserv/config/directive/DirectiveValue.hpp>
+#include <iostream>
 #include <string>
 
-class DirectiveValue
-{
-  public:
-    DirectiveValue(std::any value) : value_(value) {}
 
-    template <typename T> operator T() const { return std::any_cast<T>(value_); }
-
-  private:
-    std::any value_;
-};
 
 class ADirective
 {
@@ -26,36 +18,19 @@ class ADirective
     ADirective(ADirective &&other) noexcept = delete;
     ADirective &operator=(ADirective &&other) noexcept = delete;
 
-    virtual ~ADirective() {}
-
-    virtual void parse(const std::string &value) = 0;
-
-    [[nodiscard]] virtual std::any getValue() const = 0;
-
-    [[nodiscard]] DirectiveValue get() const;
-
-    [[nodiscard]] std::string getName() const;
+    virtual ~ADirective() = default;
 
     void setName(const std::string &name);
+    virtual void parse(const std::string &value) = 0;
+
+    [[nodiscard]] virtual DirectiveValueType getValue() const = 0;
+    [[nodiscard]] DirectiveValue get() const;
+    [[nodiscard]] std::string getName() const;
+    // [[nodiscard]] std::string toString() const;
 
   protected:
-    std::string name_; // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
+    std::string name_;
 };
 
-// Supported directives:
-
-// - listen INT {server}
-// - host STRING {server}
-// - server_name STRING {server}
-// - root STRING {server, location}
-// - index STRING[] {server, location}
-// - error_page INT STIRNG {server, location}
-// - client_max_body_size SIZE {server, location}
-// - autoindex BOOL {location}
-// - allowed_methods STRING[] {location}
-// - cgi_pass STRING {location}
-// - cgi_ext STRING[] {location}
-// - cgi_timout INT {location}
-// - upload_enabled BOOL {location}
-// - upload_store STRING {location}
-// - redirect INT STRING {location}
+// Non-member stream operator for ADirective
+std::ostream &operator<<(std::ostream &os, const ADirective &directive);

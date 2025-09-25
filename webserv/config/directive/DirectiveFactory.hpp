@@ -29,7 +29,7 @@ class DirectiveFactory
         {.name = "server_name", .type = "VectorDirective", .context = "SL"},
         {.name = "root", .type = "StringDirective", .context = "SL"},
         {.name = "index", .type = "VectorDirective", .context = "SL"},
-        {.name = "error_page", .type = "VectorDirective", .context = "SL"},
+        {.name = "error_page", .type = "IntStringDirective", .context = "SL"},
         {.name = "client_max_body_size", .type = "SizeDirective", .context = "SL"},
         {.name = "autoindex", .type = "BoolDirective", .context = "L"},
         {.name = "allowed_methods", .type = "VectorDirective", .context = "L"},

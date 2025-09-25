@@ -6,10 +6,10 @@
 void VectorDirective::parse(const std::string &value)
 {
     std::stringstream ss(value);
-    while(ss.good())
+    while (ss.good())
     {
         std::string item;
-        std::getline(ss, item, ' ');// index    indx.html
+        std::getline(ss, item, ' '); // index    indx.html
         if (!item.empty())
         {
             value_.push_back(item);
@@ -17,7 +17,7 @@ void VectorDirective::parse(const std::string &value)
     }
 }
 
-std::any VectorDirective::getValue() const
+DirectiveValueType VectorDirective::getValue() const
 {
     return value_;
 }

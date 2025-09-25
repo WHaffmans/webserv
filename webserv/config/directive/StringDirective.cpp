@@ -7,7 +7,7 @@ void StringDirective::parse(const std::string &value)
     value_ = value;
 }
 
-std::any StringDirective::getValue() const
+DirectiveValueType StringDirective::getValue() const
 {
     return value_;
 }

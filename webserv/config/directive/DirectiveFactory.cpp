@@ -3,10 +3,14 @@
 #include <webserv/config/directive/DirectiveFactory.hpp> // for DirectiveFactory
 #include <webserv/config/directive/IntDirective.hpp>
 #include <webserv/config/directive/SizeDirective.hpp>
+#include <webserv/config/directive/IntStringDirective.hpp>
 #include <webserv/config/directive/StringDirective.hpp>
 #include <webserv/config/directive/VectorDirective.hpp>
 #include <webserv/config/utils.hpp> // for trim, findCorrespondingClosingBrace, trimSemi
 #include <webserv/log/Log.hpp>      // for Log
+#include <sstream>
+
+
 
 std::unique_ptr<ADirective> DirectiveFactory::createDirective(const std::string &line)
 {
@@ -57,6 +61,8 @@ const std::unordered_map<std::string_view, DirectiveFactory::CreatorFunc> &Direc
          [](const std::string &name, const std::string &arg) { return std::make_unique<SizeDirective>(name, arg); }},
         {"StringDirective",
          [](const std::string &name, const std::string &arg) { return std::make_unique<StringDirective>(name, arg); }},
+        {"IntStringDirective",
+         [](const std::string &name, const std::string &arg) { return std::make_unique<IntStringDirective>(name, arg); }},
         {"VectorDirective",
          [](const std::string &name, const std::string &arg) { return std::make_unique<VectorDirective>(name, arg); }},
     };
