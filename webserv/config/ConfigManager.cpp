@@ -1,12 +1,14 @@
 #include <webserv/config/ConfigManager.hpp>
-#include <webserv/config/ServerConfig.hpp> // for ServerConfig
-#include <webserv/config/utils.hpp>        // for trim, findCorrespondingClosingBrace, trimSemi
-#include <webserv/log/Log.hpp>             // for Log
+#include <webserv/config/ServerConfig.hpp>               // for ServerConfig
+#include <webserv/config/directive/DirectiveFactory.hpp> // for DirectiveFactory
+#include <webserv/config/utils.hpp>                      // for trim, findCorrespondingClosingBrace, trimSemi
+#include <webserv/log/Log.hpp>                           // for Log
 
 #include <cstddef> // for size_t
 #include <fstream> // for basic_ifstream, basic_istream, basic_filebuf, basic_ostream::operator<<, ifstream, istringstream, stringstream
 #include <sstream>   // for basic_stringstream, basic_istringstream
 #include <stdexcept> // for runtime_error
+#include <string>
 
 ConfigManager::ConfigManager() : initialized_(false) {}
 
@@ -82,7 +84,7 @@ void ConfigManager::parseConfigFile(const std::string &filePath)
     removeComments(content);
 
     std::string globalDeclarations;
-
+    Log::trace("Content before parsing servers:\n" + content);
     size_t pos = 0;
     while (true)
     {
@@ -96,6 +98,9 @@ void ConfigManager::parseConfigFile(const std::string &filePath)
         }
         // Add global declarations before this server block
         globalDeclarations += content.substr(pos, serverPos - pos);
+        Log::trace(LOCATION, {{"pos", std::to_string(pos)},
+                              {"serverPos", std::to_string(serverPos)},
+                              {"globalDeclarations", globalDeclarations}});
         size_t closeBrace = utils::findCorrespondingClosingBrace(content, bracePos);
         if (closeBrace == std::string::npos)
         {
@@ -107,14 +112,25 @@ void ConfigManager::parseConfigFile(const std::string &filePath)
         pos = closeBrace + 1;
     }
 
-    // parseGlobalDeclarations(globalDeclarations); // Implement this function to handle global config
-    Log::info("Global Declarations...");
+    parseGlobalDeclarations(globalDeclarations); // Implement this function to handle global config
     file.close();
 }
 
-// void ConfigManager::parseGlobalDeclarations(const std::string &declarations)
-// {
-//     // Placeholder for actual global declarations parsing logic
-//     std::cout << "Parsing global declarations:\n" << declarations << '\n';
-//     // Implement the parsing logic here
-// }
+void ConfigManager::parseGlobalDeclarations(const std::string &declarations)
+{
+    Log::trace(LOCATION);
+    std::stringstream ss(declarations);
+    std::string line;
+    while (ss.good())
+    {
+        std::getline(ss, line);
+        line = utils::trim(line);
+        if (line.empty())
+        {
+            continue;
+        }
+        Log::info("Global Declaration: " + line);
+        auto directive = DirectiveFactory::createDirective(line);
+        globalDirectives_.push_back(std::move(directive));
+    }
+}

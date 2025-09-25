@@ -1,7 +1,9 @@
 #pragma once
 
+#include "webserv/config/directive/ADirective.hpp"
 #include <webserv/config/ServerConfig.hpp>
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -23,7 +25,8 @@ class ConfigManager
     ConfigManager();
     ~ConfigManager();
     std::vector<ServerConfig> serverConfigs_;
+    std::vector<std::unique_ptr<ADirective>> globalDirectives_;
 
     void parseConfigFile(const std::string &filePath);
-    // void parseGlobalDeclarations(const std::string &declarations);
+    void parseGlobalDeclarations(const std::string &declarations);
 };

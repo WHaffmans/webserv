@@ -1,11 +1,14 @@
-#include <webserv/config/ConfigManager.hpp> // for ConfigManager
-#include <webserv/log/Log.hpp>              // for Log, LOCATION
-#include <webserv/server/Server.hpp>        // for Server
+#include <webserv/config/ConfigManager.hpp>          // for ConfigManager
+#include <webserv/config/directive/ADirective.hpp>   // for ADirective
+#include <webserv/config/directive/IntDirective.hpp> // for IntDirective
+#include <webserv/log/Log.hpp>                       // for Log, LOCATION
+#include <webserv/server/Server.hpp>                 // for Server
 
 #include <iostream> // for basic_ostream, operator<<, cerr, ios_base
 #include <map>      // for map
-#include <string>   // for basic_string, char_traits, allocator, operator+, operator<=>
-#include <utility>  // for pair
+#include <numeric>
+#include <string>  // for basic_string, char_traits, allocator, operator+, operator<=>
+#include <utility> // for pair
 
 int main(int argc, char **argv)
 {
@@ -21,7 +24,7 @@ int main(int argc, char **argv)
     Log::warning("Testing context: " + LOCATION, {{"key1", "value1"}, {"key2", "value2"}});
     ConfigManager::getInstance().init(argv[1]); // NOLINT
     Server server(ConfigManager::getInstance());
+    
     server.start();
-
     return 0;
 }
