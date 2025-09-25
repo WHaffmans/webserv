@@ -80,7 +80,7 @@ std::string Client::getResponse() const
     }
     // further validation can be added here
     response += "Content-Length: 18\r\n\r\n";
-    response += "Server port " + std::to_string(server_config_.getPort()) + "\r\n";
+    response += "Server port 8080\r\n";
 
     Log::debug("Sending response:\n" + response);
     return response;

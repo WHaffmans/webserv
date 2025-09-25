@@ -87,7 +87,7 @@ void Server::setupServerSocket(const ServerConfig &config)
     try
     {
         std::unique_ptr<Socket> serverSocket = std::make_unique<Socket>();
-        serverSocket->bind(config.getHost(), config.getPort());
+        serverSocket->bind(config["host"], config["listen"]);
         serverSocket->listen(SOMAXCONN);
         int server_fd = serverSocket->getFd();
 
@@ -95,7 +95,7 @@ void Server::setupServerSocket(const ServerConfig &config)
 
         listeners_.push_back(std::move(serverSocket));
         fdToConfig_.insert({server_fd, std::cref(config)});
-        Log::info("Server listening on " + config.getHost() + ":" + std::to_string(config.getPort()) + "...");
+        // Log::info("Server listening on " + std::string(config["host"]) + ":" + static_cast<std::string>(config["listen"]) + "...");
     }
     catch (const std::exception &e)
     {

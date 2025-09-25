@@ -2,6 +2,9 @@
 #include <webserv/config/ServerConfig.hpp>
 #include <webserv/config/utils.hpp> // for findCorrespondingClosingBrace, trim
 #include <webserv/log/Log.hpp>      // for Log, LOCATION
+#include <webserv/config/directive/DirectiveFactory.hpp> // for DirectiveFactory
+#include <webserv/config/directive/ADirective.hpp> // for ADirective
+
 
 #include <cstddef>   // for size_t
 #include <sstream>   // for basic_istringstream, basic_istream, istringstream
@@ -54,92 +57,123 @@ void ServerConfig::parseServerBlock(const std::string &block)
     parseDirectives(serverDeclarations);
 }
 
+// void ServerConfig::parseDirectives(const std::string &declarations)
+// {
+//     Log::info("Parsing server directives");
+//     std::string line;
+//     std::istringstream stream(declarations);
+//     while (std::getline(stream, line))
+//     {
+//         std::string directive;
+//         std::istringstream lineStream{line};
+//         lineStream >> directive;
+//         if (!directive.empty())
+//         {
+//             std::string value;
+//             lineStream >> value;
+//             if (directive == "listen")
+//             {
+
+//                 port_ = std::stoi(value);
+//                 if (port_ < 1 || port_ > 65535)
+//                 {
+//                     throw std::runtime_error("Invalid port number: " + std::to_string(port_));
+//                 }
+//                 Log::debug("Set port to " + std::to_string(port_));
+//             }
+//             else if (directive == "root")
+//             {
+//                 root_ = value;
+//                 Log::debug("Set root to " + root_);
+//             }
+//             else if (directive == "host")
+//             {
+//                 host_ = value;
+//                 Log::debug("Set host to " + host_);
+//             }
+//             else if (directive == "cgi_pass")
+//             {
+//                 cgi_pass_ = value;
+//                 Log::debug("Set cgi_pass to " + cgi_pass_);
+//             }
+//             else if (directive == "cgi_ext")
+//             {
+//                 cgi_ext_ = value;
+//                 Log::debug("Set cgi_ext to " + cgi_ext_);
+//             }
+//             else if (directive == "index")
+//             {
+//                 index_files_.clear();
+//                 std::string indexFile;
+//                 while (lineStream >> indexFile)
+//                 {
+//                     index_files_.push_back(indexFile);
+//                     Log::debug("Added index file: " + indexFile);
+//                 }
+//             }
+//             else if (directive == "error_page")
+//             {
+//                 int statusCode = std::stoi("-1");
+//                 std::string errorPagePath;
+//                 lineStream >> errorPagePath;
+//                 Log::debug("Set error_page for status " + std::to_string(statusCode) + " to " + errorPagePath);
+//             }
+//             else
+//             {
+//                 Log::warning("Unknown directive: " + directive);
+//             }
+//         }
+//     }
+// }
+
+// const LocationConfig &ServerConfig::getLocation(const std::string &path) const
+// {
+//     if (locations_.count(path) > 0) // NOLINT
+//     {
+//         return locations_.at(path);
+//     }
+//     Log::error("Location not found: " + path);
+//     throw std::runtime_error("Location not found: " + path);
+// }
+
+// std::vector<std::string> ServerConfig::getLocationPaths() const
+// {
+//     std::vector<std::string> paths;
+//     paths.reserve(locations_.size());
+//     for (const auto &pair : locations_)
+//     {
+//         paths.push_back(pair.first);
+//     }
+//     return paths;
+// }
+
 void ServerConfig::parseDirectives(const std::string &declarations)
 {
-    Log::info("Parsing server directives");
+    Log::trace(LOCATION);
+    std::stringstream ss(declarations);
     std::string line;
-    std::istringstream stream(declarations);
-    while (std::getline(stream, line))
+    while (ss.good())
     {
-        std::string directive;
-        std::istringstream lineStream{line};
-        lineStream >> directive;
-        if (!directive.empty())
+        std::getline(ss, line);
+        line = utils::trim(line);
+        if (line.empty())
         {
-            std::string value;
-            lineStream >> value;
-            if (directive == "listen")
-            {
+            continue;
+        }
+        auto directive = DirectiveFactory::createDirective(line);
+        directives_.push_back(std::move(directive));
+    }
+    Log::info("Parsed " + std::to_string(directives_.size()) + " directives.", {{"declarations", declarations}});
+}
 
-                port_ = std::stoi(value);
-                if (port_ < 1 || port_ > 65535)
-                {
-                    throw std::runtime_error("Invalid port number: " + std::to_string(port_));
-                }
-                Log::debug("Set port to " + std::to_string(port_));
-            }
-            else if (directive == "root")
-            {
-                root_ = value;
-                Log::debug("Set root to " + root_);
-            }
-            else if (directive == "host")
-            {
-                host_ = value;
-                Log::debug("Set host to " + host_);
-            }
-            else if (directive == "cgi_pass")
-            {
-                cgi_pass_ = value;
-                Log::debug("Set cgi_pass to " + cgi_pass_);
-            }
-            else if (directive == "cgi_ext")
-            {
-                cgi_ext_ = value;
-                Log::debug("Set cgi_ext to " + cgi_ext_);
-            }
-            else if (directive == "index")
-            {
-                index_files_.clear();
-                std::string indexFile;
-                while (lineStream >> indexFile)
-                {
-                    index_files_.push_back(indexFile);
-                    Log::debug("Added index file: " + indexFile);
-                }
-            }
-            else if (directive == "error_page")
-            {
-                int statusCode = std::stoi("-1");
-                std::string errorPagePath;
-                lineStream >> errorPagePath;
-                Log::debug("Set error_page for status " + std::to_string(statusCode) + " to " + errorPagePath);
-            }
-            else
-            {
-                Log::warning("Unknown directive: " + directive);
-            }
+DirectiveValue ServerConfig::operator[](const std::string &directive) const
+{
+    for (const auto& dir : directives_)
+    {
+        if (dir->getName() == directive)
+        {
+            return dir->get();
         }
     }
-}
-
-const LocationConfig &ServerConfig::getLocation(const std::string &path) const
-{
-    if (locations_.count(path) > 0) // NOLINT
-    {
-        return locations_.at(path);
-    }
-    Log::error("Location not found: " + path);
-    throw std::runtime_error("Location not found: " + path);
-}
-
-std::vector<std::string> ServerConfig::getLocationPaths() const
-{
-    std::vector<std::string> paths;
-    paths.reserve(locations_.size());
-    for (const auto &pair : locations_)
-    {
-        paths.push_back(pair.first);
-    }
-    return paths;
+    throw std::runtime_error("Directive not found: " + directive);
 }

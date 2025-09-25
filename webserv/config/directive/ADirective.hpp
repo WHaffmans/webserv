@@ -1,7 +1,6 @@
 #pragma once
 
 #include <any>
-#include <array>
 #include <string>
 
 class DirectiveValue
@@ -40,7 +39,7 @@ class ADirective
     void setName(const std::string &name);
 
   protected:
-    std::string name_;
+    std::string name_; // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
 };
 
 // Supported directives:
