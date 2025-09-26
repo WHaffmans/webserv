@@ -1,8 +1,7 @@
-#include "webserv/config/GlobalConfig.hpp" // for GlobalConfig
-
 #include <webserv/config/ConfigManager.hpp>
-#include <webserv/config/utils.hpp> // for removeComments
-#include <webserv/log/Log.hpp>      // for Log
+#include <webserv/config/GlobalConfig.hpp> // for GlobalConfig
+#include <webserv/config/utils.hpp>        // for removeComments
+#include <webserv/log/Log.hpp>             // for Log
 
 #include <fstream>   // for basic_ifstream, basic_filebuf, basic_ostream::operator<<, ifstream, stringstream
 #include <sstream>   // for basic_stringstream

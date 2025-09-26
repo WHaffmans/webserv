@@ -1,6 +1,5 @@
-#include "webserv/config/directive/ADirective.hpp"     // for ADirective
-#include "webserv/config/directive/DirectiveValue.hpp" // for DirectiveValueType
-
+#include <webserv/config/directive/ADirective.hpp>      // for ADirective
+#include <webserv/config/directive/DirectiveValue.hpp>  // for DirectiveValueType
 #include <webserv/config/directive/VectorDirective.hpp> // for IntDirective
 
 #include <sstream> // for basic_stringstream, stringstream

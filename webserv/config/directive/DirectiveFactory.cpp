@@ -1,5 +1,3 @@
-#include "webserv/log/Log.hpp" // for LOCATION, Log
-
 #include <webserv/config/directive/BoolDirective.hpp>      // for BoolDirective
 #include <webserv/config/directive/DirectiveFactory.hpp>   // for DirectiveFactory
 #include <webserv/config/directive/IntDirective.hpp>       // for IntDirective
@@ -8,6 +6,7 @@
 #include <webserv/config/directive/StringDirective.hpp>    // for StringDirective
 #include <webserv/config/directive/VectorDirective.hpp>    // for VectorDirective
 #include <webserv/config/utils.hpp>                        // for trim, trimSemi
+#include <webserv/log/Log.hpp>                             // for LOCATION, Log
 
 #include <sstream>   // for basic_stringstream, stringstream
 #include <stdexcept> // for invalid_argument

@@ -1,8 +1,7 @@
-#include "webserv/config/directive/ADirective.hpp"     // for ADirective
-#include "webserv/config/directive/DirectiveValue.hpp" // for DirectiveValueType
-
-#include <webserv/config/directive/SizeDirective.hpp> // for SizeDirective
-#include <webserv/config/utils.hpp>                   // for trim
+#include <webserv/config/directive/ADirective.hpp>     // for ADirective
+#include <webserv/config/directive/DirectiveValue.hpp> // for DirectiveValueType
+#include <webserv/config/directive/SizeDirective.hpp>  // for SizeDirective
+#include <webserv/config/utils.hpp>                    // for trim
 
 #include <algorithm> // for __transform_fn, transform
 #include <cctype>    // for tolower
