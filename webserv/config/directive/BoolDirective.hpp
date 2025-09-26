@@ -1,27 +1,28 @@
 #pragma once
 
-#include "ADirective.hpp"
+#include <webserv/config/directive/ADirective.hpp>     // for ADirective
+#include <webserv/config/directive/DirectiveValue.hpp> // for DirectiveValueType
 
-#include <any>
+#include <string> // for string, basic_string
 
 class BoolDirective : public ADirective
 {
-    public:
-        BoolDirective() = delete;
+  public:
+    BoolDirective() = delete;
 
-        BoolDirective(const std::string &name, const std::string &value) : ADirective(name) { parse(value); }
+    BoolDirective(const std::string &name, const std::string &value);
 
-        BoolDirective(const BoolDirective &other) = delete;
-        BoolDirective &operator=(const BoolDirective &other) = delete;
-        BoolDirective(BoolDirective &&other) noexcept = delete;
-        BoolDirective &operator=(BoolDirective &&other) noexcept = delete;
+    BoolDirective(const BoolDirective &other) = delete;
+    BoolDirective &operator=(const BoolDirective &other) = delete;
+    BoolDirective(BoolDirective &&other) noexcept = delete;
+    BoolDirective &operator=(BoolDirective &&other) noexcept = delete;
 
-        ~BoolDirective() override = default;
+    ~BoolDirective() override = default;
 
-        void parse(const std::string &value) override;
+    void parse(const std::string &arg) override;
 
-        [[nodiscard]] DirectiveValueType getValue() const override;
+    [[nodiscard]] DirectiveValueType getValueType() const override;
 
-    private:
-        bool value_ = false;
+  private:
+    bool value_ = false;
 };

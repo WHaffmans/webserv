@@ -1,8 +1,13 @@
-#include "webserv/log/Log.hpp"
 #include <webserv/config/directive/IntStringDirective.hpp> // for IntDirective
-#include <webserv/config/utils.hpp>                     // for trim
-#include <sstream>                                     // for std::getline, std::basic_istream, std::char_traits, std::basic_stringbuf
+#include <webserv/config/utils.hpp>                        // for trim
 
+#include <sstream> // for basic_istringstream, basic_istream::operator>>, istringstream
+
+IntStringDirective::IntStringDirective(const std::string &name, const std::string &value)
+    : ADirective(name) // NOLINT(bugprone-easily-swappable-parameters)
+{
+    parse(value);
+}
 
 void IntStringDirective::parse(const std::string &value)
 {
@@ -15,7 +20,7 @@ void IntStringDirective::parse(const std::string &value)
     value_ = std::make_pair(intPart, strPart);
 }
 
-DirectiveValueType IntStringDirective::getValue() const
+DirectiveValueType IntStringDirective::getValueType() const
 {
     return value_;
 }

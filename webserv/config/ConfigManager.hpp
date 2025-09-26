@@ -1,11 +1,13 @@
 #pragma once
 
-#include "webserv/config/directive/ADirective.hpp"
-#include <webserv/config/ServerConfig.hpp>
+#include <webserv/config/GlobalConfig.hpp>
+#include <webserv/config/ServerConfig.hpp> // for ServerConfig
 
-#include <memory>
-#include <string>
-#include <vector>
+#include <memory> // for unique_ptr
+#include <string> // for string
+#include <vector> // for vector
+
+class ADirective;
 
 class ConfigManager
 {
@@ -18,15 +20,13 @@ class ConfigManager
     void init(const std::string &filePath);
     static ConfigManager &getInstance();
 
-    [[nodiscard]] const std::vector<ServerConfig> &getServerConfigs() const { return serverConfigs_; }
+    [[nodiscard]] std::vector<ServerConfig *> getServerConfigs() const;
 
   private:
     bool initialized_;
     ConfigManager();
     ~ConfigManager();
-    std::vector<ServerConfig> serverConfigs_;
-    std::vector<std::unique_ptr<ADirective>> globalDirectives_;
+    std::unique_ptr<GlobalConfig> globalConfig_;
 
     void parseConfigFile(const std::string &filePath);
-    void parseGlobalDeclarations(const std::string &declarations);
 };

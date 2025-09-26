@@ -3,20 +3,17 @@
 #include <cstddef>  // for size_t
 #include <iostream> // for ostream, operator<<
 #include <string>   // for string, basic_string, char_traits, to_string
+#include <utility>  // for pair, move
 #include <variant>  // for variant, visit, get, holds_alternative
 #include <vector>   // for vector
-#include <utility>  // for pair, move
 
 // Visitor overload pattern for std::visit
-template<class... Ts>
-struct overloaded : Ts... {
-  using Ts::operator()...;
+template <class... Ts> struct overloaded : Ts...
+{
+    using Ts::operator()...;
 };
 
-template<class... Ts>
-overloaded(Ts...) -> overloaded<Ts...>;
-
-
+template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
 // Define all possible directive value types
 using DirectiveValueType = std::variant<int, // listen, error_page status, cgi_timeout
@@ -37,7 +34,6 @@ class DirectiveValue
     template <typename T> [[nodiscard]] bool holds() const { return std::holds_alternative<T>(value_); }
 
     [[nodiscard]] std::string toString() const;
-    
 
   private:
     DirectiveValueType value_;

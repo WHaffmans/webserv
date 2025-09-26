@@ -1,8 +1,9 @@
 #include <webserv/config/directive/ADirective.hpp>
+#include <webserv/config/directive/DirectiveValue.hpp> // for DirectiveValue, operator<<
 
-DirectiveValue ADirective::get() const
+DirectiveValue ADirective::getValue() const
 {
-    return {getValue()};
+    return {getValueType()};
 }
 
 std::string ADirective::getName() const
@@ -16,8 +17,8 @@ void ADirective::setName(const std::string &name)
 }
 
 // Non-member stream operator implementations
-std::ostream &operator<<(std::ostream &os, const DirectiveValue &dv)
-{
-    return os << dv.toString();
-}
 
+std::ostream &operator<<(std::ostream &os, const ADirective &directive)
+{
+    return os << directive.getName() << ": " << directive.getValue().toString();
+}

@@ -1,19 +1,20 @@
 #pragma once
 
-#include <map>
-#include <string>
+#include <webserv/config/AConfig.hpp> // for AConfig
 
-class LocationConfig
+class LocationConfig : public AConfig
 {
   public:
-    LocationConfig(const std::string &locationBlock);
+    LocationConfig() = delete;
+    LocationConfig(const std::string &Block, const AConfig *parent = nullptr);
+
+    LocationConfig(const LocationConfig &other) = delete;
+    LocationConfig &operator=(const LocationConfig &other) = delete;
+    LocationConfig(LocationConfig &&other) noexcept = delete;
+    LocationConfig &operator=(LocationConfig &&other) noexcept = delete;
+
+    ~LocationConfig() override = default;
 
   private:
-    std::string path_;
-    bool autoIndex_;
-    std::string indexFile_;
-    std::map<std::string, std::string> directives_;
-
-    void parseLocationBlock(const std::string &block);
-    void parseDirectives(const std::string &declarations);
+    void parseBlock(const std::string &block) override;
 };

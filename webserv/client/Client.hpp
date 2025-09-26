@@ -5,10 +5,9 @@
 #include <webserv/server/Server.hpp>
 #include <webserv/socket/Socket.hpp>
 
-#include <memory> // for unique_ptr
-#include <string> // for string
-
 #include <cstddef> // for size_t
+#include <memory>  // for unique_ptr
+#include <string>  // for string
 
 class Server;
 class Socket;

@@ -4,11 +4,11 @@
 #include <webserv/server/Server.hpp>    // for Server
 #include <webserv/socket/Socket.hpp>    // for Socket
 
+#include <cstdint>    // for uint8_t
 #include <functional> // for reference_wrapper, cref, ref
 #include <map>        // for map
 #include <utility>    // for pair, move
 
-#include <cstdint>    // for uint8_t
 #include <sys/types.h> // for ssize_t
 
 Client::Client(std::unique_ptr<Socket> socket, Server &server, const ServerConfig &server_config)

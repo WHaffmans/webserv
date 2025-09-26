@@ -1,10 +1,10 @@
 #pragma once
 
-#include <webserv/config/directive/DirectiveValue.hpp>
-#include <iostream>
-#include <string>
+#include <webserv/config/directive/DirectiveValue.hpp> // for DirectiveValue, DirectiveValueType
 
-
+#include <iostream> // for ostream
+#include <string>   // for string, basic_string
+#include <utility>  // for move
 
 class ADirective
 {
@@ -23,8 +23,8 @@ class ADirective
     void setName(const std::string &name);
     virtual void parse(const std::string &value) = 0;
 
-    [[nodiscard]] virtual DirectiveValueType getValue() const = 0;
-    [[nodiscard]] DirectiveValue get() const;
+    [[nodiscard]] virtual DirectiveValueType getValueType() const = 0;
+    [[nodiscard]] DirectiveValue getValue() const;
     [[nodiscard]] std::string getName() const;
     // [[nodiscard]] std::string toString() const;
 

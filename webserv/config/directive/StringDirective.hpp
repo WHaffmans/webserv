@@ -1,14 +1,16 @@
 #pragma once
 
-#include "ADirective.hpp"
+#include <webserv/config/directive/ADirective.hpp>     // for ADirective
+#include <webserv/config/directive/DirectiveValue.hpp> // for DirectiveValueType
+
+#include <string> // for string, basic_string
 
 class StringDirective : public ADirective
 {
   public:
     StringDirective() = delete;
 
-    StringDirective(const std::string &name, const std::string &value) : ADirective(name) { parse(value); }
-
+    StringDirective(const std::string &name, const std::string &value);
     StringDirective(const StringDirective &other) = delete;
     StringDirective &operator=(const StringDirective &other) = delete;
     StringDirective(StringDirective &&other) noexcept = delete;
@@ -18,7 +20,7 @@ class StringDirective : public ADirective
 
     void parse(const std::string &value) override;
 
-    [[nodiscard]] DirectiveValueType getValue() const override;
+    [[nodiscard]] DirectiveValueType getValueType() const override;
 
   private:
     std::string value_;

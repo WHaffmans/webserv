@@ -1,9 +1,12 @@
-#include "webserv/config/directive/ADirective.hpp"
+#pragma once
+#include <webserv/config/directive/ADirective.hpp> // for ADirective
 
-#include <functional>
-#include <memory>
-#include <string_view>
-#include <unordered_map>
+#include <array>         // for array
+#include <functional>    // for function
+#include <memory>        // for unique_ptr
+#include <string>        // for string
+#include <string_view>   // for string_view
+#include <unordered_map> // for unordered_map
 
 class DirectiveFactory
 {

@@ -1,13 +1,13 @@
-#include <webserv/config/directive/ADirective.hpp>
+#include <webserv/config/directive/ADirective.hpp> // for ADirective, operator<<
 #include <webserv/config/directive/DirectiveValue.hpp>
 
-#include <cstddef>
-#include <string>
-#include <type_traits> // for is_same_v, decay_t
-#include <utility>     // for pair, move
-#include <variant>     // for variant, visit
-#include <vector>      // for vector
-                       //
+#include <cstddef> // for size_t
+#include <string>  // for string, basic_string, allocator, char_traits, operator+, to_string, operator<<
+#include <utility> // for pair
+#include <variant> // for visit
+#include <vector>  // for vector
+
+//
 
 // std::string DirectiveValue::toString() const
 // {
@@ -78,7 +78,7 @@ std::string DirectiveValue::toString() const
                       value_);
 }
 
-std::ostream &operator<<(std::ostream &os, const ADirective &directive)
+std::ostream &operator<<(std::ostream &os, const DirectiveValue &dv)
 {
-    return os << directive.getName() << ": " << directive.get().toString();
+    return os << dv.toString();
 }

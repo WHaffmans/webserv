@@ -1,14 +1,19 @@
 #include <webserv/config/directive/BoolDirective.hpp> // for IntDirective
 #include <webserv/config/utils.hpp>                   // for trim
 
-#include <algorithm>
-#include <any>
-#include <stdexcept>
+#include <algorithm> // for __transform_fn, transform
+#include <cctype>    // for tolower
+#include <stdexcept> // for invalid_argument
+
+BoolDirective::BoolDirective(const std::string &name, const std::string &value)
+    : ADirective(name) // NOLINT(bugprone-easily-swappable-parameters)
+{
+    parse(value);
+}
 
 void BoolDirective::parse(const std::string &arg)
 {
-    std::string value = arg;
-    value = utils::trim(value);
+    std::string value = utils::trim(arg);
     std::ranges::transform(value, value.begin(), ::tolower);
     if (value == "true" || value == "1" || value == "on" || value == "yes")
     {
@@ -24,7 +29,7 @@ void BoolDirective::parse(const std::string &arg)
     }
 }
 
-DirectiveValueType BoolDirective::getValue() const
+DirectiveValueType BoolDirective::getValueType() const
 {
     return value_;
 }

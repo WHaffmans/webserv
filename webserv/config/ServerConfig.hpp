@@ -1,49 +1,27 @@
 #pragma once
 
-#include "webserv/config/directive/ADirective.hpp"
-#include <webserv/config/LocationConfig.hpp>
+#include <webserv/config/AConfig.hpp>        // for AConfig
+#include <webserv/config/LocationConfig.hpp> // for LocationConfig
 
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
-
-// TODO remove implementation details from header
-class ServerConfig
+class ServerConfig : public AConfig
 {
   public:
-    ServerConfig(const std::string &serverBlock);
+    ServerConfig() = delete;
+    ServerConfig(const std::string &Block, const AConfig *parent = nullptr);
 
-    // [[nodiscard]] const std::string &getHost() const { return host_; }
+    ServerConfig(const ServerConfig &other) = delete;
+    ServerConfig &operator=(const ServerConfig &other) = delete;
+    ServerConfig(ServerConfig &&other) noexcept = delete;
+    ServerConfig &operator=(ServerConfig &&other) noexcept = delete;
 
-    // [[nodiscard]] int getPort() const { return port_; }
+    ~ServerConfig() override = default;
 
-    // [[nodiscard]] const std::string &getRoot() const { return root_; }
-
-    // [[nodiscard]] const std::string &getCgiPass() const { return cgi_pass_; }
-
-    // [[nodiscard]] const std::string &getCgiExt() const { return cgi_ext_; }
-
-    // [[nodiscard]] const std::map<int, std::string> &getErrorPages() const { return error_page_; }
-
-    // [[nodiscard]] const std::vector<std::string> &getIndexFiles() const { return index_files_; }
-
-    // [[nodiscard]] const LocationConfig &getLocation(const std::string &path) const;
-    // [[nodiscard]] std::vector<std::string> getLocationPaths() const;
-
-    DirectiveValue operator[](const std::string &directive) const;
+    [[nodiscard]] const LocationConfig *getLocation(const std::string &path) const;
+    [[nodiscard]] std::vector<std::string> getLocationPaths() const;
 
   private:
-    std::string host_;
-    int port_;
-    std::string root_;
-    std::string cgi_pass_;
-    std::string cgi_ext_;
-    std::map<int, std::string> error_page_;
-    std::vector<std::string> index_files_;
-    std::map<std::string, LocationConfig> locations_;
-    std::vector<std::unique_ptr<ADirective>> directives_;
+    std::map<std::string, std::unique_ptr<LocationConfig>> locations_;
+    AConfig *parent_ = nullptr;
 
-    void parseServerBlock(const std::string &block);
-    void parseDirectives(const std::string &declarations);
+    void parseBlock(const std::string &block) override;
 };

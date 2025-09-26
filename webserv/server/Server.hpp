@@ -5,12 +5,11 @@
 #include <webserv/config/ServerConfig.hpp> // for ServerConfig
 #include <webserv/socket/Socket.hpp>       // for Socket
 
+#include <cstdint>       // for uint32_t
 #include <functional>    // for reference_wrapper
 #include <memory>        // for unique_ptr
 #include <unordered_map> // for unordered_map
 #include <vector>        // for vector
-
-#include <cstdint> // for uint32_t
 
 class Client;
 class ConfigManager;

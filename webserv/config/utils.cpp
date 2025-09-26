@@ -1,6 +1,7 @@
 
 #include <webserv/config/utils.hpp>
 
+#include <sstream>
 #include <stdexcept>
 #include <string>
 
@@ -68,5 +69,39 @@ size_t findCorrespondingClosingBrace(const std::string &str, size_t openPos)
         }
     }
     return std::string::npos;
+}
+
+void removeEmptyLines(std::string &str)
+{
+    std::istringstream stream(str);
+    std::string line;
+    std::string result;
+
+    while (std::getline(stream, line))
+    {
+        if (!utils::trim(line).empty())
+        {
+            result += utils::trimSemi(utils::trim(line)) + '\n';
+        }
+    }
+    str = result;
+}
+
+void removeComments(std::string &str)
+{
+    size_t pos = 0;
+    while ((pos = str.find('#', pos)) != std::string::npos)
+    {
+        size_t end = str.find('\n', pos);
+        if (end == std::string::npos)
+        {
+            str.erase(pos);
+        }
+        else
+        {
+            str.erase(pos, end - pos);
+        }
+    }
+    removeEmptyLines(str);
 }
 } // namespace utils

@@ -4,15 +4,15 @@
 #include <webserv/server/Server.hpp>
 #include <webserv/socket/Socket.hpp> // for Socket
 
+#include <cerrno>    // for errno
 #include <cstring>   // for strerror, strlen
 #include <exception> // for exception
 #include <memory>    // for unique_ptr, allocator, make_unique
 #include <stdexcept> // for runtime_error
-#include <string>    // for operator+, to_string, basic_string, char_traits, string
+#include <string>    // for basic_string, operator+, to_string, char_traits, string
 #include <utility>   // for move, pair
 #include <vector>    // for vector
 
-#include <cerrno>     // for errno
 #include <sys/epoll.h> // for epoll_event, epoll_ctl, EPOLLIN, EPOLLOUT, epoll_create1, epoll_wait, EPOLLERR, EPOLLHUP, EPOLL_CTL_ADD, EPOLL_CTL_DEL, EPOLL_CTL_MOD
 #include <sys/socket.h> // for send, SOMAXCONN
 #include <sys/types.h>  // for ssize_t
@@ -48,7 +48,7 @@ void Server::start()
 
     for (const auto &config : configManager_.getServerConfigs())
     {
-        setupServerSocket(config);
+        setupServerSocket(*config);
     }
     if (fdToConfig_.empty())
     {
@@ -86,8 +86,8 @@ void Server::setupServerSocket(const ServerConfig &config)
 {
     try
     {
-        auto host = config["host"].get<std::string>();
-        auto port = config["listen"].get<int>();
+        auto host = config.getDirectiveValue<std::string>("host");
+        auto port = config.getDirectiveValue<int>("listen");
         std::unique_ptr<Socket> serverSocket = std::make_unique<Socket>();
         serverSocket->bind(host, port);
         serverSocket->listen(SOMAXCONN);
@@ -97,7 +97,8 @@ void Server::setupServerSocket(const ServerConfig &config)
 
         listeners_.push_back(std::move(serverSocket));
         fdToConfig_.insert({server_fd, std::cref(config)});
-        // Log::info("Server listening on " + std::string(config["host"]) + ":" + static_cast<std::string>(config["listen"]) + "...");
+        Log::info("Server listening on " + host + ":" + std::to_string(port) + "...");
+        // static_cast<std::string>(config["listen"]) + "...");
     }
     catch (const std::exception &e)
     {

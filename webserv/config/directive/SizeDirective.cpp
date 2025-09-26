@@ -1,10 +1,15 @@
 #include <webserv/config/directive/SizeDirective.hpp> // for SizeDirective
 #include <webserv/config/utils.hpp>                   // for trim
 
-#include <algorithm>
-#include <any>
-#include <cctype>
-#include <stdexcept>
+#include <algorithm> // for __transform_fn, transform
+#include <cctype>    // for tolower
+#include <stdexcept> // for invalid_argument
+
+SizeDirective::SizeDirective(const std::string &name, const std::string &value)
+    : ADirective(name) // NOLINT(bugprone-easily-swappable-parameters)
+{
+    parse(value);
+}
 
 void SizeDirective::parse(const std::string &value)
 {
@@ -43,7 +48,7 @@ void SizeDirective::parse(const std::string &value)
     value_ *= multiplier;
 }
 
-DirectiveValueType SizeDirective::getValue() const
+DirectiveValueType SizeDirective::getValueType() const
 {
     return value_;
 }

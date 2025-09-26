@@ -2,13 +2,12 @@
 #include <webserv/config/ServerConfig.hpp>               // for ServerConfig
 #include <webserv/config/directive/DirectiveFactory.hpp> // for DirectiveFactory
 #include <webserv/config/utils.hpp>                      // for trim, findCorrespondingClosingBrace, trimSemi
-#include <webserv/log/Log.hpp>                           // for Log
+#include <webserv/log/Log.hpp>                           // for Log, LOCATION
 
-#include <cstddef> // for size_t
-#include <fstream> // for basic_ifstream, basic_istream, basic_filebuf, basic_ostream::operator<<, ifstream, istringstream, stringstream
+#include <fstream> // for basic_ifstream, basic_istream, basic_filebuf, basic_ostream::operator<<, stringstream, ifstream, istringstream
 #include <sstream>   // for basic_stringstream, basic_istringstream
 #include <stdexcept> // for runtime_error
-#include <string>
+#include <string>    // for basic_string, char_traits, string, operator+, to_string, getline, operator<=>
 
 ConfigManager::ConfigManager() : initialized_(false) {}
 
@@ -32,40 +31,6 @@ void ConfigManager::init(const std::string &filePath)
     initialized_ = true;
 }
 
-void removeEmptyLines(std::string &str)
-{
-    std::istringstream stream(str);
-    std::string line;
-    std::string result;
-
-    while (std::getline(stream, line))
-    {
-        if (!utils::trim(line).empty())
-        {
-            result += utils::trimSemi(utils::trim(line)) + '\n';
-        }
-    }
-    str = result;
-}
-
-void removeComments(std::string &str)
-{
-    size_t pos = 0;
-    while ((pos = str.find('#', pos)) != std::string::npos)
-    {
-        size_t end = str.find('\n', pos);
-        if (end == std::string::npos)
-        {
-            str.erase(pos);
-        }
-        else
-        {
-            str.erase(pos, end - pos);
-        }
-    }
-    removeEmptyLines(str);
-}
-
 void ConfigManager::parseConfigFile(const std::string &filePath)
 {
     // Placeholder for actual file parsing logic
@@ -81,56 +46,18 @@ void ConfigManager::parseConfigFile(const std::string &filePath)
     std::stringstream buffer;
     buffer << file.rdbuf();
     std::string content = buffer.str();
-    removeComments(content);
+    utils::removeComments(content);
+    globalConfig_ = std::make_unique<GlobalConfig>(content);
 
-    std::string globalDeclarations;
-    Log::trace("Content before parsing servers:\n" + content);
-    size_t pos = 0;
-    while (true)
-    {
-        size_t serverPos = content.find("server", pos);
-        size_t bracePos = content.find('{', serverPos);
-        if (serverPos == std::string::npos || bracePos == std::string::npos)
-        {
-            // No more server blocks, remaining is global
-            globalDeclarations += content.substr(pos);
-            break;
-        }
-        // Add global declarations before this server block
-        globalDeclarations += content.substr(pos, serverPos - pos);
-        Log::trace(LOCATION, {{"pos", std::to_string(pos)},
-                              {"serverPos", std::to_string(serverPos)},
-                              {"globalDeclarations", globalDeclarations}});
-        size_t closeBrace = utils::findCorrespondingClosingBrace(content, bracePos);
-        if (closeBrace == std::string::npos)
-        {
-            throw std::runtime_error("Malformed block in config file.");
-        }
-        // Optionally parse the server block here
-        std::string serverBlock = content.substr(bracePos + 1, closeBrace - bracePos - 1);
-        serverConfigs_.emplace_back(serverBlock);
-        pos = closeBrace + 1;
-    }
-
-    parseGlobalDeclarations(globalDeclarations); // Implement this function to handle global config
+    // Implement this function to handle global config
     file.close();
 }
 
-void ConfigManager::parseGlobalDeclarations(const std::string &declarations)
+std::vector<ServerConfig *> ConfigManager::getServerConfigs() const
 {
-    Log::trace(LOCATION);
-    std::stringstream ss(declarations);
-    std::string line;
-    while (ss.good())
+    if (!initialized_)
     {
-        std::getline(ss, line);
-        line = utils::trim(line);
-        if (line.empty())
-        {
-            continue;
-        }
-        Log::info("Global Declaration: " + line);
-        auto directive = DirectiveFactory::createDirective(line);
-        globalDirectives_.push_back(std::move(directive));
+        throw std::runtime_error("ConfigManager is not initialized.");
     }
+    return globalConfig_->getServerConfigs();
 }

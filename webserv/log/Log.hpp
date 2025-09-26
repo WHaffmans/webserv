@@ -2,14 +2,13 @@
 
 #include <array>         // for array
 #include <chrono>        // for steady_clock
+#include <cstdint>       // for uint8_t
 #include <ios>           // for ios_base
 #include <map>           // for map
 #include <memory>        // for unique_ptr
 #include <string>        // for string, basic_string, hash
 #include <string_view>   // for string_view
 #include <unordered_map> // for unordered_map
-
-#include <cstdint> // for uint8_t
 
 class Channel; // Forward declaration
 

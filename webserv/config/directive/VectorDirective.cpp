@@ -1,7 +1,12 @@
 #include <webserv/config/directive/VectorDirective.hpp> // for IntDirective
 
-#include <any>
-#include <sstream> // for std::getline, std::basic_istream, std::char_traits, std::basic_stringbuf
+#include <sstream> // for basic_stringstream, stringstream
+
+VectorDirective::VectorDirective(const std::string &name, const std::string &value)
+    : ADirective(name) // NOLINT(bugprone-easily-swappable-parameters)
+{
+    parse(value);
+}
 
 void VectorDirective::parse(const std::string &value)
 {
@@ -17,7 +22,7 @@ void VectorDirective::parse(const std::string &value)
     }
 }
 
-DirectiveValueType VectorDirective::getValue() const
+DirectiveValueType VectorDirective::getValueType() const
 {
     return value_;
 }

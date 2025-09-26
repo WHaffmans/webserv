@@ -1,13 +1,17 @@
 #include <webserv/config/directive/IntDirective.hpp> // for IntDirective
 
-#include <any>
+IntDirective::IntDirective(const std::string &name, const std::string &value)
+    : ADirective(name) // NOLINT(bugprone-easily-swappable-parameters)
+{
+    parse(value);
+}
 
 void IntDirective::parse(const std::string &value)
 {
     value_ = std::stoi(value); // TODO: check parsing
 }
 
-DirectiveValueType IntDirective::getValue() const
+DirectiveValueType IntDirective::getValueType() const
 {
     return value_;
 }
