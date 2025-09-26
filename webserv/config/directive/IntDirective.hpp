@@ -2,7 +2,6 @@
 
 #include <webserv/config/directive/ADirective.hpp>     // for ADirective
 #include <webserv/config/directive/DirectiveValue.hpp> // for DirectiveValueType
-
 #include <string> // for string, basic_string
 
 class IntDirective : public ADirective

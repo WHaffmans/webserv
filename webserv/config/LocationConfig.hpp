@@ -1,6 +1,7 @@
 #pragma once
 
-#include <webserv/config/AConfig.hpp> // for AConfig
+#include <webserv/config/AConfig.hpp>  // for AConfig
+#include <string>                      // for string
 
 class LocationConfig : public AConfig
 {

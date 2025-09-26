@@ -1,22 +1,21 @@
-#include <webserv/client/Client.hpp>        // for Client
-#include <webserv/config/ConfigManager.hpp> // for ConfigManager
-#include <webserv/log/Log.hpp>              // for Log
+#include <webserv/client/Client.hpp>         // for Client
+#include <webserv/config/ConfigManager.hpp>  // for ConfigManager
+#include <webserv/log/Log.hpp>               // for Log
 #include <webserv/server/Server.hpp>
-#include <webserv/socket/Socket.hpp> // for Socket
-
-#include <cerrno>    // for errno
-#include <cstring>   // for strerror, strlen
-#include <exception> // for exception
-#include <memory>    // for unique_ptr, allocator, make_unique
-#include <stdexcept> // for runtime_error
-#include <string>    // for basic_string, operator+, to_string, char_traits, string
-#include <utility>   // for move, pair
-#include <vector>    // for vector
-
-#include <sys/epoll.h> // for epoll_event, epoll_ctl, EPOLLIN, EPOLLOUT, epoll_create1, epoll_wait, EPOLLERR, EPOLLHUP, EPOLL_CTL_ADD, EPOLL_CTL_DEL, EPOLL_CTL_MOD
-#include <sys/socket.h> // for send, SOMAXCONN
-#include <sys/types.h>  // for ssize_t
-#include <unistd.h>     // for close
+#include <webserv/socket/Socket.hpp>         // for Socket
+#include <sys/epoll.h>                       // for epoll_event, epoll_ctl, EPOLLIN, EPOLLOUT, epoll_create1, epoll_wait, EPOLLERR, EPOLLHUP, EPOLL_CTL_ADD, EPOLL_CTL_DEL, EPOLL_CTL_MOD
+#include <sys/socket.h>                      // for send, SOMAXCONN
+#include <sys/types.h>                       // for ssize_t
+#include <unistd.h>                          // for close
+#include <webserv/config/ServerConfig.hpp>   // for ServerConfig
+#include <cerrno>                            // for errno
+#include <cstring>                           // for strerror, strlen
+#include <exception>                         // for exception
+#include <memory>                            // for unique_ptr, allocator, make_unique
+#include <stdexcept>                         // for runtime_error
+#include <string>                            // for basic_string, operator+, to_string, char_traits, string
+#include <utility>                           // for move, pair
+#include <vector>                            // for vector
 
 Server::Server(const ConfigManager &configManager) : epoll_fd_(epoll_create1(0)), configManager_(configManager)
 {

@@ -1,13 +1,12 @@
 #include <webserv/config/ConfigManager.hpp>
-#include <webserv/config/ServerConfig.hpp>               // for ServerConfig
-#include <webserv/config/directive/DirectiveFactory.hpp> // for DirectiveFactory
-#include <webserv/config/utils.hpp>                      // for trim, findCorrespondingClosingBrace, trimSemi
-#include <webserv/log/Log.hpp>                           // for Log, LOCATION
+#include <webserv/config/utils.hpp>         // for removeComments
+#include <webserv/log/Log.hpp>              // for Log
+#include <fstream>                          // for basic_ifstream, basic_filebuf, basic_ostream::operator<<, ifstream, stringstream
+#include <sstream>                          // for basic_stringstream
+#include <stdexcept>                        // for runtime_error
+#include <string>                           // for char_traits, operator+, basic_string, string
 
-#include <fstream> // for basic_ifstream, basic_istream, basic_filebuf, basic_ostream::operator<<, stringstream, ifstream, istringstream
-#include <sstream>   // for basic_stringstream, basic_istringstream
-#include <stdexcept> // for runtime_error
-#include <string>    // for basic_string, char_traits, string, operator+, to_string, getline, operator<=>
+#include "webserv/config/GlobalConfig.hpp"  // for GlobalConfig
 
 ConfigManager::ConfigManager() : initialized_(false) {}
 

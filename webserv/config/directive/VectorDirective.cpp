@@ -1,6 +1,8 @@
 #include <webserv/config/directive/VectorDirective.hpp> // for IntDirective
+#include <sstream>                                      // for basic_stringstream, stringstream
 
-#include <sstream> // for basic_stringstream, stringstream
+#include "webserv/config/directive/ADirective.hpp"      // for ADirective
+#include "webserv/config/directive/DirectiveValue.hpp"  // for DirectiveValueType
 
 VectorDirective::VectorDirective(const std::string &name, const std::string &value)
     : ADirective(name) // NOLINT(bugprone-easily-swappable-parameters)

@@ -1,15 +1,15 @@
 #include <webserv/client/Client.hpp>
-#include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
-#include <webserv/log/Log.hpp>          // for Log
-#include <webserv/server/Server.hpp>    // for Server
-#include <webserv/socket/Socket.hpp>    // for Socket
+#include <webserv/http/HttpHeaders.hpp>  // for HttpHeaders
+#include <webserv/log/Log.hpp>           // for Log, LOCATION
+#include <webserv/server/Server.hpp>     // for Server
+#include <webserv/socket/Socket.hpp>     // for Socket
+#include <sys/types.h>                   // for ssize_t
+#include <cstdint>                       // for uint8_t
+#include <functional>                    // for reference_wrapper, cref, ref
+#include <map>                           // for map
+#include <utility>                       // for pair, move
 
-#include <cstdint>    // for uint8_t
-#include <functional> // for reference_wrapper, cref, ref
-#include <map>        // for map
-#include <utility>    // for pair, move
-
-#include <sys/types.h> // for ssize_t
+class ServerConfig;
 
 Client::Client(std::unique_ptr<Socket> socket, Server &server, const ServerConfig &server_config)
     : client_socket_(std::move(socket)), server_(std::ref(server)), server_config_(std::cref(server_config)),

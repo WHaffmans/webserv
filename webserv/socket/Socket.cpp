@@ -1,14 +1,12 @@
 #include <webserv/log/Log.hpp>
 #include <webserv/socket/Socket.hpp>
-
-#include <memory>
-#include <stdexcept>
-
 #include <arpa/inet.h>  // For inet_addr
 #include <fcntl.h>      // For fcntl()"
 #include <netinet/in.h> // For sockaddr_in
 #include <sys/socket.h>
 #include <unistd.h> // For close()
+#include <memory>
+#include <stdexcept>
 
 Socket::Socket() : fd_(socket(AF_INET, SOCK_STREAM, 0))
 {

@@ -2,7 +2,6 @@
 #include <webserv/http/HttpConstants.hpp> // for CRLF
 #include <webserv/http/HttpHeaders.hpp>   // for HttpHeaders
 #include <webserv/log/Log.hpp>
-
 #include <algorithm> // for __transform_fn, transform
 #include <cctype>    // for tolower
 #include <utility>   // for pair

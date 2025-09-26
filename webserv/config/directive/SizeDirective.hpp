@@ -2,7 +2,6 @@
 
 #include <webserv/config/directive/ADirective.hpp>     // for ADirective
 #include <webserv/config/directive/DirectiveValue.hpp> // for DirectiveValueType
-
 #include <cstddef> // for size_t
 #include <string>  // for string, basic_string
 

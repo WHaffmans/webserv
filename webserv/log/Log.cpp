@@ -2,7 +2,6 @@
 #include <webserv/log/FileChannel.hpp> // for FileChannel
 #include <webserv/log/Log.hpp>
 #include <webserv/log/StdoutChannel.hpp> // for StdoutChannel
-
 #include <chrono>    // for duration_cast, operator-, steady_clock, duration, seconds
 #include <exception> // for exception
 #include <iostream>  // for basic_ostream, operator<<, cerr

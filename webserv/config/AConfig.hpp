@@ -1,12 +1,11 @@
 #pragma once
 
+#include <webserv/config/directive/ADirective.hpp>  // for ADirective
+#include <map>                                      // for map
+#include <memory>                                   // for unique_ptr
+#include <string>                                   // for basic_string, string
+
 #include "webserv/config/directive/DirectiveValue.hpp"
-
-#include <webserv/config/directive/ADirective.hpp> // for ADirective
-
-#include <map>
-#include <memory>
-#include <string>
 
 class AConfig
 {

@@ -1,8 +1,9 @@
 #include <webserv/config/GlobalConfig.hpp>
-#include <webserv/config/utils.hpp>
-#include <webserv/log/Log.hpp> // for Log, LOCATION
-
-#include <vector>
+#include <webserv/config/utils.hpp>  // for findCorrespondingClosingBrace
+#include <webserv/log/Log.hpp>       // for Log
+#include <stddef.h>                  // for size_t
+#include <vector>                    // for vector
+#include <stdexcept>                 // for runtime_error
 
 GlobalConfig::GlobalConfig(const std::string &block)
 {

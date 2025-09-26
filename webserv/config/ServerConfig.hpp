@@ -1,7 +1,11 @@
 #pragma once
 
-#include <webserv/config/AConfig.hpp>        // for AConfig
-#include <webserv/config/LocationConfig.hpp> // for LocationConfig
+#include <webserv/config/AConfig.hpp>         // for AConfig
+#include <webserv/config/LocationConfig.hpp>  // for LocationConfig
+#include <map>                                // for map
+#include <memory>                             // for unique_ptr
+#include <string>                             // for basic_string, string
+#include <vector>                             // for vector
 
 class ServerConfig : public AConfig
 {

@@ -1,6 +1,5 @@
 #pragma once
 #include <webserv/config/directive/ADirective.hpp> // for ADirective
-
 #include <array>         // for array
 #include <functional>    // for function
 #include <memory>        // for unique_ptr

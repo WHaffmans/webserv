@@ -1,5 +1,4 @@
 #include <webserv/log/Channel.hpp>
-
 #include <iomanip> // for operator<<, setfill, setw
 #include <sstream> // for basic_ostream, operator<<, basic_stringstream, basic_istream, basic_istringstream, right, istringstream, stringstream
 #include <utility> // for get
