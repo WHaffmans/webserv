@@ -1,11 +1,12 @@
-#include <webserv/config/directive/BoolDirective.hpp> // for IntDirective
-#include <webserv/config/utils.hpp>                     // for trim
-#include <algorithm>                                    // for __transform_fn, transform
-#include <cctype>                                       // for tolower
-#include <stdexcept>                                    // for invalid_argument
+#include "webserv/config/directive/ADirective.hpp"     // for ADirective
+#include "webserv/config/directive/DirectiveValue.hpp" // for DirectiveValueType
 
-#include "webserv/config/directive/ADirective.hpp"      // for ADirective
-#include "webserv/config/directive/DirectiveValue.hpp"  // for DirectiveValueType
+#include <webserv/config/directive/BoolDirective.hpp> // for IntDirective
+#include <webserv/config/utils.hpp>                   // for trim
+
+#include <algorithm> // for __transform_fn, transform
+#include <cctype>    // for tolower
+#include <stdexcept> // for invalid_argument
 
 BoolDirective::BoolDirective(const std::string &name, const std::string &value)
     : ADirective(name) // NOLINT(bugprone-easily-swappable-parameters)

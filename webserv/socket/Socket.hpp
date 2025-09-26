@@ -1,9 +1,10 @@
 #pragma once
 
-#include <sys/types.h> // for ssize_t
 #include <cstddef> // for size_t
 #include <memory>  // for unique_ptr
 #include <string>  // for string
+
+#include <sys/types.h> // for ssize_t
 
 class Socket
 {

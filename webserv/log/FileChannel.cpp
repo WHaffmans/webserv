@@ -1,5 +1,6 @@
 #include <webserv/log/FileChannel.hpp>
 #include <webserv/log/Log.hpp> // for Log
+
 #include <chrono>   // for system_clock
 #include <ctime>    // for localtime, tm
 #include <iomanip>  // for operator<<, put_time

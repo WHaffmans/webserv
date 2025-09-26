@@ -1,12 +1,14 @@
-#include <webserv/config/LocationConfig.hpp>  // for LocationConfig
-#include <webserv/config/ServerConfig.hpp>
-#include <webserv/config/utils.hpp>           // for findCorrespondingClosingBrace, trim
-#include <webserv/log/Log.hpp>                // for Log, LOCATION
-#include <stddef.h>                           // for size_t
-#include <stdexcept>                          // for runtime_error
-#include <utility>                            // for pair
+#include "webserv/config/AConfig.hpp" // for AConfig
 
-#include "webserv/config/AConfig.hpp"         // for AConfig
+#include <webserv/config/LocationConfig.hpp> // for LocationConfig
+#include <webserv/config/ServerConfig.hpp>
+#include <webserv/config/utils.hpp> // for findCorrespondingClosingBrace, trim
+#include <webserv/log/Log.hpp>      // for Log, LOCATION
+
+#include <stdexcept> // for runtime_error
+#include <utility>   // for pair
+
+#include <stddef.h> // for size_t
 
 ServerConfig::ServerConfig(const std::string &block, const AConfig *parent) : AConfig(parent)
 {

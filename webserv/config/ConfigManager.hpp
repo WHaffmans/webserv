@@ -1,10 +1,11 @@
 #pragma once
 
 #include <webserv/config/GlobalConfig.hpp>
-#include <webserv/config/ServerConfig.hpp>  // for ServerConfig
-#include <memory>                           // for unique_ptr
-#include <string>                           // for string
-#include <vector>                           // for vector
+#include <webserv/config/ServerConfig.hpp> // for ServerConfig
+
+#include <memory> // for unique_ptr
+#include <string> // for string
+#include <vector> // for vector
 
 class ADirective;
 class GlobalConfig;

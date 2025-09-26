@@ -2,6 +2,7 @@
 
 #include <webserv/log/Channel.hpp> // for Channel
 #include <webserv/log/Log.hpp>     // for Log
+
 #include <map>    // for map
 #include <string> // for string, basic_string
 

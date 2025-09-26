@@ -1,10 +1,11 @@
 #pragma once
 
 #include <webserv/config/ServerConfig.hpp>
-#include <webserv/http/HttpHeaders.hpp>  // for HttpHeaders
-#include <cstddef>                       // for size_t
-#include <cstdint>                       // for uint8_t
-#include <string>                        // for string, basic_string
+#include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
+
+#include <cstddef> // for size_t
+#include <cstdint> // for uint8_t
+#include <string>  // for string, basic_string
 
 class Client;
 class ServerConfig;
