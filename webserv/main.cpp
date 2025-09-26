@@ -5,7 +5,6 @@
 #include <iostream> // for basic_ostream, operator<<, cerr, ios_base
 #include <map>      // for map
 #include <string>   // for basic_string, char_traits, allocator, operator+, operator<=>
-#include <utility>  // for pair
 
 int main(int argc, char **argv)
 {
@@ -20,7 +19,20 @@ int main(int argc, char **argv)
     Log::info("\n======================\nStarting webserv...\n======================\n");
     Log::warning("Testing context: " + LOCATION, {{"key1", "value1"}, {"key2", "value2"}});
     ConfigManager::getInstance().init(argv[1]); // NOLINT
-    Server server(ConfigManager::getInstance());
+    ConfigManager &configManager = ConfigManager::getInstance();
+    Log::info("ConfigManager initialized successfully.");
+
+
+    auto serverConfigs = configManager.getServerConfigs();
+    auto *firstServer = serverConfigs[0];
+    const auto *location = firstServer->getLocation("/");
+    const auto *listenDirective = location->getDirective("listen");
+    int listenPort = listenDirective->getValueAs<int>();
+    Log::warning("Listen port for '/' location: " + std::to_string(listenPort));
+
+
+
+    Server server(configManager);
 
     server.start();
     return 0;

@@ -26,7 +26,16 @@ class ADirective
     [[nodiscard]] virtual DirectiveValueType getValueType() const = 0;
     [[nodiscard]] DirectiveValue getValue() const;
     [[nodiscard]] std::string getName() const;
+
     // [[nodiscard]] std::string toString() const;
+    template <typename T> [[nodiscard]] T getValueAs() const
+    {
+        if (getValue().holds<T>())
+        {
+            return getValue().get<T>();
+        }
+        return T(); //TODO: does this work for all types?
+    }
 
   protected:
     std::string name_;
