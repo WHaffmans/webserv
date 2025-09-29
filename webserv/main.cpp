@@ -23,12 +23,12 @@ int main(int argc, char **argv)
     Log::info("ConfigManager initialized successfully.");
 
 
-    auto serverConfigs = configManager.getServerConfigs();
-    auto *firstServer = serverConfigs[0];
-    const auto *location = firstServer->getLocation("/");
-    const auto *listenDirective = location->getDirective("listen");
-    int listenPort = listenDirective->getValueAs<int>();
-    Log::warning("Listen port for '/' location: " + std::to_string(listenPort));
+    // auto serverConfigs = configManager.getServerConfigs();
+    // auto *firstServer = serverConfigs[0];
+    // const auto *location = firstServer->getLocation("/");
+    // const auto *listenDirective = location->getDirective("listen");
+    // int listenPort = listenDirective->getValueAs<int>();
+    // Log::warning("Listen port for '/' location: " + std::to_string(listenPort));
 
 
 

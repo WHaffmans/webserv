@@ -1,7 +1,9 @@
 #include <webserv/config/utils.hpp>       // for stoul
 #include <webserv/http/HttpConstants.hpp> // for CRLF, DOUBLE_CRLF
 #include <webserv/http/HttpRequest.hpp>
-#include <webserv/log/Log.hpp> // for Log, LOCATION
+#include <webserv/log/Log.hpp>          // for Log, LOCATION
+#include <webserv/client/Client.hpp>    // for Client
+
 
 #include <map>      // for map
 #include <optional> // for optional
@@ -11,8 +13,7 @@
 
 class ServerConfig;
 
-HttpRequest::HttpRequest(const ServerConfig *serverConfig, const Client *client)
-    : serverConfig_(serverConfig), client_(client)
+HttpRequest::HttpRequest(Client *client) : client_(client)
 {
     Log::trace(LOCATION);
 }
@@ -26,6 +27,11 @@ HttpRequest::State HttpRequest::getState() const
 {
     Log::trace(LOCATION);
     return state_;
+}
+
+void HttpRequest::setState(State state)
+{
+    state_ = state;
 }
 
 const HttpHeaders &HttpRequest::getHeaders() const
@@ -80,7 +86,10 @@ void HttpRequest::parseBuffer()
             case State::Complete:
                 Log::debug("HttpRequest::parseBuffer() request is complete");
                 return; // Request is complete
-            case State::ParseError: Log::warning("Parse error occurred, stopping further processing"); return;
+            case State::ParseError:
+                Log::warning("Parse error occurred, stopping further processing");
+                client_->setStatusCode(Http::StatusCode::BAD_REQUEST);
+                return;
             }
         }
         catch (...)

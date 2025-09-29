@@ -1,3 +1,4 @@
+#include "webserv/config/ServerConfig.hpp"
 #include <webserv/config/ConfigManager.hpp>
 #include <webserv/config/GlobalConfig.hpp> // for GlobalConfig
 #include <webserv/config/utils.hpp>        // for removeComments
@@ -59,4 +60,39 @@ std::vector<ServerConfig *> ConfigManager::getServerConfigs() const
         throw std::runtime_error("ConfigManager is not initialized.");
     }
     return globalConfig_->getServerConfigs();
+}
+
+ServerConfig *ConfigManager::getMatchingServerConfig(const std::string &host_port) const
+{
+    if (!initialized_)
+    {
+        throw std::runtime_error("ConfigManager is not initialized.");
+    }
+    // split host and port on the colon:
+    size_t colonPos = host_port.find(':');
+    std::string host = (colonPos != std::string::npos) ? host_port.substr(0, colonPos) : host_port;
+    int port = (colonPos != std::string::npos) ? std::stoi(host_port.substr(colonPos + 1)) : 0;
+    return getMatchingServerConfig(host, port);
+}
+
+ServerConfig *ConfigManager::getMatchingServerConfig(const std::string &host, int port) const
+{
+    if (!initialized_)
+    {
+        throw std::runtime_error("ConfigManager is not initialized.");
+    }
+    std::vector<ServerConfig *> serverConfigs = globalConfig_->getServerConfigs();
+   for (ServerConfig *serverConfig : serverConfigs)
+   {
+       auto serverName = serverConfig->getDirectiveValue<std::string>("server_name", "");
+       auto listenPorts = serverConfig->getDirectiveValue<int>("listen", 80);
+        Log::debug("Checking server config: " + serverName + " on port " + std::to_string(listenPorts));
+       if ((serverName == host) && (listenPorts == port))
+       {
+           Log::info("Found matching server config for host: " + host + " and port: " + std::to_string(port));
+           return serverConfig;
+       }
+   }
+    Log::warning("No matching server config found for host: " + host + " and port: " + std::to_string(port));
+   return nullptr;
 }

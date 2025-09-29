@@ -1,3 +1,4 @@
+#include "webserv/config/ConfigManager.hpp"
 #include <webserv/client/Client.hpp>
 #include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
 #include <webserv/log/Log.hpp>          // for Log, LOCATION
@@ -13,9 +14,9 @@
 
 class ServerConfig;
 
-Client::Client(std::unique_ptr<Socket> socket, Server &server, const ServerConfig &server_config)
-    : client_socket_(std::move(socket)), server_(std::ref(server)), server_config_(std::cref(server_config)),
-      httpRequest_(std::make_unique<HttpRequest>(&server_config, this))
+Client::Client(std::unique_ptr<Socket> socket, Server &server)
+    : client_socket_(std::move(socket)), server_(std::ref(server)),
+      httpRequest_(std::make_unique<HttpRequest>(this))
 {
 }
 
@@ -24,6 +25,16 @@ Client::~Client()
     Log::debug("Client destructor called for fd: " + std::to_string(client_socket_->getFd()));
     server_.removeFromEpoll(*client_socket_);
 };
+
+int Client::getStatusCode() const
+{
+    return statusCode_;
+}
+
+void Client::setStatusCode(int code)
+{
+    statusCode_ = code;
+}
 
 void Client::request()
 {
@@ -56,6 +67,13 @@ void Client::request()
                       {"body", httpRequest_->getBody()},
                       {"state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
                   });
+        server_config_ = ConfigManager::getInstance().getMatchingServerConfig(httpRequest_->getHeaders().get("Host"));
+        if (server_config_ == nullptr)
+        {
+            Log::warning("No matching server config found for Host: " + httpRequest_->getHeaders().get("Host"));
+            httpRequest_->setState(HttpRequest::State::ParseError);
+        }
+         // Example usage, replace with actual host and port extraction from request
         server_.responseReady(client_socket_->getFd());
     }
     else
@@ -79,10 +97,16 @@ std::string Client::getResponse() const
     else
     {
         response += "200 OK\r\n";
-    }
+    
     // further validation can be added here
-    response += "Content-Length: 18\r\n\r\n";
-    response += "Server port 8080\r\n";
+
+    auto serverName = server_config_->getDirectiveValue<std::string>("server_name");
+    auto port = server_config_->getDirectiveValue<int>("listen");
+    std::string body = "Server Name " + serverName + "\r\n";
+    body += "Server port " + std::to_string(port) + "\r\n";
+    response += "Content-Length: " + std::to_string(body.size()) + "\r\n\r\n";
+    response += body;
+    }
 
     Log::debug("Sending response:\n" + response);
     return response;

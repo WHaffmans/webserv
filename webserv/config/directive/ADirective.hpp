@@ -38,7 +38,7 @@ class ADirective
     }
 
   protected:
-    std::string name_;
+    std::string name_; //NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
 };
 
 // Non-member stream operator for ADirective

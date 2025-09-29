@@ -22,6 +22,9 @@ class ConfigManager
     static ConfigManager &getInstance();
 
     [[nodiscard]] std::vector<ServerConfig *> getServerConfigs() const;
+    [[nodiscard]] ServerConfig *getMatchingServerConfig(const std::string &host, int port) const;
+    [[nodiscard]] ServerConfig *getMatchingServerConfig(const std::string &host_port) const;
+    [[nodiscard]] GlobalConfig *getGlobalConfig() const;
 
   private:
     bool initialized_;

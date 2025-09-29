@@ -23,7 +23,7 @@ class HttpRequest
         ParseError
     };
 
-    HttpRequest(const ServerConfig *serverConfig, const Client *client);
+    HttpRequest(Client *client);
 
     HttpRequest(const HttpRequest &other) = delete;
     HttpRequest(HttpRequest &&other) noexcept = delete;
@@ -32,6 +32,7 @@ class HttpRequest
     ~HttpRequest();
 
     [[nodiscard]] State getState() const;
+    void setState(State state);
     [[nodiscard]] const HttpHeaders &getHeaders() const;
     [[nodiscard]] const std::string &getBody() const;
 
@@ -54,8 +55,7 @@ class HttpRequest
 
     void parseContentLength();
 
-    const ServerConfig *serverConfig_;
-    const Client *client_;
+    Client *client_;
 
     State state_ = State::RequestLine;
 

@@ -113,7 +113,7 @@ void Server::handleConnection(struct epoll_event *event)
     std::unique_ptr<Socket> clientSocket = listener.accept();
     addToEpoll(*clientSocket, EPOLLIN);
     clients_.insert(
-        {clientSocket->getFd(), std::make_unique<Client>(std::move(clientSocket), *this, getConfig(listener))});
+        {clientSocket->getFd(), std::make_unique<Client>(std::move(clientSocket), *this)});
 }
 
 Socket &Server::getListener(int fd) const
