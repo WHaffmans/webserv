@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string_view>
+#include <array>
 
 namespace Http
 {
@@ -41,6 +42,27 @@ constexpr uint16_t NOT_IMPLEMENTED = 501;
 constexpr uint16_t BAD_GATEWAY = 502;
 constexpr uint16_t SERVICE_UNAVAILABLE = 503;
 } // namespace StatusCode
+
+struct StatusCodeInfo
+{
+    uint16_t code;
+    std::string_view reason;
+};
+
+static constexpr std::array<StatusCodeInfo, 12> statusCodeInfos = {{
+    { .code = StatusCode::OK, .reason = "OK" },
+    { .code = StatusCode::CREATED, .reason = "Created" },
+    { .code = StatusCode::NO_CONTENT, .reason = "No Content" },
+    { .code = StatusCode::BAD_REQUEST, .reason = "Bad Request" },
+    { .code = StatusCode::UNAUTHORIZED, .reason = "Unauthorized" },
+    { .code = StatusCode::FORBIDDEN, .reason = "Forbidden" },
+    { .code = StatusCode::NOT_FOUND, .reason = "Not Found" },
+    { .code = StatusCode::METHOD_NOT_ALLOWED, .reason = "Method Not Allowed" },
+    { .code = StatusCode::INTERNAL_SERVER_ERROR, .reason = "Internal Server Error" },
+    { .code = StatusCode::NOT_IMPLEMENTED, .reason = "Not Implemented" },
+    { .code = StatusCode::BAD_GATEWAY, .reason = "Bad Gateway" },
+    { .code = StatusCode::SERVICE_UNAVAILABLE, .reason = "Service Unavailable" }
+}};
 
 // Header Names
 namespace Header

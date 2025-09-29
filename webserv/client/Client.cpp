@@ -1,4 +1,6 @@
 #include "webserv/config/ConfigManager.hpp"
+#include "webserv/handler/ErrorHandler.hpp"
+
 #include <webserv/client/Client.hpp>
 #include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
 #include <webserv/log/Log.hpp>          // for Log, LOCATION
@@ -15,8 +17,7 @@
 class ServerConfig;
 
 Client::Client(std::unique_ptr<Socket> socket, Server &server)
-    : client_socket_(std::move(socket)), server_(std::ref(server)),
-      httpRequest_(std::make_unique<HttpRequest>(this))
+    : client_socket_(std::move(socket)), server_(std::ref(server)), httpRequest_(std::make_unique<HttpRequest>(this))
 {
 }
 
@@ -73,7 +74,7 @@ void Client::request()
             Log::warning("No matching server config found for Host: " + httpRequest_->getHeaders().get("Host"));
             httpRequest_->setState(HttpRequest::State::ParseError);
         }
-         // Example usage, replace with actual host and port extraction from request
+        // Example usage, replace with actual host and port extraction from request
         server_.responseReady(client_socket_->getFd());
     }
     else
@@ -89,16 +90,12 @@ void Client::request()
 std::string Client::getResponse() const
 {
     Log::trace(LOCATION);
-    std::string response = "HTTP/1.1 ";
     if (httpRequest_->getState() == HttpRequest::State::ParseError)
     {
-        response += "400 Bad Request\r\n";
+        return ErrorHandler::generateErrorPage(Http::StatusCode::BAD_REQUEST);
     }
-    else
-    {
-        response += "200 OK\r\n";
-    
-    // further validation can be added here
+    std::string response = "HTTP/1.1 ";
+    response += "200 OK\r\n";
 
     auto serverName = server_config_->getDirectiveValue<std::string>("server_name");
     auto port = server_config_->getDirectiveValue<int>("listen");
@@ -106,7 +103,6 @@ std::string Client::getResponse() const
     body += "Server port " + std::to_string(port) + "\r\n";
     response += "Content-Length: " + std::to_string(body.size()) + "\r\n\r\n";
     response += body;
-    }
 
     Log::debug("Sending response:\n" + response);
     return response;

@@ -21,6 +21,7 @@ class AConfig
 
     void addDirective(const std::string &line);
     [[nodiscard]] const ADirective *getDirective(const std::string &name) const;
+    [[nodiscard]] std::string getErrorPage(int statusCode) const; 
 
     [[nodiscard]] bool hasDirective(const std::string &name) const;
 
@@ -43,7 +44,7 @@ class AConfig
   protected:
     virtual void parseBlock(const std::string &block) = 0;
     void parseDirectives(const std::string &declarations);
-    std::map<std::string, std::unique_ptr<ADirective>>
+    std::vector<std::unique_ptr<ADirective>>
         directives_;                  // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
     const AConfig *parent_ = nullptr; // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
 };

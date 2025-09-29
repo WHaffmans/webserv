@@ -14,16 +14,16 @@ void AConfig::addDirective(const std::string &line)
     auto directive = DirectiveFactory::createDirective(line);
     if (directive)
     {
-        directives_[directive->getName()] = std::move(directive);
+        directives_.emplace_back(std::move(directive));
     }
 }
 
 const ADirective *AConfig::getDirective(const std::string &name) const
 {
-    auto it = directives_.find(name);
-    if (it != directives_.end())
-    {
-        return it->second.get();
+    for (const auto &directive : directives_) {
+        if (directive->getName() == name) {
+            return directive.get();
+        }
     }
     if (parent_ != nullptr)
     {
@@ -34,9 +34,10 @@ const ADirective *AConfig::getDirective(const std::string &name) const
 
 bool AConfig::hasDirective(const std::string &name) const
 {
-    if (directives_.contains(name)) // NOLINT
-    {
-        return true;
+    for (const auto &directive : directives_) {
+        if (directive->getName() == name) {
+            return true;
+        }
     }
     if (parent_ != nullptr)
     {
@@ -59,7 +60,27 @@ void AConfig::parseDirectives(const std::string &declarations)
             continue;
         }
         Log::info("Global Declaration: " + line);
-        auto directive = DirectiveFactory::createDirective(line);
-        directives_[directive->getName()] = std::move(directive);
+        addDirective(line);
     }
+}
+
+std::string AConfig::getErrorPage(int statusCode) const
+{
+    const ADirective *directive = getDirective("error_page");
+    for (const auto &directive : directives_)
+    {
+        if (directive->getName() == "error_page")
+        {
+            auto value = directive->getValueAs<std::pair<int, std::string>>();
+            if (value.first == statusCode)
+            {
+                return value.second;
+            }
+        }
+    }
+    if (parent_ != nullptr)
+    {
+        return parent_->getErrorPage(statusCode);
+    }
+    return ""; // Return empty string if not found
 }
