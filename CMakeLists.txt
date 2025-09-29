@@ -5,6 +5,9 @@ project(webserv)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Enable testing
+enable_testing()
+
 # Enable parallel compilation
 include(ProcessorCount)
 ProcessorCount(N)
@@ -16,6 +19,9 @@ endif()
 file(GLOB_RECURSE SOURCES
     "${PROJECT_SOURCE_DIR}/webserv/*.cpp"
 )
+
+# Remove main.cpp from sources for library (we'll add it back for the main executable)
+list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 
 # Add include directories
 include_directories(
@@ -56,5 +62,34 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "ASAN")
 endif()
 
 # Add executable target
-add_executable(webserv ${SOURCES})
+add_executable(webserv ${SOURCES} "${PROJECT_SOURCE_DIR}/webserv/main.cpp")
+
+# Create a library for testing (without main.cpp)
+add_library(webserv_lib ${SOURCES})
+
+# Google Test integration
+find_package(PkgConfig QUIET)
+if(PkgConfig_FOUND)
+    pkg_check_modules(GTEST gtest)
+    pkg_check_modules(GTEST_MAIN gtest_main)
+endif()
+
+if(GTEST_FOUND AND GTEST_MAIN_FOUND)
+    message(STATUS "Using system Google Test")
+    # Use system gtest - variables will be set by pkg_check_modules
+else()
+    message(STATUS "Downloading Google Test")
+    include(FetchContent)
+    FetchContent_Declare(
+      googletest
+      URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+      DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    )
+    # For Windows: Prevent overriding the parent project's compiler/linker settings
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+endif()
+
+# Add test directory
+add_subdirectory(tests)
 

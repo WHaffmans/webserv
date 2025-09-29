@@ -71,5 +71,20 @@ fclean:
 # Rebuild everything
 re: fclean all
 
+# Test targets
+test: release
+	@echo "Building and running tests..."
+	$(CMAKE_BUILD) $(BUILD_DIR) --target webserv_tests
+	cd $(BUILD_DIR) && ctest --output-on-failure
+
+test_verbose: release
+	@echo "Building and running tests with verbose output..."
+	$(CMAKE_BUILD) $(BUILD_DIR) --target webserv_tests
+	cd $(BUILD_DIR) && ctest --verbose
+
+test_build: release
+	@echo "Building tests only..."
+	$(CMAKE_BUILD) $(BUILD_DIR) --target webserv_tests
+
 # Mark targets as phony
-.PHONY: all release debug asan run run_release run_debug run_asan clean fclean re
+.PHONY: all release debug asan run run_release run_debug run_asan clean fclean re test test_verbose test_build
