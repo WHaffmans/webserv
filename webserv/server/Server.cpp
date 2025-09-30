@@ -14,6 +14,7 @@
 #include <string>    // for basic_string, operator+, to_string, char_traits, string
 #include <utility>   // for move, pair
 #include <vector>    // for vector
+#include <unordered_map> // for unordered_map, unordered_map<>::container_type
 
 #include <sys/epoll.h> // for epoll_event, epoll_ctl, EPOLLIN, EPOLLOUT, epoll_create1, epoll_wait, EPOLLERR, EPOLLHUP, EPOLL_CTL_ADD, EPOLL_CTL_DEL, EPOLL_CTL_MOD
 #include <sys/socket.h> // for send, SOMAXCONN

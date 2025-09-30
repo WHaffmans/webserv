@@ -37,7 +37,7 @@ endif()
 # Define available build types for IDE
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
     "Debug"
-    "Release" 
+    "Release"
     "ASAN"
     "RelWithDebInfo"
     "MinSizeRel"
@@ -68,28 +68,90 @@ add_executable(webserv ${SOURCES} "${PROJECT_SOURCE_DIR}/webserv/main.cpp")
 add_library(webserv_lib ${SOURCES})
 
 # Google Test integration
-find_package(PkgConfig QUIET)
-if(PkgConfig_FOUND)
-    pkg_check_modules(GTEST gtest)
-    pkg_check_modules(GTEST_MAIN gtest_main)
-endif()
+option(BUILD_TESTS "Build tests" ON)
 
-if(GTEST_FOUND AND GTEST_MAIN_FOUND)
-    message(STATUS "Using system Google Test")
-    # Use system gtest - variables will be set by pkg_check_modules
-else()
-    message(STATUS "Downloading Google Test")
-    include(FetchContent)
-    FetchContent_Declare(
-      googletest
-      URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-      DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+if(BUILD_TESTS)
+    find_package(PkgConfig QUIET)
+    if(PkgConfig_FOUND)
+        pkg_check_modules(GTEST gtest)
+        pkg_check_modules(GTEST_MAIN gtest_main)
+    endif()
+
+    if(GTEST_FOUND AND GTEST_MAIN_FOUND)
+        message(STATUS "Using system Google Test")
+        # Use system gtest - variables will be set by pkg_check_modules
+    else()
+        message(STATUS "Downloading Google Test")
+        include(FetchContent)
+        FetchContent_Declare(
+            googletest
+            URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+        )
+        # For Windows: Prevent overriding the parent project's compiler/linker settings
+        set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+        FetchContent_MakeAvailable(googletest)
+
+        # Make sure gtest targets are available
+        if(TARGET gtest_main)
+            message(STATUS "Google Test targets available")
+        endif()
+    endif()
+
+    # Add test directory if it exists
+    if(EXISTS "${CMAKE_SOURCE_DIR}/tests")
+        add_subdirectory(tests)
+    else()
+        message(STATUS "Tests directory not found, creating basic test structure")
+        file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/tests")
+
+        # Create a basic test file
+        file(WRITE "${CMAKE_SOURCE_DIR}/tests/test_main.cpp"
+"#include <gtest/gtest.h>
+
+// Basic test to verify Google Test is working
+TEST(BasicTest, TruthTest) {
+    EXPECT_TRUE(true);
+    EXPECT_FALSE(false);
+    EXPECT_EQ(1 + 1, 2);
+}
+
+int main(int argc, char** argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
+")
+
+        # Create CMakeLists.txt for tests
+        file(WRITE "${CMAKE_SOURCE_DIR}/tests/CMakeLists.txt"
+"# Test executable
+add_executable(webserv_tests
+    test_main.cpp
+)
+
+# Link with Google Test
+if(TARGET gtest_main)
+    target_link_libraries(webserv_tests
+        gtest_main
+        webserv_lib
     )
-    # For Windows: Prevent overriding the parent project's compiler/linker settings
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(googletest)
+else()
+    target_link_libraries(webserv_tests
+        \${GTEST_LIBRARIES}
+        \${GTEST_MAIN_LIBRARIES}
+        webserv_lib
+    )
+    target_include_directories(webserv_tests PRIVATE \${GTEST_INCLUDE_DIRS})
 endif()
 
-# Add test directory
-add_subdirectory(tests)
+target_include_directories(webserv_tests PRIVATE
+    \${CMAKE_SOURCE_DIR}
+    \${CMAKE_SOURCE_DIR}/webserv
+)
+
+# Discover tests
+include(GoogleTest)
+gtest_discover_tests(webserv_tests)
+")
+    endif()
+endif()
 
