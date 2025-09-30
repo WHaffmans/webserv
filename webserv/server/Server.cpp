@@ -20,7 +20,8 @@
 #include <sys/types.h>  // for ssize_t
 #include <unistd.h>     // for close
 
-Server::Server(const ConfigManager &configManager) : epoll_fd_(epoll_create1(0)), configManager_(configManager)
+Server::Server(const ConfigManager &configManager)
+    : epoll_fd_(epoll_create1(0)), configManager_(configManager), router_()
 {
     Log::trace(LOCATION);
     const auto &serverConfigs = configManager.getServerConfigs();
@@ -229,4 +230,9 @@ void Server::eventLoop()
             }
         }
     }
+}
+
+const Router &Server::getRouter() const
+{
+    return router_;
 }

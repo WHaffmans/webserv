@@ -1,4 +1,5 @@
 #include "webserv/http/HttpConstants.hpp"
+
 #include <webserv/client/Client.hpp>
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/ServerConfig.hpp>  // for ServerConfig
@@ -75,14 +76,14 @@ void Client::request()
                       {"body", httpRequest_->getBody()},
                       {"state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
                   });
-        server_config_ =
-            ConfigManager::getInstance().getMatchingServerConfig(httpRequest_->getHeaders().getHost().value_or(""));
-        if (server_config_ == nullptr)
-        {
-            Log::warning("No matching server config found for Host: " +
-                         httpRequest_->getHeaders().getHost().value_or("unknown host"));
-            setError(Http::StatusCode::BAD_REQUEST);
-        }
+        // server_config_ =
+        //     ConfigManager::getInstance().getMatchingServerConfig(httpRequest_->getHeaders().getHost().value_or(""));
+        // if (server_config_ == nullptr)
+        // {
+        //     Log::warning("No matching server config found for Host: " +
+        //                  httpRequest_->getHeaders().getHost().value_or("unknown host"));
+        //     setError(Http::StatusCode::BAD_REQUEST);
+        // }
 
         // Example usage, replace with actual host and port extraction from request
         server_.responseReady(client_socket_->getFd());
@@ -107,23 +108,23 @@ bool Client::isResponseReady() const
 std::vector<uint8_t> Client::getResponse() const
 {
     Log::trace(LOCATION);
-    Log::trace(LOCATION);
-    if (statusCode_ == Http::StatusCode::OK)
-    {
-        httpResponse_->setStatus(200);
-        httpResponse_->addHeader("Content-Type", "text/plain");
-        httpResponse_->appendBody("Hello, World!\n");
-    }
-    return httpResponse_->toBytes();
+    // if (statusCode_ != Http::StatusCode::OK)
+    // {
+    //     return httpResponse_->toBytes();
+    // }
+
+    const Router &router = server_.getRouter();
+    auto response = router.handleRequest(*httpRequest_);
+    return response.toBytes();
 }
 
-void Client::setError(int statusCode)
-{
-    Log::trace(LOCATION);
-    statusCode_ = statusCode;
-    Log::debug("Setting error response with status code: " + std::to_string(statusCode));
-    auto errorResponse = std::make_unique<HttpResponse>(
-        ErrorHandler::getErrorResponse(statusCode, const_cast<ServerConfig *>(server_config_)));
-    httpResponse_ = std::move(errorResponse);
-    Log::debug("Error response set successfully");
-}
+// void Client::setError(int statusCode)
+// {
+//     Log::trace(LOCATION);
+//     statusCode_ = statusCode;
+//     Log::debug("Setting error response with status code: " + std::to_string(statusCode));
+//     auto errorResponse = std::make_unique<HttpResponse>(
+//         ErrorHandler::getErrorResponse(statusCode, const_cast<ServerConfig *>(server_config_)));
+//     httpResponse_ = std::move(errorResponse);
+//     Log::debug("Error response set successfully");
+// }

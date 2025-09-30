@@ -8,7 +8,7 @@ class LocationConfig : public AConfig
 {
   public:
     LocationConfig() = delete;
-    LocationConfig(const std::string &Block, const AConfig *parent = nullptr);
+    LocationConfig(const std::string &Block, const std::string &path, const AConfig *parent = nullptr);
 
     LocationConfig(const LocationConfig &other) = delete;
     LocationConfig &operator=(const LocationConfig &other) = delete;
@@ -17,6 +17,9 @@ class LocationConfig : public AConfig
 
     ~LocationConfig() override = default;
 
+    [[nodiscard]] const std::string &getPath() const { return _path; }
+
   private:
     void parseBlock(const std::string &block) override;
+    std::string _path;
 };

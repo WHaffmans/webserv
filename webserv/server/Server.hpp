@@ -1,16 +1,17 @@
 #pragma once
 
+#include "webserv/router/Router.hpp"
+
 #include <webserv/client/Client.hpp>
 #include <webserv/config/ConfigManager.hpp>
 #include <webserv/config/ServerConfig.hpp> // for ServerConfig
 #include <webserv/socket/Socket.hpp>       // for Socket
 
 #include <cstdint>       // for uint32_t
-
 #include <memory>        // for unique_ptr
+#include <set>           // for set
 #include <unordered_map> // for unordered_map
 #include <vector>        // for vector
-#include <set>           // for set
 
 class Client;
 class ConfigManager;
@@ -41,13 +42,15 @@ class Server
     void handleRequest(struct epoll_event *event) const;
     void responseReady(int client_fd) const;
     void eventLoop();
+
     Socket &getListener(int fd) const;
     Client &getClient(int fd) const;
-
+    const Router &getRouter() const;
 
   private:
     int epoll_fd_;
     const ConfigManager &configManager_;
+    const Router router_;
     std::vector<std::unique_ptr<Socket>> listeners_;
     std::set<int> listener_fds_;
     std::unordered_map<int, std::unique_ptr<Client>> clients_;
