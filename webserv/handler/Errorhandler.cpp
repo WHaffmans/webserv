@@ -61,7 +61,7 @@ std::string ErrorHandler::getErrorPageFile(const std::string &path)
     if (!file.is_open())
     {
         Log::error("Could not open custom error page: " + path);
-        return generateErrorPage(Http::StatusCode::INTERNAL_SERVER_ERROR);
+        return generateDefaultErrorPage(Http::StatusCode::INTERNAL_SERVER_ERROR);
     }
     std::stringstream buffer;
     buffer << file.rdbuf();

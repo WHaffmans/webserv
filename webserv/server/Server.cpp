@@ -83,8 +83,6 @@ void Server::removeClient(const Client &client)
     Log::trace(LOCATION);
     int client_fd = client.getSocket().getFd();
     clients_.erase(client_fd);
-    // removeFromEpoll(client.getSocket());
-    // close(client_fd);
 }
 
 void Server::removeFromEpoll(const Socket &socket) const
