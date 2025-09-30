@@ -62,17 +62,17 @@ echo -e "${BLUE}🔧 Applying IWYU fixes...${NC}"
 iwyu_fix_options=""
 
 # Ask user for options
-echo -e "${YELLOW}Choose fix options:${NC}"
-echo -e "  1) ${GREEN}Safe mode${NC} (conservative, only safe changes)"
-echo -e "  2) ${BLUE}Standard mode${NC} (recommended)"
-echo -e "  3) ${YELLOW}Aggressive mode${NC} (with comments, updates existing)"
-echo -n "Choose (1-3) [default: 2]: "
+# echo -e "${YELLOW}Choose fix options:${NC}"
+# echo -e "  1) ${GREEN}Safe mode${NC} (conservative, only safe changes)"
+# echo -e "  2) ${BLUE}Standard mode${NC} (recommended)"
+# echo -e "  3) ${YELLOW}Aggressive mode${NC} (with comments, updates existing)"
+# echo -n "Choose (1-3) [default: 2]: "
 
-if [ -t 0 ]; then  # Only read input if running interactively
-    read -r choice
-else
-    choice="2"
-fi
+# if [ -t 0 ]; then  # Only read input if running interactively
+#     read -r choice
+# else
+    choice="3"
+# fi
 
 case "${choice:-2}" in
     1)
