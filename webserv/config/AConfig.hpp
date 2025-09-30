@@ -5,7 +5,8 @@
 
 #include <map>    // for map
 #include <memory> // for unique_ptr
-#include <string> // for basic_string, string
+#include <string> // for string
+#include <vector> // for vector
 
 class AConfig
 {
@@ -21,7 +22,7 @@ class AConfig
 
     void addDirective(const std::string &line);
     [[nodiscard]] const ADirective *getDirective(const std::string &name) const;
-    [[nodiscard]] std::string getErrorPage(int statusCode) const; 
+    [[nodiscard]] std::string getErrorPage(int statusCode) const;
 
     [[nodiscard]] bool hasDirective(const std::string &name) const;
 

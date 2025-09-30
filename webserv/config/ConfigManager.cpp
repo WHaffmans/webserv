@@ -1,4 +1,3 @@
-#include "webserv/config/ServerConfig.hpp"
 #include <webserv/config/ConfigManager.hpp>
 #include <webserv/config/GlobalConfig.hpp> // for GlobalConfig
 #include <webserv/config/utils.hpp>        // for removeComments
@@ -7,7 +6,9 @@
 #include <fstream>   // for basic_ifstream, basic_filebuf, basic_ostream::operator<<, ifstream, stringstream
 #include <sstream>   // for basic_stringstream
 #include <stdexcept> // for runtime_error
-#include <string>    // for char_traits, operator+, basic_string, string
+#include <string>    // for basic_string, char_traits, operator+, string, to_string, operator==, stoi
+
+#include <stddef.h> // for size_t
 
 ConfigManager::ConfigManager() : initialized_(false) {}
 
@@ -82,19 +83,19 @@ ServerConfig *ConfigManager::getMatchingServerConfig(const std::string &host, in
         throw std::runtime_error("ConfigManager is not initialized.");
     }
     std::vector<ServerConfig *> serverConfigs = globalConfig_->getServerConfigs();
-   for (ServerConfig *serverConfig : serverConfigs)
-   {
-       auto serverName = serverConfig->getDirectiveValue<std::string>("server_name", "");
-       auto listenPorts = serverConfig->getDirectiveValue<int>("listen", 80);
+    for (ServerConfig *serverConfig : serverConfigs)
+    {
+        auto serverName = serverConfig->getDirectiveValue<std::string>("server_name", "");
+        auto listenPorts = serverConfig->getDirectiveValue<int>("listen", 80);
         Log::debug("Checking server config: " + serverName + " on port " + std::to_string(listenPorts));
-       if ((serverName == host) && (listenPorts == port))
-       {
-           Log::info("Found matching server config for host: " + host + " and port: " + std::to_string(port));
-           return serverConfig;
-       }
-   }
+        if ((serverName == host) && (listenPorts == port))
+        {
+            Log::info("Found matching server config for host: " + host + " and port: " + std::to_string(port));
+            return serverConfig;
+        }
+    }
     Log::warning("No matching server config found for host: " + host + " and port: " + std::to_string(port));
-   return nullptr;
+    return nullptr;
 }
 
 GlobalConfig *ConfigManager::getGlobalConfig() const

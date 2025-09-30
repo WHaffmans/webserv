@@ -1,6 +1,7 @@
 #pragma once
 
-#include "webserv/config/AConfig.hpp"
+#include <webserv/config/AConfig.hpp>
+
 class ErrorHandler
 {
   public:
@@ -11,5 +12,4 @@ class ErrorHandler
     static std::string_view getStatusMessage(int statusCode);
     // static bool isValidStatusCode(int statusCode);
     static std::string getErrorPageFile(const std::string &path);
-
 };

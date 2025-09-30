@@ -1,7 +1,7 @@
 #pragma once
 
 #include <webserv/config/ServerConfig.hpp> // for ServerConfig
-#include <webserv/http/HttpConstants.hpp>  // for StatusCode, HTTP
+#include <webserv/http/HttpConstants.hpp>  // for OK
 #include <webserv/http/HttpRequest.hpp>    // for HttpRequest
 #include <webserv/server/Server.hpp>
 #include <webserv/socket/Socket.hpp>

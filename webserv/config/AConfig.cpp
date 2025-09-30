@@ -20,8 +20,10 @@ void AConfig::addDirective(const std::string &line)
 
 const ADirective *AConfig::getDirective(const std::string &name) const
 {
-    for (const auto &directive : directives_) {
-        if (directive->getName() == name) {
+    for (const auto &directive : directives_)
+    {
+        if (directive->getName() == name)
+        {
             return directive.get();
         }
     }
@@ -34,8 +36,10 @@ const ADirective *AConfig::getDirective(const std::string &name) const
 
 bool AConfig::hasDirective(const std::string &name) const
 {
-    for (const auto &directive : directives_) {
-        if (directive->getName() == name) {
+    for (const auto &directive : directives_)
+    {
+        if (directive->getName() == name)
+        {
             return true;
         }
     }

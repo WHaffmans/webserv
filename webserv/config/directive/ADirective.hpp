@@ -34,11 +34,11 @@ class ADirective
         {
             return getValue().get<T>();
         }
-        return T(); //TODO: does this work for all types?
+        return T(); // TODO: does this work for all types?
     }
 
   protected:
-    std::string name_; //NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
+    std::string name_; // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
 };
 
 // Non-member stream operator for ADirective

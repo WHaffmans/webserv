@@ -1,12 +1,14 @@
-#include "webserv/config/ConfigManager.hpp"
-#include <webserv/config/AConfig.hpp>
-#include <webserv/handler/ErrorHandler.hpp>
-#include <webserv/http/HttpConstants.hpp> // for StatusCode
-#include <webserv/log/Log.hpp>
+#include <webserv/config/AConfig.hpp>       // for AConfig
+#include <webserv/config/ConfigManager.hpp> // for ConfigManager
+#include <webserv/config/GlobalConfig.hpp>  // for GlobalConfig
+#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
+#include <webserv/http/HttpConstants.hpp> // for StatusCodeInfo, CRLF, DOUBLE_CRLF, INTERNAL_SERVER_ERROR, statusCodeInfos
+#include <webserv/log/Log.hpp>            // for Log
 
+#include <array>       // for array
 #include <fstream>     // for basic_ifstream, basic_filebuf, basic_ostream::operator<<, ifstream, stringstream
 #include <sstream>     // for basic_stringstream
-#include <string>      // for basic_string, to_string, string
+#include <string>      // for basic_string, operator+, allocator, char_traits, string, to_string
 #include <string_view> // for string_view
 
 std::string ErrorHandler::getErrorResponse(int statusCode, AConfig *config)
@@ -22,7 +24,8 @@ std::string ErrorHandler::generateErrorHeader(int statusCode, const std::string 
     response += std::to_string(statusCode) + " ";
     response += std::string(getStatusMessage(statusCode)) + std::string(Http::Protocol::CRLF);
     response += "Content-Type: text/html" + std::string(Http::Protocol::CRLF);
-    response += "Content-Length: " + std::to_string(body.size()) + std::string(Http::Protocol::DOUBLE_CRLF); // End of headers
+    response +=
+        "Content-Length: " + std::to_string(body.size()) + std::string(Http::Protocol::DOUBLE_CRLF); // End of headers
     return response;
 }
 
@@ -32,7 +35,7 @@ std::string ErrorHandler::generateErrorPage(int statusCode, AConfig *config)
     if (config != nullptr)
     {
         config = ConfigManager::getInstance().getGlobalConfig();
-        Log::info("Checking for custom error page for status code: " + std::to_string(statusCode)); 
+        Log::info("Checking for custom error page for status code: " + std::to_string(statusCode));
         std::string customPage = config->getErrorPage(statusCode);
         if (!customPage.empty())
         {
