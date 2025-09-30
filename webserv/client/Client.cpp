@@ -18,11 +18,12 @@
 Client::Client(std::unique_ptr<Socket> socket, Server &server)
     : client_socket_(std::move(socket)), server_(std::ref(server)), httpRequest_(std::make_unique<HttpRequest>(this))
 {
+    Log::info("New client connected, fd: " + std::to_string(client_socket_->getFd()));
 }
 
 Client::~Client()
 {
-    Log::debug("Client destructor called for fd: " + std::to_string(client_socket_->getFd()));
+    Log::info("Client disconnected, fd: " + std::to_string(client_socket_->getFd()));
     server_.removeFromEpoll(*client_socket_);
 };
 
@@ -48,7 +49,7 @@ void Client::request()
     }
     if (bytesRead == 0)
     {
-        Log::info("Client disconnected, fd: " + std::to_string(client_socket_->getFd()));
+        Log::info("Client disconnected, fd: " + std::to_string(client_socket_->getFd())); //TODO weird
         return;
     }
 
@@ -102,7 +103,7 @@ std::string Client::getResponse() const
     body += "Server port " + std::to_string(port) + "\r\n";
     response += "Content-Length: " + std::to_string(body.size()) + "\r\n\r\n";
     response += body;
-
+    Log::info("Prepared response for client fd: " + std::to_string(client_socket_->getFd()));
     Log::debug("Sending response:\n" + response);
     return response;
 }

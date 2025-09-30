@@ -28,7 +28,7 @@ void ConfigManager::init(const std::string &filePath)
         Log::warning("ConfigManager is already initialized.");
         throw std::runtime_error("ConfigManager is already initialized.");
     }
-    Log::info("Initializing ConfigManager with file: " + filePath);
+    Log::debug("Initializing ConfigManager with file: " + filePath);
     parseConfigFile(filePath);
     initialized_ = true;
 }
@@ -36,7 +36,7 @@ void ConfigManager::init(const std::string &filePath)
 void ConfigManager::parseConfigFile(const std::string &filePath)
 {
     // Placeholder for actual file parsing logic
-    Log::info("Parsing configuration file: " + filePath);
+    Log::debug("Parsing configuration file: " + filePath);
     // Implement the parsing logic here
 
     std::ifstream file(filePath);

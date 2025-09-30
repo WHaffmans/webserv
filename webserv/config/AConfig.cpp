@@ -64,7 +64,7 @@ void AConfig::parseDirectives(const std::string &declarations)
         {
             continue;
         }
-        Log::info("Global Declaration: " + line);
+        Log::debug("Global Declaration: " + line);
         addDirective(line);
     }
 }

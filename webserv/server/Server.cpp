@@ -166,7 +166,7 @@ void Server::handleRequest(struct epoll_event *event) const
 
 void Server::responseReady(int client_fd) const
 {
-    Log::info("Response ready for client fd: " + std::to_string(client_fd));
+    Log::debug("Response ready for client fd: " + std::to_string(client_fd));
     struct epoll_event ev{};
     ev.events = EPOLLOUT;
     ev.data.fd = client_fd;
@@ -179,7 +179,7 @@ void Server::responseReady(int client_fd) const
 
 void Server::eventLoop()
 {
-    Log::info("Entering event loop...");
+    Log::info("Listening...");
     const int MAX_EVENTS = 10;
     struct epoll_event events[MAX_EVENTS]; // NOLINT
     while (true)
@@ -209,7 +209,7 @@ void Server::eventLoop()
             }
             else if ((event.events & EPOLLOUT) > 0)
             {
-                Log::info("Attempting to send data to fd: " + std::to_string(event.data.fd));
+                Log::debug("Attempting to send data to fd: " + std::to_string(event.data.fd));
                 Client &client = getClient(event.data.fd);
                 std::string response = client.getResponse();
                 const char *httpResponse = response.c_str();
@@ -221,7 +221,7 @@ void Server::eventLoop()
                 }
                 else
                 {
-                    Log::info("Sent " + std::to_string(bytesSent) + " bytes to fd: " + std::to_string(event.data.fd));
+                    Log::debug("Sent " + std::to_string(bytesSent) + " bytes to fd: " + std::to_string(event.data.fd));
                 }
                 clients_.erase(event.data.fd);
             }

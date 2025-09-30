@@ -16,9 +16,8 @@ int main(int argc, char **argv)
         return 1;
     }
     Log::setFileChannel("webserv.log", std::ios_base::app, Log::Level::Trace);
-    Log::setStdoutChannel(Log::Level::Trace);
+    Log::setStdoutChannel(Log::Level::Info);
     Log::info("\n======================\nStarting webserv...\n======================\n");
-    Log::warning("Testing context: " + LOCATION, {{"key1", "value1"}, {"key2", "value2"}});
     ConfigManager::getInstance().init(argv[1]); // NOLINT
     ConfigManager &configManager = ConfigManager::getInstance();
     Log::info("ConfigManager initialized successfully.");
