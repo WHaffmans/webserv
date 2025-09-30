@@ -96,3 +96,12 @@ ServerConfig *ConfigManager::getMatchingServerConfig(const std::string &host, in
     Log::warning("No matching server config found for host: " + host + " and port: " + std::to_string(port));
    return nullptr;
 }
+
+GlobalConfig *ConfigManager::getGlobalConfig() const
+{
+    if (!initialized_)
+    {
+        throw std::runtime_error("ConfigManager is not initialized.");
+    }
+    return globalConfig_.get();
+}

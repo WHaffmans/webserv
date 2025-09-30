@@ -1,3 +1,4 @@
+#include "webserv/config/ConfigManager.hpp"
 #include <webserv/config/AConfig.hpp>
 #include <webserv/handler/ErrorHandler.hpp>
 #include <webserv/http/HttpConstants.hpp> // for StatusCode
@@ -30,11 +31,14 @@ std::string ErrorHandler::generateErrorPage(int statusCode, AConfig *config)
 
     if (config != nullptr)
     {
+        config = ConfigManager::getInstance().getGlobalConfig();
+        Log::info("Checking for custom error page for status code: " + std::to_string(statusCode)); 
         std::string customPage = config->getErrorPage(statusCode);
         if (!customPage.empty())
         {
             return getErrorPageFile(customPage);
         }
+        Log::warning("No custom error page foundin config for status code: " + std::to_string(statusCode));
     }
     return generateDefaultErrorPage(statusCode);
 }
