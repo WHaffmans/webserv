@@ -1,6 +1,7 @@
 #pragma once
 
 #include "webserv/http/HttpHeaders.hpp"
+#include "webserv/log/Log.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -19,7 +20,7 @@ class HttpResponse
     HttpResponse(HttpResponse &&other) noexcept = default;            // Move constructor
     HttpResponse &operator=(HttpResponse &&other) noexcept = default; // Move assignment
 
-    ~HttpResponse() = default;
+    ~HttpResponse() {Log::trace(LOCATION);};
 
     void addHeader(const std::string &key, const std::string &value);
 

@@ -33,6 +33,7 @@ class Server
 
     void start();
     void addToEpoll(const Socket &socket, uint32_t events) const;
+    void removeClient(const Client &client);
     void removeFromEpoll(const Socket &socket) const;
     void setupServerSocket(const ServerConfig &config);
     void handleConnection(struct epoll_event *event);

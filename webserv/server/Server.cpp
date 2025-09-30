@@ -22,6 +22,7 @@
 
 Server::Server(const ConfigManager &configManager) : epoll_fd_(epoll_create1(0)), configManager_(configManager)
 {
+    Log::trace(LOCATION);
     const auto &serverConfigs = configManager.getServerConfigs();
     if (serverConfigs.empty())
     {
@@ -37,6 +38,7 @@ Server::Server(const ConfigManager &configManager) : epoll_fd_(epoll_create1(0))
 
 Server::~Server()
 {
+    Log::trace(LOCATION);
     if (epoll_fd_ != -1)
     {
         close(epoll_fd_);
@@ -45,6 +47,7 @@ Server::~Server()
 
 void Server::start()
 {
+    Log::trace(LOCATION);
     Log::info("Starting servers...");
     // 1. Load server configurations
 
@@ -63,6 +66,7 @@ void Server::start()
 
 void Server::addToEpoll(const Socket &socket, uint32_t events) const
 {
+    Log::trace(LOCATION);
     int fd = socket.getFd();
     struct epoll_event event{};
     event.events = events;
@@ -74,8 +78,18 @@ void Server::addToEpoll(const Socket &socket, uint32_t events) const
     }
 }
 
+void Server::removeClient(const Client &client)
+{
+    Log::trace(LOCATION);
+    int client_fd = client.getSocket().getFd();
+    clients_.erase(client_fd);
+    // removeFromEpoll(client.getSocket());
+    // close(client_fd);
+}
+
 void Server::removeFromEpoll(const Socket &socket) const
 {
+    Log::trace(LOCATION);
     int filedes = socket.getFd();
     if (epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, filedes, nullptr) == -1)
     {
@@ -86,6 +100,7 @@ void Server::removeFromEpoll(const Socket &socket) const
 
 void Server::setupServerSocket(const ServerConfig &config)
 {
+    Log::trace(LOCATION);
     try
     {
         auto host = config.getDirectiveValue<std::string>("host");
@@ -110,6 +125,7 @@ void Server::setupServerSocket(const ServerConfig &config)
 
 void Server::handleConnection(struct epoll_event *event)
 {
+    Log::trace(LOCATION);
     Socket &listener = getListener(event->data.fd);
     std::unique_ptr<Socket> clientSocket = listener.accept();
     addToEpoll(*clientSocket, EPOLLIN);
@@ -118,6 +134,7 @@ void Server::handleConnection(struct epoll_event *event)
 
 Socket &Server::getListener(int fd) const
 {
+    Log::trace(LOCATION);
     for (const auto &listener : listeners_)
     {
         if (listener->getFd() == fd)
@@ -131,6 +148,7 @@ Socket &Server::getListener(int fd) const
 
 Client &Server::getClient(int fd) const
 {
+    Log::trace(LOCATION);
     auto it = clients_.find(fd);
     if (it != clients_.end())
     {
@@ -142,11 +160,13 @@ Client &Server::getClient(int fd) const
 
 const ServerConfig &Server::getConfig(const Socket &socket) const
 {
+    Log::trace(LOCATION);
     return getConfig(socket.getFd());
 }
 
 const ServerConfig &Server::getConfig(int fd) const
 {
+    Log::trace(LOCATION);
     auto it = fdToConfig_.find(fd);
     if (it != fdToConfig_.end())
     {
@@ -158,6 +178,7 @@ const ServerConfig &Server::getConfig(int fd) const
 
 void Server::handleRequest(struct epoll_event *event) const
 {
+    Log::trace(LOCATION);
     int client_fd = event->data.fd;
 
     Client &client = getClient(client_fd);
@@ -166,6 +187,7 @@ void Server::handleRequest(struct epoll_event *event) const
 
 void Server::responseReady(int client_fd) const
 {
+    Log::trace(LOCATION);
     Log::debug("Response ready for client fd: " + std::to_string(client_fd));
     struct epoll_event ev{};
     ev.events = EPOLLOUT;
@@ -179,6 +201,7 @@ void Server::responseReady(int client_fd) const
 
 void Server::eventLoop()
 {
+    Log::trace(LOCATION);
     Log::info("Listening...");
     const int MAX_EVENTS = 10;
     struct epoll_event events[MAX_EVENTS]; // NOLINT

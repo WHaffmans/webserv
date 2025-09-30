@@ -39,6 +39,7 @@ class Client
     [[nodiscard]] int getStatusCode() const;
 
     [[nodiscard]] Socket &getSocket() const { return *client_socket_; }
+    void setError(int statusCode);
 
     void setStatusCode(int code);
 

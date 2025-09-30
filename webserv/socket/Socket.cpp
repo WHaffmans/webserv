@@ -13,6 +13,7 @@
 
 Socket::Socket() : fd_(socket(AF_INET, SOCK_STREAM, 0))
 {
+    Log::trace(LOCATION);
     if (fd_ == -1)
     {
         Log::error("Socket creation failed");
@@ -31,6 +32,7 @@ Socket::Socket() : fd_(socket(AF_INET, SOCK_STREAM, 0))
 
 Socket::Socket(int fd) : fd_(fd) // NOLINT(readability-identifier-naming)
 {
+    Log::trace(LOCATION);
     if (fd_ == -1)
     {
         Log::error("Invalid file descriptor");
@@ -41,6 +43,7 @@ Socket::Socket(int fd) : fd_(fd) // NOLINT(readability-identifier-naming)
 
 Socket::~Socket()
 {
+    Log::trace(LOCATION);
     if (fd_ != -1)
     {
         close(fd_);
@@ -49,6 +52,7 @@ Socket::~Socket()
 
 void Socket::listen(int backlog) const
 {
+    Log::trace(LOCATION);
     if (::listen(fd_, backlog) < 0)
     {
         Log::error("Listen failed");
@@ -58,7 +62,7 @@ void Socket::listen(int backlog) const
 
 void Socket::bind(const std::string &host, const int port) const
 {
-
+    Log::trace(LOCATION);
     struct sockaddr_in address{};
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = inet_addr(host.c_str());
@@ -72,6 +76,7 @@ void Socket::bind(const std::string &host, const int port) const
 
 std::unique_ptr<Socket> Socket::accept() const
 {
+    Log::trace(LOCATION);
     int client_fd = ::accept(fd_, nullptr, nullptr);
     if (client_fd < 0)
     {
@@ -83,16 +88,19 @@ std::unique_ptr<Socket> Socket::accept() const
 
 ssize_t Socket::recv(void *buf, size_t len) const
 {
+    Log::trace(LOCATION);
     return ::recv(fd_, buf, len, 0);
 }
 
 ssize_t Socket::send(const void *buf, size_t len) const
 {
+    Log::trace(LOCATION);
     return ::send(fd_, buf, len, 0);
 }
 
 void Socket::setNonBlocking() const
 {
+    Log::trace(LOCATION);
     if (fcntl(fd_, F_SETFL, O_NONBLOCK) < 0)
     {
         Log::error("Failed to set non-blocking mode");
@@ -102,5 +110,6 @@ void Socket::setNonBlocking() const
 
 int Socket::getFd() const
 {
+    Log::trace(LOCATION);
     return fd_;
 }
