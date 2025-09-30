@@ -16,7 +16,7 @@
 
 Client::Client(std::unique_ptr<Socket> socket, Server &server)
     : client_socket_(std::move(socket)), server_(std::ref(server)), httpRequest_(std::make_unique<HttpRequest>(this)),
-      httpResponse_(std::make_unique<HttpResponse>(this))
+      httpResponse_(std::make_unique<HttpResponse>())
 {
     Log::info("New client connected, fd: " + std::to_string(client_socket_->getFd()));
 }
@@ -93,26 +93,17 @@ void Client::request()
 bool Client::isResponseReady() const
 {
     // todo: poll the httpResponse_ object
+    return httpResponse_->isComplete();
 }
 
 std::vector<uint8_t> Client::getResponse() const
 {
     Log::trace(LOCATION);
-    // if (httpRequest_->getState() == HttpRequest::State::ParseError)
-    // {
-    //     return ErrorHandler::generateErrorPage(Http::StatusCode::BAD_REQUEST);
-    // }
-    // std::string response = "HTTP/1.1 ";
-    // response += "200 OK\r\n";
+    if (httpRequest_->getState() == HttpRequest::State::ParseError)
+    {
+        return ErrorHandler::getErrorResponse(Http::StatusCode::BAD_REQUEST).toBytes();
+    }
 
-    // auto serverName = server_config_->getDirectiveValue<std::string>("server_name");
-    // auto port = server_config_->getDirectiveValue<int>("listen");
-    // std::string body = "Server Name " + serverName + "\r\n";
-    // body += "Server port " + std::to_string(port) + "\r\n";
-    // response += "Content-Length: " + std::to_string(body.size()) + "\r\n\r\n";
-    // response += body;
-    // Log::info("Prepared response for client fd: " + std::to_string(client_socket_->getFd()));
-    // Log::debug("Sending response:\n" + response);
     httpResponse_->setStatus(200);
     httpResponse_->addHeader("Content-Type", "text/plain");
     httpResponse_->appendBody("Hello, World!\n");

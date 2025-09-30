@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-HttpResponse::HttpResponse(Client *client) : client_(client), headers_(std::make_unique<HttpHeaders>()) {}
+HttpResponse::HttpResponse() : headers_(std::make_unique<HttpHeaders>()) {}
 
 void HttpResponse::addHeader(const std::string &key, const std::string &value)
 {
@@ -22,9 +22,31 @@ void HttpResponse::appendBody(const std::string &body)
     body_.insert(body_.end(), body.begin(), body.end());
 }
 
+void HttpResponse::setBody(const std::vector<uint8_t> &data)
+{
+    body_ = data;
+    setComplete();
+}
+
+void HttpResponse::setBody(const std::string &body)
+{
+    body_.assign(body.begin(), body.end());
+    setComplete();
+}
+
 void HttpResponse::setStatus(int statusCode)
 {
     statusCode_ = statusCode;
+}
+
+void HttpResponse::setComplete()
+{
+    complete_ = true;
+}
+
+bool HttpResponse::isComplete() const
+{
+    return complete_;
 }
 
 const HttpHeaders &HttpResponse::getHeaders() const

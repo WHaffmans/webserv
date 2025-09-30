@@ -18,15 +18,6 @@
 class HttpHeaders
 {
   public:
-    HttpHeaders() = default;
-
-    HttpHeaders(const HttpHeaders &other) = delete;
-    HttpHeaders(HttpHeaders &&other) noexcept = delete;
-    HttpHeaders &operator=(const HttpHeaders &other) = delete;
-    HttpHeaders &operator=(HttpHeaders &&other) noexcept = delete;
-
-    ~HttpHeaders() = default;
-
     const std::string &get(const std::string &name) const;
     bool has(const std::string &name) const;
 

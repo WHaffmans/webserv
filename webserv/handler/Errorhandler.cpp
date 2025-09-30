@@ -1,3 +1,5 @@
+#include "webserv/http/HttpResponse.hpp"
+
 #include <webserv/config/AConfig.hpp>       // for AConfig
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/GlobalConfig.hpp>  // for GlobalConfig
@@ -5,43 +7,39 @@
 #include <webserv/http/HttpConstants.hpp> // for StatusCodeInfo, CRLF, DOUBLE_CRLF, INTERNAL_SERVER_ERROR, statusCodeInfos
 #include <webserv/log/Log.hpp>            // for Log
 
-#include <array>       // for array
-#include <fstream>     // for basic_ifstream, basic_filebuf, basic_ostream::operator<<, ifstream, stringstream
-#include <sstream>     // for basic_stringstream
-#include <string>      // for basic_string, operator+, allocator, char_traits, string, to_string
-#include <string_view> // for string_view
+#include <fstream> // for basic_ifstream, basic_filebuf, basic_ostream::operator<<, ifstream, stringstream
+#include <sstream> // for basic_stringstream
+#include <string>  // for basic_string, operator+, allocator, char_traits, string, to_string
 
-std::string ErrorHandler::getErrorResponse(int statusCode, AConfig *config)
+HttpResponse ErrorHandler::getErrorResponse(int statusCode, AConfig *config)
 {
+    HttpResponse response;
+
     std::string body = generateErrorPage(statusCode, config);
-    Log::debug("Generated error page : " + generateErrorHeader(statusCode, body) + body);
-    return generateErrorHeader(statusCode, body) + body;
-}
-
-std::string ErrorHandler::generateErrorHeader(int statusCode, const std::string &body)
-{
-    std::string response = "HTTP/1.1 ";
-    response += std::to_string(statusCode) + " ";
-    response += std::string(getStatusMessage(statusCode)) + std::string(Http::Protocol::CRLF);
-    response += "Content-Type: text/html" + std::string(Http::Protocol::CRLF);
-    response +=
-        "Content-Length: " + std::to_string(body.size()) + std::string(Http::Protocol::DOUBLE_CRLF); // End of headers
+    response.appendBody(body);
+    response.setStatus(statusCode);
+    response.addHeader("Content-Type", "text/html");
+    response.addHeader("Connection", "close");
     return response;
 }
 
 std::string ErrorHandler::generateErrorPage(int statusCode, AConfig *config)
 {
-
-    if (config != nullptr)
+    Log::trace(LOCATION);
+    if (config == nullptr)
     {
         config = ConfigManager::getInstance().getGlobalConfig();
+        Log::debug("Using global config for error page generation");
+    }
+    if (config != nullptr)
+    {
         Log::info("Checking for custom error page for status code: " + std::to_string(statusCode));
         std::string customPage = config->getErrorPage(statusCode);
         if (!customPage.empty())
         {
             return getErrorPageFile(customPage);
         }
-        Log::warning("No custom error page foundin config for status code: " + std::to_string(statusCode));
+        Log::warning("No custom error page found in config for status code: " + std::to_string(statusCode));
     }
     return generateDefaultErrorPage(statusCode);
 }
@@ -49,24 +47,11 @@ std::string ErrorHandler::generateErrorPage(int statusCode, AConfig *config)
 std::string ErrorHandler::generateDefaultErrorPage(int statusCode)
 {
     Log::info("Generating default error page for status code: " + std::to_string(statusCode));
-
-    std::string_view statusMessage = getStatusMessage(statusCode);
-    std::string html = "<html><head><title>" + std::to_string(statusCode) + " " + std::string(statusMessage) +
-                       "</title></head><body><h1>" + std::to_string(statusCode) + " " + std::string(statusMessage) +
+    std::string statusMessage = Http::getStatusCodeReason(statusCode);
+    std::string html = "<html><head><title>" + std::to_string(statusCode) + " " + statusMessage +
+                       "</title></head><body><h1>" + std::to_string(statusCode) + " " + statusMessage +
                        "</h1><hr><p>webserv</p></body></html>";
-    return generateErrorHeader(statusCode, html) + html;
-}
-
-std::string_view ErrorHandler::getStatusMessage(int statusCode)
-{
-    for (const auto info : Http::statusCodeInfos)
-    {
-        if (info.code == statusCode)
-        {
-            return info.reason;
-        }
-    }
-    return "Unknown Status";
+    return html;
 }
 
 std::string ErrorHandler::getErrorPageFile(const std::string &path)

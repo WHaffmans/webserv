@@ -12,12 +12,12 @@ class Client;
 class HttpResponse
 {
   public:
-    HttpResponse(Client *client);
+    HttpResponse();
 
-    HttpResponse(const HttpResponse &other) = delete;                // Disable copy constructor
-    HttpResponse &operator=(const HttpResponse &other) = delete;     // Disable copy assignment
-    HttpResponse(HttpResponse &&other) noexcept = delete;            // Move constructor
-    HttpResponse &operator=(HttpResponse &&other) noexcept = delete; // Move assignment
+    HttpResponse(const HttpResponse &other) = delete;                 // Disable copy constructor
+    HttpResponse &operator=(const HttpResponse &other) = delete;      // Disable copy assignment
+    HttpResponse(HttpResponse &&other) noexcept = default;            // Move constructor
+    HttpResponse &operator=(HttpResponse &&other) noexcept = default; // Move assignment
 
     ~HttpResponse() = default;
 
@@ -25,6 +25,9 @@ class HttpResponse
 
     void appendBody(const std::vector<uint8_t> &data);
     void appendBody(const std::string &body);
+
+    void setBody(const std::vector<uint8_t> &data);
+    void setBody(const std::string &body);
 
     void setComplete();
 
@@ -40,7 +43,6 @@ class HttpResponse
     [[nodiscard]] std::string getStatusLine() const;
     [[nodiscard]] std::string getContentLength() const;
 
-    Client *client_;
     std::vector<uint8_t> body_;
     std::unique_ptr<HttpHeaders> headers_;
     bool complete_ = false;
