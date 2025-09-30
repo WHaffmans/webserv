@@ -1,20 +1,19 @@
-#include <webserv/server/Server.hpp>
-
 #include <webserv/client/Client.hpp>        // for Client
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/ServerConfig.hpp>  // for ServerConfig
 #include <webserv/log/Log.hpp>              // for Log
+#include <webserv/server/Server.hpp>
 #include <webserv/socket/Socket.hpp> // for Socket
 
-#include <cerrno>    // for errno
-#include <cstring>   // for strerror, strlen
-#include <exception> // for exception
-#include <memory>    // for unique_ptr, allocator, make_unique
-#include <stdexcept> // for runtime_error
-#include <string>    // for basic_string, operator+, to_string, char_traits, string
-#include <utility>   // for move, pair
-#include <vector>    // for vector
+#include <cerrno>        // for errno
+#include <cstring>       // for strerror, strlen
+#include <exception>     // for exception
+#include <memory>        // for unique_ptr, allocator, make_unique
+#include <stdexcept>     // for runtime_error
+#include <string>        // for basic_string, operator+, to_string, char_traits, string
 #include <unordered_map> // for unordered_map, unordered_map<>::container_type
+#include <utility>       // for move, pair
+#include <vector>        // for vector
 
 #include <sys/epoll.h> // for epoll_event, epoll_ctl, EPOLLIN, EPOLLOUT, epoll_create1, epoll_wait, EPOLLERR, EPOLLHUP, EPOLL_CTL_ADD, EPOLL_CTL_DEL, EPOLL_CTL_MOD
 #include <sys/socket.h> // for send, SOMAXCONN
@@ -212,9 +211,8 @@ void Server::eventLoop()
             {
                 Log::debug("Attempting to send data to fd: " + std::to_string(event.data.fd));
                 Client &client = getClient(event.data.fd);
-                std::string response = client.getResponse();
-                const char *httpResponse = response.c_str();
-                ssize_t bytesSent = send(event.data.fd, httpResponse, strlen(httpResponse), 0);
+                auto httpResponse = client.getResponse();
+                ssize_t bytesSent = send(event.data.fd, httpResponse.data(), httpResponse.size(), 0);
                 if (bytesSent < 0)
                 {
                     Log::error("Send failed for fd: " + std::to_string(event.data.fd) +

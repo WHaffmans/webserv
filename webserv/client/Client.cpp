@@ -1,5 +1,4 @@
 #include <webserv/client/Client.hpp>
-
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/ServerConfig.hpp>  // for ServerConfig
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
@@ -16,7 +15,8 @@
 #include <sys/types.h> // for ssize_t
 
 Client::Client(std::unique_ptr<Socket> socket, Server &server)
-    : client_socket_(std::move(socket)), server_(std::ref(server)), httpRequest_(std::make_unique<HttpRequest>(this))
+    : client_socket_(std::move(socket)), server_(std::ref(server)), httpRequest_(std::make_unique<HttpRequest>(this)),
+      httpResponse_(std::make_unique<HttpResponse>(this))
 {
     Log::info("New client connected, fd: " + std::to_string(client_socket_->getFd()));
 }
@@ -49,7 +49,7 @@ void Client::request()
     }
     if (bytesRead == 0)
     {
-        Log::info("Client disconnected, fd: " + std::to_string(client_socket_->getFd())); //TODO weird
+        Log::info("Client disconnected, fd: " + std::to_string(client_socket_->getFd())); // TODO weird
         return;
     }
 
@@ -68,12 +68,15 @@ void Client::request()
                       {"body", httpRequest_->getBody()},
                       {"state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
                   });
-        server_config_ = ConfigManager::getInstance().getMatchingServerConfig(httpRequest_->getHeaders().get("Host"));
+        server_config_ =
+            ConfigManager::getInstance().getMatchingServerConfig(httpRequest_->getHeaders().getHost().value_or(""));
         if (server_config_ == nullptr)
         {
-            Log::warning("No matching server config found for Host: " + httpRequest_->getHeaders().get("Host"));
+            Log::warning("No matching server config found for Host: " +
+                         httpRequest_->getHeaders().getHost().value_or("unknown host"));
             httpRequest_->setState(HttpRequest::State::ParseError);
         }
+
         // Example usage, replace with actual host and port extraction from request
         server_.responseReady(client_socket_->getFd());
     }
@@ -87,23 +90,31 @@ void Client::request()
     }
 }
 
-std::string Client::getResponse() const
+bool Client::isResponseReady() const
+{
+    // todo: poll the httpResponse_ object
+}
+
+std::vector<uint8_t> Client::getResponse() const
 {
     Log::trace(LOCATION);
-    if (httpRequest_->getState() == HttpRequest::State::ParseError)
-    {
-        return ErrorHandler::generateErrorPage(Http::StatusCode::BAD_REQUEST);
-    }
-    std::string response = "HTTP/1.1 ";
-    response += "200 OK\r\n";
+    // if (httpRequest_->getState() == HttpRequest::State::ParseError)
+    // {
+    //     return ErrorHandler::generateErrorPage(Http::StatusCode::BAD_REQUEST);
+    // }
+    // std::string response = "HTTP/1.1 ";
+    // response += "200 OK\r\n";
 
-    auto serverName = server_config_->getDirectiveValue<std::string>("server_name");
-    auto port = server_config_->getDirectiveValue<int>("listen");
-    std::string body = "Server Name " + serverName + "\r\n";
-    body += "Server port " + std::to_string(port) + "\r\n";
-    response += "Content-Length: " + std::to_string(body.size()) + "\r\n\r\n";
-    response += body;
-    Log::info("Prepared response for client fd: " + std::to_string(client_socket_->getFd()));
-    Log::debug("Sending response:\n" + response);
-    return response;
+    // auto serverName = server_config_->getDirectiveValue<std::string>("server_name");
+    // auto port = server_config_->getDirectiveValue<int>("listen");
+    // std::string body = "Server Name " + serverName + "\r\n";
+    // body += "Server port " + std::to_string(port) + "\r\n";
+    // response += "Content-Length: " + std::to_string(body.size()) + "\r\n\r\n";
+    // response += body;
+    // Log::info("Prepared response for client fd: " + std::to_string(client_socket_->getFd()));
+    // Log::debug("Sending response:\n" + response);
+    httpResponse_->setStatus(200);
+    httpResponse_->addHeader("Content-Type", "text/plain");
+    httpResponse_->appendBody("Hello, World!\n");
+    return httpResponse_->toBytes();
 }
