@@ -55,7 +55,7 @@ void Server::start()
     {
         setupServerSocket(*config);
     }
-    if (fdToConfig_.empty())
+    if (listener_fds_.empty())
     {
         Log::fatal("No server sockets created.");
         throw std::runtime_error("No server sockets created.");
@@ -111,7 +111,7 @@ void Server::setupServerSocket(const ServerConfig &config)
         addToEpoll(*serverSocket, EPOLLIN);
 
         listeners_.push_back(std::move(serverSocket));
-        fdToConfig_.insert({server_fd, std::cref(config)});
+        listener_fds_.insert(server_fd);
         Log::info("Server listening on " + host + ":" + std::to_string(port) + "...");
         // static_cast<std::string>(config["listen"]) + "...");
     }
@@ -154,24 +154,6 @@ Client &Server::getClient(int fd) const
     }
     Log::error("Client not found for fd: " + std::to_string(fd));
     throw std::runtime_error("Client not found for fd: " + std::to_string(fd));
-}
-
-const ServerConfig &Server::getConfig(const Socket &socket) const
-{
-    Log::trace(LOCATION);
-    return getConfig(socket.getFd());
-}
-
-const ServerConfig &Server::getConfig(int fd) const
-{
-    Log::trace(LOCATION);
-    auto it = fdToConfig_.find(fd);
-    if (it != fdToConfig_.end())
-    {
-        return (it->second.get());
-    }
-    Log::error("Config not found for fd: " + std::to_string(fd));
-    throw std::runtime_error("Config not found for fd: " + std::to_string(fd));
 }
 
 void Server::handleRequest(struct epoll_event *event) const
@@ -220,7 +202,7 @@ void Server::eventLoop()
                 removeFromEpoll(getListener(event.data.fd));
                 close(event.data.fd);
             }
-            else if (fdToConfig_.contains(event.data.fd))
+            else if (listener_fds_.contains(event.data.fd))
             {
                 handleConnection(&event);
             }

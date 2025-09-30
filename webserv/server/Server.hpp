@@ -6,10 +6,11 @@
 #include <webserv/socket/Socket.hpp>       // for Socket
 
 #include <cstdint>       // for uint32_t
-#include <functional>    // for reference_wrapper
+
 #include <memory>        // for unique_ptr
 #include <unordered_map> // for unordered_map
 #include <vector>        // for vector
+#include <set>           // for set
 
 class Client;
 class ConfigManager;
@@ -42,13 +43,12 @@ class Server
     void eventLoop();
     Socket &getListener(int fd) const;
     Client &getClient(int fd) const;
-    const ServerConfig &getConfig(int fd) const;
-    const ServerConfig &getConfig(const Socket &socket) const;
+
 
   private:
     int epoll_fd_;
     const ConfigManager &configManager_;
     std::vector<std::unique_ptr<Socket>> listeners_;
-    std::unordered_map<int, std::reference_wrapper<const ServerConfig>> fdToConfig_;
+    std::set<int> listener_fds_;
     std::unordered_map<int, std::unique_ptr<Client>> clients_;
 };
