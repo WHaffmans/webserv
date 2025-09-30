@@ -1,5 +1,6 @@
-#include <webserv/config/directive/BoolDirective.hpp>      // for BoolDirective
 #include <webserv/config/directive/DirectiveFactory.hpp>   // for DirectiveFactory
+
+#include <webserv/config/directive/BoolDirective.hpp>      // for BoolDirective
 #include <webserv/config/directive/IntDirective.hpp>       // for IntDirective
 #include <webserv/config/directive/IntStringDirective.hpp> // for IntStringDirective
 #include <webserv/config/directive/SizeDirective.hpp>      // for SizeDirective

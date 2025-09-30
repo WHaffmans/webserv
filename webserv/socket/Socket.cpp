@@ -1,5 +1,6 @@
-#include <webserv/log/Log.hpp>
 #include <webserv/socket/Socket.hpp>
+
+#include <webserv/log/Log.hpp>
 
 #include <memory>
 #include <stdexcept>

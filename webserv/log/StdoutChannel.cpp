@@ -1,5 +1,6 @@
-#include <webserv/log/Log.hpp> // for Log
 #include <webserv/log/StdoutChannel.hpp>
+
+#include <webserv/log/Log.hpp> // for Log
 
 #include <iomanip>  // for operator<<, setfill, setw
 #include <iostream> // for basic_ostream, operator<<, basic_ostream::operator<<, cerr, cout, flush, ostream

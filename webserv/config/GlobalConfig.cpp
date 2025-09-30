@@ -1,4 +1,5 @@
 #include <webserv/config/GlobalConfig.hpp>
+
 #include <webserv/config/utils.hpp> // for findCorrespondingClosingBrace
 #include <webserv/log/Log.hpp>      // for Log
 

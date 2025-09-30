@@ -1,4 +1,5 @@
 #include <webserv/config/directive/ADirective.hpp>
+
 #include <webserv/config/directive/DirectiveValue.hpp> // for DirectiveValue, operator<<
 
 DirectiveValue ADirective::getValue() const

@@ -1,8 +1,9 @@
+#include <webserv/server/Server.hpp>
+
 #include <webserv/client/Client.hpp>        // for Client
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/ServerConfig.hpp>  // for ServerConfig
 #include <webserv/log/Log.hpp>              // for Log
-#include <webserv/server/Server.hpp>
 #include <webserv/socket/Socket.hpp> // for Socket
 
 #include <cerrno>    // for errno
