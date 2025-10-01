@@ -4,8 +4,9 @@
 #include "webserv/handler/URIParser.hpp"
 #include "webserv/http/HttpResponse.hpp"
 
-#include <cstdio>
+#include <cstdint>
 #include <memory>
+#include <string>
 
 class FileHandler
 {
@@ -13,11 +14,20 @@ class FileHandler
     FileHandler(const LocationConfig *location, const URIParser &uriParser);
 
     [[nodiscard]] std::unique_ptr<HttpResponse> getResponse() const;
-    static std::vector<char> readBinaryFile(const std ::string &filepath);
-    static std::string readFileAsString(const std::string &filepath);
 
   private:
-    // std::unique_ptr<HttpResponse> response_;
     const LocationConfig *location_;
     const URIParser &uriParser_;
+
+    enum ResourceType : uint8_t
+    {
+        FILE,
+        DIRECTORY_INDEX,
+        DIRECTORY_AUTOINDEX,
+        NOT_FOUND
+    };
+
+    [[nodiscard]] ResourceType getResourceType(const std::string &path) const;
+    [[nodiscard]] std::unique_ptr<HttpResponse> handleFile(const std::string &filepath) const;
+    [[nodiscard]] std::unique_ptr<HttpResponse> handleDirectory(const std::string &dirpath, ResourceType type) const;
 };

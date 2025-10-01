@@ -1,4 +1,5 @@
 #include "webserv/handler/ErrorHandler.hpp"
+#include "webserv/http/HttpConstants.hpp"
 #include "webserv/http/HttpResponse.hpp"
 
 #include <webserv/config/LocationConfig.hpp>
@@ -8,15 +9,12 @@
 #include <webserv/log/Log.hpp>
 #include <webserv/utils/FileUtils.hpp>
 
+#include <algorithm>
 #include <cerrno>  // for errno
 #include <cstring> // for strerror, strlen
-#include <fstream>
 #include <memory>
-#include <ranges> // for views
 #include <string>
 #include <vector>
-// for FILE, fopen, fclose, fread, SEEK_END, SEEK
-#include <sys/stat.h> // for stat, S_ISREG, S_ISDIR
 
 FileHandler::FileHandler(const LocationConfig *location, const URIParser &uriParser)
     : location_(location), uriParser_(uriParser)
@@ -24,102 +22,84 @@ FileHandler::FileHandler(const LocationConfig *location, const URIParser &uriPar
     Log::trace(LOCATION);
 }
 
-std::vector<char> FileHandler::readBinaryFile(const std::string &filepath)
+std::unique_ptr<HttpResponse> FileHandler::handleFile(const std::string &filepath) const
 {
     Log::trace(LOCATION);
+    auto response = std::make_unique<HttpResponse>();
 
-    std::ifstream file(filepath, std::ios::binary | std::ios::ate);
-    if (!file.is_open())
+    std::string extension = FileUtils::getExtension(filepath);
+    std::string mimeType = MIMETypes().getType(extension);
+    response->addHeader("Content-Type", mimeType);
+
+    std::vector<char> fileData = FileUtils::readBinaryFile(filepath);
+    Log::debug("Serving file: " + filepath + " with MIME type: " + mimeType);
+    if (fileData.empty())
     {
-        Log::error("Failed to open file: " + filepath);
-        return {};
+        return ErrorHandler::getErrorResponse(Http::StatusCode::NOT_FOUND, location_);
     }
-
-    // Get file size
-    std::streamsize size = file.tellg();
-    file.seekg(0, std::ios::beg);
-
-    // Read entire file
-    std::vector<char> buffer(size);
-    if (!file.read(buffer.data(), size))
-    {
-        Log::error("Failed to read file: " + filepath);
-        return {};
-    }
-
-    return buffer;
+    // TODO: annoying: For reading files, vector<char> is preferred, but for http data vector<uint8_t> is preferred
+    response->setBody(std::vector<uint8_t>{fileData.begin(), fileData.end()});
+    response->setStatus(Http::StatusCode::OK);
+    return response;
 }
 
-std::string FileHandler::readFileAsString(const std::string &filepath)
+std::unique_ptr<HttpResponse> FileHandler::handleDirectory(const std::string &dirpath, ResourceType type) const
 {
     Log::trace(LOCATION);
 
-    std::ifstream file(filepath, std::ios::binary);
-    if (!file.is_open())
+    if (type == DIRECTORY_INDEX)
     {
-        return "";
+        auto possible_indexes = location_->get<std::vector<std::string>>("index").value();
+        auto first_matching = std::ranges::find_if(possible_indexes, [&](const std::string &index) {
+            return FileUtils::isFile(FileUtils::joinPath(dirpath, index));
+        });
+        if (first_matching == possible_indexes.end())
+        {
+            return ErrorHandler::getErrorResponse(Http::StatusCode::FORBIDDEN, location_);
+        }
+        return handleFile(FileUtils::joinPath(dirpath, *first_matching));
     }
-
-    return std::string(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
+    if (type == DIRECTORY_AUTOINDEX)
+    {
+        Log::debug("Requested path is a directory: " + dirpath);
+        return ErrorHandler::getErrorResponse(Http::StatusCode::FORBIDDEN, location_);
+    }
+    return ErrorHandler::getErrorResponse(Http::StatusCode::NOT_FOUND, location_);
 }
 
 std::unique_ptr<HttpResponse> FileHandler::getResponse() const
 {
     Log::trace(LOCATION);
-    auto response = std::make_unique<HttpResponse>();
-    response->setStatus(200);
     std::string filepath = uriParser_.getFilePath();
+    ResourceType resourceType = getResourceType(filepath);
+
+    switch (resourceType)
+    {
+    case FILE: return handleFile(filepath);
+    case DIRECTORY_AUTOINDEX:
+    case DIRECTORY_INDEX: return handleDirectory(filepath, resourceType);
+    case NOT_FOUND: return ErrorHandler::getErrorResponse(Http::StatusCode::NOT_FOUND, location_);
+    }
+}
+
+FileHandler::ResourceType FileHandler::getResourceType(const std::string &path) const
+{
+    Log::trace(LOCATION);
+
     if (uriParser_.isFile())
     {
-        std::string extension = uriParser_.getExtension();
-        std::string mimeType = MIMETypes().getType(extension);
-        response->addHeader("Content-Type", mimeType);
-
-        std::vector<char> fileData = readBinaryFile(filepath);
-        Log::debug("Serving file: " + filepath + " with MIME type: " + mimeType);
-        if (fileData.empty())
-        {
-            return ErrorHandler::getErrorResponse(404, location_);
-        }
-        response->setBody(std::string(fileData.begin(), fileData.end()));
+        return FILE;
     }
-    else if (uriParser_.isDirectory() && location_->get<std::vector<std::string>>("index").has_value())
+    if (uriParser_.isDirectory())
     {
-        auto possible_indexes = location_->get<std::vector<std::string>>("index").value();
-        std::string indexPath;
-        for (auto &index : possible_indexes)
+        if (location_->get<std::vector<std::string>>("index").has_value())
         {
-            indexPath = FileUtils::joinPath(filepath, index);
-            Log::debug("Checking for index file: " + indexPath);
-            if (FileUtils::isFile(indexPath))
-            {
-                Log::debug("Found index file: " + indexPath);
-                break;
-            }
-            indexPath.clear();
+            return DIRECTORY_INDEX;
         }
-
-        std::vector<char> fileData = readBinaryFile(indexPath);
-        Log::debug("Serving index file: " + indexPath);
-        if (fileData.empty())
+        if (location_->get<bool>("autoindex").value_or(false))
         {
-            return ErrorHandler::getErrorResponse(404);
+            return DIRECTORY_AUTOINDEX;
         }
-
-        std::string extension = FileUtils::getExtension(indexPath);
-        std::string mimeType = MIMETypes().getType(extension);
-        response->addHeader("Content-Type", mimeType);
-        response->setBody(std::string(fileData.begin(), fileData.end()));
     }
-
-    else if (uriParser_.isDirectory() && location_->get<bool>("autoindex").value_or(false))
-    {
-        Log::debug("Requested path is a directory: " + filepath);
-        return ErrorHandler::getErrorResponse(403);
-    }
-    else
-    {
-        return ErrorHandler::getErrorResponse(404);
-    }
-    return response;
+    return NOT_FOUND;
 }
