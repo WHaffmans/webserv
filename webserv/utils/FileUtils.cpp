@@ -1,7 +1,10 @@
+#include "webserv/log/Log.hpp"
+
 #include <webserv/utils/FileUtils.hpp>
 
 #include <cstring> // for strlen
-#include <string>  // for string
+#include <fstream>
+#include <string> // for string
 
 #include <sys/stat.h> // for stat, S_ISREG, S_ISDIR
 
@@ -58,4 +61,42 @@ std::string joinPath(const std::string &base, const std::string &addition) // NO
     }
     return result;
 }
+
+std::vector<char> readBinaryFile(const std::string &filepath)
+{
+    Log::trace(LOCATION);
+
+    std::ifstream file(filepath, std::ios::binary | std::ios::ate);
+    if (!file.is_open())
+    {
+        Log::error("Failed to open file: " + filepath);
+        return {};
+    }
+
+    std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    std::vector<char> buffer(size);
+    if (!file.read(buffer.data(), size))
+    {
+        Log::error("Failed to read file: " + filepath);
+        return {};
+    }
+
+    return buffer;
+}
+
+std::string readFileAsString(const std::string &filepath)
+{
+    Log::trace(LOCATION);
+
+    std::ifstream file(filepath, std::ios::binary);
+    if (!file.is_open())
+    {
+        return "";
+    }
+
+    return {std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
+}
+
 } // namespace FileUtils
