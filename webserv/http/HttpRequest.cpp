@@ -1,9 +1,8 @@
-#include <webserv/http/HttpRequest.hpp>
-
 #include <webserv/client/Client.hpp>      // for Client
-#include <webserv/config/utils.hpp>       // for stoul
 #include <webserv/http/HttpConstants.hpp> // for CRLF, DOUBLE_CRLF, BAD_REQUEST
-#include <webserv/log/Log.hpp> // for Log, LOCATION
+#include <webserv/http/HttpRequest.hpp>
+#include <webserv/log/Log.hpp>     // for Log, LOCATION
+#include <webserv/utils/utils.hpp> // for stoul
 
 #include <map>      // for map
 #include <optional> // for optional

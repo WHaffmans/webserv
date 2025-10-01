@@ -1,8 +1,7 @@
-#include <webserv/http/HttpHeaders.hpp>   // for HttpHeaders
-
-#include <webserv/config/utils.hpp>       // for trim
 #include <webserv/http/HttpConstants.hpp> // for CRLF
+#include <webserv/http/HttpHeaders.hpp>   // for HttpHeaders
 #include <webserv/log/Log.hpp>
+#include <webserv/utils/utils.hpp> // for trim
 
 #include <algorithm> // for __transform_fn, transform
 #include <cctype>    // for tolower

@@ -3,8 +3,8 @@
 #include <webserv/config/directive/ADirective.hpp> // for ADirective
 #include <webserv/config/directive/DirectiveValue.hpp>
 
-#include <map>    // for map
 #include <memory> // for unique_ptr
+#include <optional>
 #include <string> // for string
 #include <vector> // for vector
 
@@ -21,17 +21,17 @@ class AConfig
     virtual ~AConfig() = default;
 
     void addDirective(const std::string &line);
-    [[nodiscard]] const ADirective *getDirective(const std::string &name) const;
     [[nodiscard]] std::string getErrorPage(int statusCode) const;
 
     [[nodiscard]] bool hasDirective(const std::string &name) const;
 
-    template <typename T> T getDirectiveValue(const std::string &name, const T &defaultValue = T{}) const
+    template <typename T>
+    std::optional<T> get(const std::string &name) const
     {
         const auto *directive = getDirective(name);
         if (!directive)
         {
-            return defaultValue;
+            return std::nullopt;
         }
 
         auto value = directive->getValue();
@@ -39,10 +39,11 @@ class AConfig
         {
             return value.get<T>();
         }
-        return defaultValue;
+        return std::nullopt;
     }
 
-  protected:
+    protected:
+    [[nodiscard]] const ADirective *getDirective(const std::string &name) const;
     virtual void parseBlock(const std::string &block) = 0;
     void parseDirectives(const std::string &declarations);
     std::vector<std::unique_ptr<ADirective>>

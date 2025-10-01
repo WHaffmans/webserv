@@ -14,7 +14,7 @@
   { include: ["<bits/exception.h>", "private", "<exception>", "public"] },
   { include: ["<bits/std_function.h>", "private", "<functional>", "public"] },
   { include: ["<bits/stringfwd.h>", "private", "<string>", "public"] },
-  
+
   # Standard library strict mappings (preference 5C - very strict)
   { include: ["<iostream>", "public", "<iostream>", "public"] },
   { symbol: ["std::cout", "private", "<iostream>", "public"] },
@@ -29,7 +29,7 @@
   { symbol: ["std::shared_ptr", "private", "<memory>", "public"] },
   { symbol: ["std::make_unique", "private", "<memory>", "public"] },
   { symbol: ["std::make_shared", "private", "<memory>", "public"] },
-  
+
   # System headers for socket programming
   { include: ["<sys/socket.h>", "public", "<sys/socket.h>", "public"] },
   { include: ["<netinet/in.h>", "public", "<netinet/in.h>", "public"] },
@@ -37,46 +37,46 @@
   { include: ["<sys/epoll.h>", "public", "<sys/epoll.h>", "public"] },
   { include: ["<fcntl.h>", "public", "<fcntl.h>", "public"] },
   { include: ["<unistd.h>", "public", "<unistd.h>", "public"] },
-  
+
   # Error handling (preference 6A - stdexcept)
   { symbol: ["std::runtime_error", "private", "<stdexcept>", "public"] },
   { symbol: ["std::logic_error", "private", "<stdexcept>", "public"] },
   { symbol: ["std::invalid_argument", "private", "<stdexcept>", "public"] },
   { symbol: ["std::out_of_range", "private", "<stdexcept>", "public"] },
-  
+
   # ============================================================================
   # PROJECT HEADER MAPPINGS - Standardized on <> angle brackets
   # ============================================================================
-  
+
   # Convert quoted includes to angle brackets for consistency
   { include: ["\"webserv/log/Log.hpp\"", "public", "<webserv/log/Log.hpp>", "public"] },
   { include: ["\"webserv/log/Channel.hpp\"", "public", "<webserv/log/Channel.hpp>", "public"] },
   { include: ["\"webserv/log/StdoutChannel.hpp\"", "public", "<webserv/log/StdoutChannel.hpp>", "public"] },
   { include: ["\"webserv/log/FileChannel.hpp\"", "public", "<webserv/log/FileChannel.hpp>", "public"] },
-  
+
   { include: ["\"webserv/http/HttpRequest.hpp\"", "public", "<webserv/http/HttpRequest.hpp>", "public"] },
   { include: ["\"webserv/http/HttpResponse.hpp\"", "public", "<webserv/http/HttpResponse.hpp>", "public"] },
   { include: ["\"webserv/http/HttpHeaders.hpp\"", "public", "<webserv/http/HttpHeaders.hpp>", "public"] },
   { include: ["\"webserv/http/HttpConstants.hpp\"", "public", "<webserv/http/HttpConstants.hpp>", "public"] },
-  
+
   { include: ["\"webserv/config/ConfigManager.hpp\"", "public", "<webserv/config/ConfigManager.hpp>", "public"] },
   { include: ["\"webserv/config/ServerConfig.hpp\"", "public", "<webserv/config/ServerConfig.hpp>", "public"] },
   { include: ["\"webserv/config/LocationConfig.hpp\"", "public", "<webserv/config/LocationConfig.hpp>", "public"] },
-  { include: ["\"webserv/config/utils.hpp\"", "public", "<webserv/config/utils.hpp>", "public"] },
-  
+  { include: ["\i"webserv/utils/utls.hpp\"", "public", "<webserv/utils/utils.hpp>", "public"] },
+
   { include: ["\"webserv/server/Server.hpp\"", "public", "<webserv/server/Server.hpp>", "public"] },
   { include: ["\"webserv/client/Client.hpp\"", "public", "<webserv/client/Client.hpp>", "public"] },
   { include: ["\"webserv/socket/Socket.hpp\"", "public", "<webserv/socket/Socket.hpp>", "public"] },
   { include: ["\"webserv/router/Router.hpp\"", "public", "<webserv/router/Router.hpp>", "public"] },
-  
+
   { include: ["\"webserv/handler/CgiHandler.hpp\"", "public", "<webserv/handler/CgiHandler.hpp>", "public"] },
   { include: ["\"webserv/handler/FileHandler.hpp\"", "public", "<webserv/handler/FileHandler.hpp>", "public"] },
   { include: ["\"webserv/handler/ErrorHandler.hpp\"", "public", "<webserv/handler/ErrorHandler.hpp>", "public"] },
-  
+
   # ============================================================================
-  # FORWARD DECLARATION PREFERENCES 
+  # FORWARD DECLARATION PREFERENCES
   # ============================================================================
-  
+
   # Suggest forward declarations instead of full includes in headers where possible
   { symbol: ["Client", "private", "<webserv/client/Client.hpp>", "public"] },
   { symbol: ["Server", "private", "<webserv/server/Server.hpp>", "public"] },

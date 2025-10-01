@@ -1,8 +1,7 @@
 #include <webserv/config/ConfigManager.hpp>
-
 #include <webserv/config/GlobalConfig.hpp> // for GlobalConfig
-#include <webserv/config/utils.hpp>        // for removeComments
 #include <webserv/log/Log.hpp>             // for Log
+#include <webserv/utils/utils.hpp>         // for removeComments
 
 #include <fstream>   // for basic_ifstream, basic_filebuf, basic_ostream::operator<<, ifstream, stringstream
 #include <sstream>   // for basic_stringstream
@@ -86,8 +85,8 @@ ServerConfig *ConfigManager::getMatchingServerConfig(const std::string &host, in
     std::vector<ServerConfig *> serverConfigs = globalConfig_->getServerConfigs();
     for (ServerConfig *serverConfig : serverConfigs)
     {
-        auto serverName = serverConfig->getDirectiveValue<std::string>("server_name", "");
-        auto listenPorts = serverConfig->getDirectiveValue<int>("listen", 80);
+        auto serverName = serverConfig->get<std::string>("server_name").value_or("");
+        auto listenPorts = serverConfig->get<int>("listen").value_or(80);
         Log::debug("Checking server config: " + serverName + " on port " + std::to_string(listenPorts));
         if ((serverName == host) && (listenPorts == port))
         {

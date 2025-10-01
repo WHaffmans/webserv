@@ -102,8 +102,9 @@ void Server::setupServerSocket(const ServerConfig &config)
     Log::trace(LOCATION);
     try
     {
-        auto host = config.getDirectiveValue<std::string>("host");
-        auto port = config.getDirectiveValue<int>("listen");
+        auto host = config.get<std::string>("host").value_or(std::string()); // TODO should not be a default host
+
+        auto port = config.get<int>("listen").value_or(0); // TODO should not be a default port
         std::unique_ptr<Socket> serverSocket = std::make_unique<Socket>();
         serverSocket->bind(host, port);
         serverSocket->listen(SOMAXCONN);

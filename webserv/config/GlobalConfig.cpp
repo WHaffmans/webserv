@@ -1,7 +1,6 @@
 #include <webserv/config/GlobalConfig.hpp>
-
-#include <webserv/config/utils.hpp> // for findCorrespondingClosingBrace
-#include <webserv/log/Log.hpp>      // for Log
+#include <webserv/log/Log.hpp>     // for Log
+#include <webserv/utils/utils.hpp> // for findCorrespondingClosingBrace
 
 #include <stdexcept> // for runtime_error
 #include <vector>    // for vector

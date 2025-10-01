@@ -115,7 +115,7 @@ std::vector<uint8_t> Client::getResponse() const
 
     const Router &router = server_.getRouter();
     auto response = router.handleRequest(*httpRequest_);
-    return response.toBytes();
+    return response->toBytes();
 }
 
 // void Client::setError(int statusCode)

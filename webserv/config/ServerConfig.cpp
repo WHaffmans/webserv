@@ -1,8 +1,8 @@
 #include <webserv/config/AConfig.hpp>        // for AConfig
 #include <webserv/config/LocationConfig.hpp> // for LocationConfig
 #include <webserv/config/ServerConfig.hpp>
-#include <webserv/config/utils.hpp> // for findCorrespondingClosingBrace, trim
-#include <webserv/log/Log.hpp>      // for Log, LOCATION
+#include <webserv/log/Log.hpp>     // for Log, LOCATION
+#include <webserv/utils/utils.hpp> // for findCorrespondingClosingBrace, trim
 
 #include <stdexcept> // for runtime_error
 #include <utility>   // for pair

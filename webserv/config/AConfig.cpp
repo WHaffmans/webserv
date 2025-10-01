@@ -1,9 +1,8 @@
 #include <webserv/config/AConfig.hpp>                    // for AConfig
-
 #include <webserv/config/directive/ADirective.hpp>       // for ADirective
 #include <webserv/config/directive/DirectiveFactory.hpp> // for DirectiveFactory
-#include <webserv/config/utils.hpp>                      // for trim
 #include <webserv/log/Log.hpp>                           // for Log, LOCATION
+#include <webserv/utils/utils.hpp>                       // for trim
 
 #include <sstream> // for basic_stringstream, stringstream
 #include <utility> // for move, pair
@@ -71,7 +70,7 @@ void AConfig::parseDirectives(const std::string &declarations)
 
 std::string AConfig::getErrorPage(int statusCode) const
 {
-    //TODO
+    // TODO
     const ADirective *directive = getDirective("error_page");
     for (const auto &directive : directives_)
     {

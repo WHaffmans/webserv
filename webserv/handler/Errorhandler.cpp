@@ -8,18 +8,21 @@
 #include <webserv/log/Log.hpp>            // for Log
 
 #include <fstream> // for basic_ifstream, basic_filebuf, basic_ostream::operator<<, ifstream, stringstream
+#include <memory>
 #include <sstream> // for basic_stringstream
 #include <string>  // for basic_string, operator+, allocator, char_traits, string, to_string
 
-HttpResponse ErrorHandler::getErrorResponse(int statusCode, AConfig *config)
+std::unique_ptr<HttpResponse> ErrorHandler::getErrorResponse(int statusCode, AConfig *config)
 {
-    HttpResponse response;
+    std::string statusMessage = Http::getStatusCodeReason(statusCode);
+    Log::warning("Generating error response: " + std::to_string(statusCode) + " " + statusMessage);
 
+    auto response = std::make_unique<HttpResponse>();
     std::string body = generateErrorPage(statusCode, config);
-    response.appendBody(body);
-    response.setStatus(statusCode);
-    response.addHeader("Content-Type", "text/html");
-    response.addHeader("Connection", "close");
+    response->appendBody(body);
+    response->setStatus(statusCode);
+    response->addHeader("Content-Type", "text/html");
+    response->addHeader("Connection", "close");
     return response;
 }
 
@@ -33,20 +36,20 @@ std::string ErrorHandler::generateErrorPage(int statusCode, AConfig *config)
     }
     if (config != nullptr)
     {
-        Log::info("Checking for custom error page for status code: " + std::to_string(statusCode));
+        Log::info("Checking for custom error page");
         std::string customPage = config->getErrorPage(statusCode);
         if (!customPage.empty())
         {
             return getErrorPageFile(customPage);
         }
-        Log::warning("No custom error page found in config for status code: " + std::to_string(statusCode));
+        Log::warning("No custom error page found");
     }
     return generateDefaultErrorPage(statusCode);
 }
 
 std::string ErrorHandler::generateDefaultErrorPage(int statusCode)
 {
-    Log::info("Generating default error page for status code: " + std::to_string(statusCode));
+    Log::info("Generating default error page");
     std::string statusMessage = Http::getStatusCodeReason(statusCode);
     std::string html = "<html><head><title>" + std::to_string(statusCode) + " " + statusMessage +
                        "</title></head><body><h1>" + std::to_string(statusCode) + " " + statusMessage +
@@ -56,7 +59,7 @@ std::string ErrorHandler::generateDefaultErrorPage(int statusCode)
 
 std::string ErrorHandler::getErrorPageFile(const std::string &path)
 {
-    Log::info("Loading custom error page from: " + path);
+    Log::debug("Loading custom error page from: " + path);
     std::ifstream file(path.c_str());
     if (!file.is_open())
     {

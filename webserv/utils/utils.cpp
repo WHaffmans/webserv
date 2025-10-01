@@ -1,5 +1,5 @@
 
-#include <webserv/config/utils.hpp>
+#include <webserv/utils/utils.hpp>
 
 #include <sstream>
 #include <stdexcept>

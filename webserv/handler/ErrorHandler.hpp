@@ -3,11 +3,12 @@
 #include "webserv/http/HttpResponse.hpp"
 
 #include <webserv/config/AConfig.hpp>
+#include <memory>
 
 class ErrorHandler
 {
   public:
-    static HttpResponse getErrorResponse(int statusCode, AConfig *config = nullptr);
+    static std::unique_ptr<HttpResponse> getErrorResponse(int statusCode, AConfig *config = nullptr);
 
   private:
     static std::string generateErrorPage(int statusCode, AConfig *config = nullptr);
