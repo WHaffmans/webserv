@@ -12,7 +12,7 @@
 #include <sstream> // for basic_stringstream
 #include <string>  // for basic_string, operator+, allocator, char_traits, string, to_string
 
-std::unique_ptr<HttpResponse> ErrorHandler::getErrorResponse(int statusCode, AConfig *config)
+std::unique_ptr<HttpResponse> ErrorHandler::getErrorResponse(int statusCode, const AConfig *config)
 {
     std::string statusMessage = Http::getStatusCodeReason(statusCode);
     Log::warning("Generating error response: " + std::to_string(statusCode) + " " + statusMessage);
@@ -26,7 +26,7 @@ std::unique_ptr<HttpResponse> ErrorHandler::getErrorResponse(int statusCode, ACo
     return response;
 }
 
-std::string ErrorHandler::generateErrorPage(int statusCode, AConfig *config)
+std::string ErrorHandler::generateErrorPage(int statusCode, const AConfig *config)
 {
     Log::trace(LOCATION);
     if (config == nullptr)

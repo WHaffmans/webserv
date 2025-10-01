@@ -33,7 +33,7 @@ std::unique_ptr<HttpResponse> Router::handleRequest(const HttpRequest &request) 
     const LocationConfig *location = uriParser.getLocation();
     if (location == nullptr)
     {
-        return ErrorHandler::getErrorResponse(404);
+        return ErrorHandler::getErrorResponse(404, config);
     }
 
     FileHandler fileHandler(location, uriParser);

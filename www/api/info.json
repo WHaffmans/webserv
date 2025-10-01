@@ -1,0 +1,57 @@
+{
+  "server": "WebServ",
+  "version": "1.0.0",
+  "status": "running",
+  "uptime": "2d 14h 32m",
+  "build": {
+    "compiler": "clang++ 12.0.1",
+    "standard": "C++20",
+    "optimization": "O3",
+    "build_type": "release"
+  },
+  "connections": {
+    "active": 127,
+    "total": 45892,
+    "max_concurrent": 10000
+  },
+  "performance": {
+    "requests_per_second": 1542,
+    "avg_response_time_ms": 1.2,
+    "memory_usage_mb": 45.2,
+    "cpu_usage_percent": 12.5
+  },
+  "features": [
+    "HTTP/1.1",
+    "Keep-Alive",
+    "Chunked Transfer Encoding",
+    "Virtual Hosts",
+    "Static File Serving",
+    "Directory Listing",
+    "Custom Error Pages",
+    "Configuration Validation",
+    "Epoll Event Loop",
+    "Multi-threaded Processing"
+  ],
+  "supported_methods": [
+    "GET",
+    "POST",
+    "PUT",
+    "DELETE",
+    "HEAD",
+    "OPTIONS"
+  ],
+  "configuration": {
+    "config_file": "webserv.conf",
+    "document_root": "./www",
+    "index_files": ["index.html", "index.htm"],
+    "error_log": "logs/error.log",
+    "access_log": "logs/access.log"
+  },
+  "system": {
+    "os": "Linux",
+    "architecture": "x86_64",
+    "cores": 8,
+    "total_memory_gb": 16.0,
+    "available_memory_gb": 12.3
+  }
+}

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration Guide - WebServ Documentation</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .docs-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 6rem 2rem 4rem;
+        }
+        .docs-nav {
+            background: var(--surface-color);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+        .docs-nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .docs-nav li {
+            margin: 0.5rem 0;
+        }
+        .docs-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .docs-nav a:hover {
+            color: var(--primary-color);
+        }
+        .code-block {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-family: 'Fira Code', monospace;
+            overflow-x: auto;
+        }
+        .directive-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--surface-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .directive-table th,
+        .directive-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .directive-table th {
+            background: var(--surface-light);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .directive-table td {
+            color: var(--text-secondary);
+        }
+        .directive-table tr:last-child td {
+            border-bottom: none;
+        }
+        .info {
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid var(--primary-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+        .warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--warning-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2><a href="../index.html" style="color: var(--primary-color); text-decoration: none;">WebServ</a></h2>
+            </div>
+            <div class="nav-menu">
+                <a href="../index.html#home" class="nav-link">Home</a>
+                <a href="../index.html#features" class="nav-link">Features</a>
+                <a href="../index.html#documentation" class="nav-link">Documentation</a>
+                <a href="../index.html#demo" class="nav-link">Demo</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="docs-container">
+        <h1>Configuration Guide</h1>
+        
+        <nav class="docs-nav">
+            <ul>
+                <li><a href="#overview">Configuration Overview</a></li>
+                <li><a href="#server-directives">Server Directives</a></li>
+                <li><a href="#location-directives">Location Directives</a></li>
+                <li><a href="#examples">Configuration Examples</a></li>
+                <li><a href="#best-practices">Best Practices</a></li>
+            </ul>
+        </nav>
+
+        <section id="overview">
+            <h2>Configuration Overview</h2>
+            <p>WebServ uses an nginx-inspired configuration syntax that is both powerful and familiar. Configuration files consist of directive blocks that define server behavior.</p>
+
+            <h3>Configuration Structure</h3>
+            <div class="code-block">
+<pre># Global directives (coming soon)
+worker_processes auto;
+error_log logs/error.log;
+
+# Server blocks define virtual hosts
+server {
+    # Server-specific directives
+    listen 80;
+    server_name example.com;
+    root /var/www/html;
+    
+    # Location blocks define URI-specific behavior
+    location / {
+        # Location-specific directives
+        try_files $uri $uri/ =404;
+    }
+    
+    location /api/ {
+        proxy_pass http://backend;
+    }
+}</pre>
+            </div>
+
+            <div class="info">
+                <strong>💡 Note:</strong> Comments start with <code>#</code> and continue to the end of the line. Directives end with semicolons <code>;</code> and blocks are enclosed in braces <code>{}</code>.
+            </div>
+        </section>
+
+        <section id="server-directives">
+            <h2>Server Directives</h2>
+            <p>Server directives define the behavior of virtual hosts and are placed within <code>server {}</code> blocks.</p>
+
+            <table class="directive-table">
+                <thead>
+                    <tr>
+                        <th>Directive</th>
+                        <th>Syntax</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>listen</code></td>
+                        <td><code>listen port [ssl];</code></td>
+                        <td>Specifies the port to listen on, optionally with SSL</td>
+                    </tr>
+                    <tr>
+                        <td><code>server_name</code></td>
+                        <td><code>server_name name ...;</code></td>
+                        <td>Defines server names for virtual hosting</td>
+                    </tr>
+                    <tr>
+                        <td><code>root</code></td>
+                        <td><code>root path;</code></td>
+                        <td>Sets the document root directory</td>
+                    </tr>
+                    <tr>
+                        <td><code>index</code></td>
+                        <td><code>index file ...;</code></td>
+                        <td>Defines default files to serve for directories</td>
+                    </tr>
+                    <tr>
+                        <td><code>error_page</code></td>
+                        <td><code>error_page code ... uri;</code></td>
+                        <td>Defines custom error pages for HTTP status codes</td>
+                    </tr>
+                    <tr>
+                        <td><code>client_max_body_size</code></td>
+                        <td><code>client_max_body_size size;</code></td>
+                        <td>Maximum allowed size of client request body</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Listen Directive Examples</h3>
+            <div class="code-block">
+<pre># Basic HTTP server
+listen 80;
+
+# HTTPS server
+listen 443 ssl;
+
+# Specific interface
+listen 192.168.1.10:8080;
+
+# IPv6
+listen [::]:80;</pre>
+            </div>
+
+            <h3>Server Name Examples</h3>
+            <div class="code-block">
+<pre># Exact match
+server_name example.com;
+
+# Multiple names
+server_name example.com www.example.com;
+
+# Wildcard
+server_name *.example.com;
+
+# Regular expression
+server_name ~^www\.(.+)$;</pre>
+            </div>
+        </section>
+
+        <section id="location-directives">
+            <h2>Location Directives</h2>
+            <p>Location blocks define how to process requests for specific URIs and are placed within <code>server {}</code> blocks.</p>
+
+            <h3>Location Matching</h3>
+            <div class="code-block">
+<pre># Exact match
+location = /favicon.ico {
+    expires 1y;
+}
+
+# Prefix match
+location /images/ {
+    expires 7d;
+}
+
+# Regular expression (case-sensitive)
+location ~ \.(jpg|jpeg|png|gif)$ {
+    expires 1M;
+}
+
+# Regular expression (case-insensitive)
+location ~* \.(css|js)$ {
+    expires 1y;
+}</pre>
+            </div>
+
+            <table class="directive-table">
+                <thead>
+                    <tr>
+                        <th>Directive</th>
+                        <th>Syntax</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>try_files</code></td>
+                        <td><code>try_files file ... uri;</code></td>
+                        <td>Tries files in order, falls back to URI</td>
+                    </tr>
+                    <tr>
+                        <td><code>alias</code></td>
+                        <td><code>alias path;</code></td>
+                        <td>Maps location to a different path</td>
+                    </tr>
+                    <tr>
+                        <td><code>return</code></td>
+                        <td><code>return code [text];</code></td>
+                        <td>Returns HTTP response with status code</td>
+                    </tr>
+                    <tr>
+                        <td><code>rewrite</code></td>
+                        <td><code>rewrite regex replacement;</code></td>
+                        <td>Rewrites URI using regular expressions</td>
+                    </tr>
+                    <tr>
+                        <td><code>autoindex</code></td>
+                        <td><code>autoindex on|off;</code></td>
+                        <td>Enables/disables directory listing</td>
+                    </tr>
+                    <tr>
+                        <td><code>expires</code></td>
+                        <td><code>expires time;</code></td>
+                        <td>Sets cache expiration headers</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="examples">
+            <h2>Configuration Examples</h2>
+            
+            <h3>Static Website</h3>
+            <div class="code-block">
+<pre>server {
+    listen 80;
+    server_name mysite.com www.mysite.com;
+    root /var/www/mysite;
+    index index.html index.htm;
+    
+    # Cache static assets
+    location ~* \.(css|js|jpg|jpeg|png|gif|ico|svg)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+    
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-Content-Type-Options "nosniff";
+    add_header X-XSS-Protection "1; mode=block";
+    
+    # Custom error pages
+    error_page 404 /404.html;
+    error_page 500 502 503 504 /50x.html;
+}</pre>
+            </div>
+
+            <h3>API Server with Reverse Proxy</h3>
+            <div class="code-block">
+<pre>server {
+    listen 80;
+    server_name api.example.com;
+    
+    # API endpoints
+    location /v1/ {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # CORS headers
+        add_header Access-Control-Allow-Origin "*";
+        add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS";
+        add_header Access-Control-Allow-Headers "Content-Type, Authorization";
+    }
+    
+    # Handle preflight requests
+    location / {
+        if ($request_method = 'OPTIONS') {
+            add_header Access-Control-Allow-Origin "*";
+            add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS";
+            add_header Access-Control-Allow-Headers "Content-Type, Authorization";
+            add_header Content-Length 0;
+            return 204;
+        }
+    }
+}</pre>
+            </div>
+
+            <h3>Multi-Domain Hosting</h3>
+            <div class="code-block">
+<pre># Main website
+server {
+    listen 80;
+    server_name example.com www.example.com;
+    root /var/www/example.com;
+    index index.html;
+    
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+
+# Blog subdomain
+server {
+    listen 80;
+    server_name blog.example.com;
+    root /var/www/blog;
+    index index.html;
+    
+    # WordPress-style permalinks
+    location / {
+        try_files $uri $uri/ /index.php?$args;
+    }
+}
+
+# File sharing subdomain
+server {
+    listen 80;
+    server_name files.example.com;
+    root /var/www/files;
+    
+    # Enable directory browsing
+    location / {
+        autoindex on;
+        autoindex_exact_size off;
+        autoindex_localtime on;
+    }
+    
+    # Restrict access to sensitive files
+    location ~ /\. {
+        deny all;
+    }
+}</pre>
+            </div>
+
+            <h3>Development Server</h3>
+            <div class="code-block">
+<pre>server {
+    listen 8080;
+    server_name localhost;
+    root ./www;
+    index index.html;
+    
+    # Disable caching for development
+    expires -1;
+    add_header Cache-Control "no-cache, no-store, must-revalidate";
+    add_header Pragma "no-cache";
+    
+    # Enable directory listing
+    autoindex on;
+    
+    # Detailed error pages
+    error_page 404 /dev-404.html;
+    
+    # Hot reload support
+    location /ws {
+        proxy_pass http://127.0.0.1:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}</pre>
+            </div>
+        </section>
+
+        <section id="best-practices">
+            <h2>Best Practices</h2>
+            
+            <h3>Security</h3>
+            <ul>
+                <li>Always set appropriate security headers</li>
+                <li>Restrict access to sensitive files and directories</li>
+                <li>Use HTTPS in production environments</li>
+                <li>Implement rate limiting for API endpoints</li>
+                <li>Validate and sanitize all input</li>
+            </ul>
+
+            <div class="code-block">
+<pre># Security headers example
+add_header X-Frame-Options "SAMEORIGIN";
+add_header X-Content-Type-Options "nosniff";
+add_header X-XSS-Protection "1; mode=block";
+add_header Strict-Transport-Security "max-age=31536000; includeSubDomains";
+
+# Hide server information
+server_tokens off;
+
+# Restrict sensitive files
+location ~ /\.(ht|git|svn) {
+    deny all;
+}</pre>
+            </div>
+
+            <h3>Performance</h3>
+            <ul>
+                <li>Set appropriate cache headers for static content</li>
+                <li>Use gzip compression for text-based files</li>
+                <li>Optimize file serving with sendfile</li>
+                <li>Configure proper keepalive settings</li>
+                <li>Use CDN for static assets in production</li>
+            </ul>
+
+            <div class="code-block">
+<pre># Performance optimizations
+sendfile on;
+tcp_nopush on;
+tcp_nodelay on;
+keepalive_timeout 65;
+
+# Gzip compression
+gzip on;
+gzip_vary on;
+gzip_min_length 1024;
+gzip_types text/plain text/css application/json application/javascript;</pre>
+            </div>
+
+            <h3>Organization</h3>
+            <ul>
+                <li>Use separate configuration files for different sites</li>
+                <li>Group related directives together</li>
+                <li>Comment complex configurations</li>
+                <li>Use consistent indentation and formatting</li>
+                <li>Version control your configuration files</li>
+            </ul>
+
+            <div class="warning">
+                <strong>⚠️ Important:</strong> Always test configuration changes in a development environment before applying them to production. Use <code>webserv -t config.conf</code> to validate syntax.
+            </div>
+        </section>
+
+        <hr style="margin: 3rem 0; border: 1px solid var(--border-color);">
+        
+        <div style="text-align: center;">
+            <p>Need more help? Check out the <a href="getting-started.html" style="color: var(--primary-color);">Getting Started</a> guide or <a href="api.html" style="color: var(--primary-color);">API Reference</a>.</p>
+        </div>
+    </div>
+</body>
+</html>

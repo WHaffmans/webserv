@@ -79,7 +79,7 @@ std::unique_ptr<HttpResponse> FileHandler::getResponse() const
         Log::debug("Serving file: " + filepath + " with MIME type: " + mimeType);
         if (fileData.empty())
         {
-            return ErrorHandler::getErrorResponse(404);
+            return ErrorHandler::getErrorResponse(404, location_);
         }
         response->setBody(std::string(fileData.begin(), fileData.end()));
     }
