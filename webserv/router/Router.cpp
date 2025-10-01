@@ -14,7 +14,7 @@
 
 Router::Router() {}
 
-std::unique_ptr<HttpResponse> Router::handleRequest(const HttpRequest &request) const
+std::unique_ptr<HttpResponse> Router::handleRequest(const HttpRequest &request)
 {
     Log::trace(LOCATION);
 
@@ -39,9 +39,3 @@ std::unique_ptr<HttpResponse> Router::handleRequest(const HttpRequest &request) 
     FileHandler fileHandler(location, uriParser);
     return fileHandler.getResponse();
 }
-
-// void Router::handleError(int statusCode, HttpResponse &response, AConfig *config) const
-// {
-//     response = ErrorHandler::getErrorResponse(statusCode, config);
-//     response.setComplete();
-// }

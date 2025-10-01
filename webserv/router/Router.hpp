@@ -13,9 +13,8 @@ class Router
   public:
     Router();
 
-    [[nodiscard]] std::unique_ptr<HttpResponse> handleRequest(const HttpRequest &request) const;
+    [[nodiscard]] static std::unique_ptr<HttpResponse> handleRequest(const HttpRequest &request);
 
   private:
-    // void handleError(int statusCode, HttpResponse &response, AConfig *config = nullptr) const;
     [[nodiscard]] const LocationConfig *getLocation(const std::string &path, const ServerConfig &serverConfig) const;
 };

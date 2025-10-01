@@ -1,20 +1,20 @@
-#include "webserv/http/HttpConstants.hpp"
+#include "webserv/router/Router.hpp"
 
 #include <webserv/client/Client.hpp>
-#include <webserv/config/ConfigManager.hpp> // for ConfigManager
-#include <webserv/config/ServerConfig.hpp>  // for ServerConfig
-#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
-#include <webserv/http/HttpHeaders.hpp>     // for HttpHeaders
-#include <webserv/log/Log.hpp>              // for Log, LOCATION
-#include <webserv/server/Server.hpp>        // for Server
-#include <webserv/socket/Socket.hpp>        // for Socket
+#include <webserv/config/ConfigManager.hpp>
+#include <webserv/config/ServerConfig.hpp>
+#include <webserv/handler/ErrorHandler.hpp>
+#include <webserv/http/HttpHeaders.hpp>
+#include <webserv/log/Log.hpp>
+#include <webserv/server/Server.hpp>
+#include <webserv/socket/Socket.hpp>
 
-#include <cstdint>    // for uint8_t
-#include <functional> // for ref, reference_wrapper
-#include <map>        // for map
-#include <utility>    // for pair, move
+#include <cstdint>
+#include <functional>
+#include <map>
+#include <utility>
 
-#include <sys/types.h> // for ssize_t
+#include <sys/types.h>
 
 Client::Client(std::unique_ptr<Socket> socket, Server &server)
     : client_socket_(std::move(socket)), server_(std::ref(server)), httpRequest_(std::make_unique<HttpRequest>(this)),
@@ -76,16 +76,6 @@ void Client::request()
                       {"body", httpRequest_->getBody()},
                       {"state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
                   });
-        // server_config_ =
-        //     ConfigManager::getInstance().getMatchingServerConfig(httpRequest_->getHeaders().getHost().value_or(""));
-        // if (server_config_ == nullptr)
-        // {
-        //     Log::warning("No matching server config found for Host: " +
-        //                  httpRequest_->getHeaders().getHost().value_or("unknown host"));
-        //     setError(Http::StatusCode::BAD_REQUEST);
-        // }
-
-        // Example usage, replace with actual host and port extraction from request
         server_.responseReady(client_socket_->getFd());
     }
     else
@@ -108,23 +98,8 @@ bool Client::isResponseReady() const
 std::vector<uint8_t> Client::getResponse() const
 {
     Log::trace(LOCATION);
-    // if (statusCode_ != Http::StatusCode::OK)
-    // {
-    //     return httpResponse_->toBytes();
-    // }
 
     const Router &router = server_.getRouter();
-    auto response = router.handleRequest(*httpRequest_);
+    auto response = Router::handleRequest(*httpRequest_);
     return response->toBytes();
 }
-
-// void Client::setError(int statusCode)
-// {
-//     Log::trace(LOCATION);
-//     statusCode_ = statusCode;
-//     Log::debug("Setting error response with status code: " + std::to_string(statusCode));
-//     auto errorResponse = std::make_unique<HttpResponse>(
-//         ErrorHandler::getErrorResponse(statusCode, const_cast<ServerConfig *>(server_config_)));
-//     httpResponse_ = std::move(errorResponse);
-//     Log::debug("Error response set successfully");
-// }
