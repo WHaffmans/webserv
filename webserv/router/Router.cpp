@@ -1,16 +1,18 @@
-#include "webserv/config/AConfig.hpp"
-#include "webserv/config/ConfigManager.hpp"
-#include "webserv/config/ServerConfig.hpp"
-#include "webserv/handler/ErrorHandler.hpp"
-#include "webserv/handler/FileHandler.hpp"
-#include "webserv/handler/URIParser.hpp"
-#include "webserv/http/HttpResponse.hpp"
-#include "webserv/log/Log.hpp"
-
 #include <webserv/router/Router.hpp>
 
-#include <memory>
-#include <string>
+#include <webserv/config/ConfigManager.hpp> // for ConfigManager
+#include <webserv/config/ServerConfig.hpp>  // for ServerConfig
+#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
+#include <webserv/handler/FileHandler.hpp>  // for FileHandler
+#include <webserv/handler/URIParser.hpp>    // for URIParser
+#include <webserv/http/HttpHeaders.hpp>     // for HttpHeaders
+#include <webserv/log/Log.hpp>              // for LOCATION, Log
+
+#include <memory>   // for unique_ptr
+#include <optional> // for optional
+#include <string>   // for basic_string, string
+
+class LocationConfig;
 
 Router::Router() {}
 

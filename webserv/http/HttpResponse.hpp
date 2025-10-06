@@ -1,12 +1,12 @@
 #pragma once
 
-#include "webserv/http/HttpHeaders.hpp"
-#include "webserv/log/Log.hpp"
+#include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
+#include <webserv/log/Log.hpp>          // for LOCATION, Log
 
-#include <cstdint>
-#include <memory>
-#include <string>
-#include <vector>
+#include <cstdint> // for uint8_t
+#include <memory>  // for unique_ptr
+#include <string>  // for string
+#include <vector>  // for vector
 
 class Client;
 
@@ -20,7 +20,7 @@ class HttpResponse
     HttpResponse(HttpResponse &&other) noexcept = default;            // Move constructor
     HttpResponse &operator=(HttpResponse &&other) noexcept = default; // Move assignment
 
-    ~HttpResponse() {Log::trace(LOCATION);};
+    ~HttpResponse() { Log::trace(LOCATION); };
 
     void addHeader(const std::string &key, const std::string &value);
 

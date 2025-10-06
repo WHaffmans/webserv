@@ -1,12 +1,13 @@
-#include "webserv/log/Log.hpp"
-
 #include <webserv/utils/FileUtils.hpp>
 
-#include <cstring> // for strlen
-#include <fstream>
-#include <string> // for string
+#include <webserv/log/Log.hpp> // for Log, LOCATION
 
-#include <sys/stat.h> // for stat, S_ISREG, S_ISDIR
+#include <cstring> // for size_t
+#include <fstream> // for basic_ifstream, basic_ios, basic_istream, ios, ifstream, operator|, basic_istream::read, basic_istream::seekg, basic_istream::tellg, streamsize
+#include <iterator> // for istreambuf_iterator, operator==
+#include <string>   // for basic_string, string, char_traits, operator+
+
+#include <sys/stat.h> // for stat, S_ISDIR, S_ISREG
 
 namespace FileUtils
 {

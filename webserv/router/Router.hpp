@@ -1,12 +1,14 @@
 #pragma once
 
-#include "webserv/config/LocationConfig.hpp"
+#include <webserv/config/LocationConfig.hpp>
+#include <webserv/http/HttpRequest.hpp>  // for HttpRequest
+#include <webserv/http/HttpResponse.hpp> // for HttpResponse
 
-#include <webserv/http/HttpRequest.hpp>
-#include <webserv/http/HttpResponse.hpp>
+#include <memory> // for unique_ptr
+#include <string> // for string
 
-#include <memory>
-#include <string>
+class LocationConfig;
+class ServerConfig;
 
 class Router
 {

@@ -1,8 +1,11 @@
 #pragma once
 
-#include <array>
-#include <cstdint>
-#include <string_view>
+#include <array>       // for array
+#include <cstdint>     // for uint16_t
+#include <string>      // for string
+#include <string_view> // for string_view
+
+#include <stddef.h> // for size_t
 
 namespace Http
 {

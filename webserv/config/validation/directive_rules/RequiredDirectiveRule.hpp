@@ -1,8 +1,8 @@
 #pragma once
 
-#include "webserv/config/config_validator/AValidationRule.hpp"
+#include <webserv/config/validation/directive_rules/AValidationRule.hpp> // for AValidationRule
 
-#include <string>
+#include <string> // for string
 
 class AConfig;
 

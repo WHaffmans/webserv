@@ -1,19 +1,18 @@
 #pragma once
 
-// #include "webserv/http/HttpResponse.hpp"
-
-#include "webserv/http/HttpResponse.hpp"
+// #include <webserv/http/HttpResponse.hpp>
 
 #include <webserv/config/ServerConfig.hpp> // for ServerConfig
 #include <webserv/http/HttpConstants.hpp>  // for OK
 #include <webserv/http/HttpRequest.hpp>    // for HttpRequest
+#include <webserv/http/HttpResponse.hpp>   // for HttpResponse
 #include <webserv/server/Server.hpp>
-#include <webserv/socket/Socket.hpp>
+#include <webserv/socket/Socket.hpp> // for Socket
 
 #include <cstddef> // for size_t
-#include <cstdint>
-#include <memory> // for unique_ptr
-#include <vector>
+#include <cstdint> // for uint8_t
+#include <memory>  // for unique_ptr
+#include <vector>  // for vector
 
 class Server;
 class Socket;
@@ -39,6 +38,7 @@ class Client
     [[nodiscard]] int getStatusCode() const;
 
     [[nodiscard]] Socket &getSocket() const { return *client_socket_; }
+
     // void setError(int statusCode);
 
     void setStatusCode(int code);

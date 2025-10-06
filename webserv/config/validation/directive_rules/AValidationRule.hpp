@@ -1,6 +1,5 @@
 #pragma once
-#include <string>
-
+#include <string> // for string, basic_string
 
 class ValidationResult;
 class ADirective;
@@ -18,7 +17,8 @@ class AValidationRule
 
     [[nodiscard]] ValidationResult validate(const AConfig *config, const std::string &directiveName) const;
     [[nodiscard]] bool isRequired() const;
-    [[nodiscard]] virtual ValidationResult validateValue(const AConfig *config, const std::string &directiveName) const = 0;
+    [[nodiscard]] virtual ValidationResult validateValue(const AConfig *config,
+                                                         const std::string &directiveName) const = 0;
     [[nodiscard]] std::string getRuleName() const;
     [[nodiscard]] std::string getDescription() const;
 

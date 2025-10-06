@@ -27,7 +27,6 @@ class ServerConfig : public AConfig
     [[nodiscard]] const LocationConfig *getLocation(const std::string &path) const;
     [[nodiscard]] std::vector<std::string> getLocationPaths() const;
 
-
   private:
     std::map<std::string, std::unique_ptr<LocationConfig>> locations_;
     AConfig *parent_ = nullptr;

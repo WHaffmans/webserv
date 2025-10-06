@@ -1,20 +1,21 @@
-#include "webserv/handler/ErrorHandler.hpp"
-#include "webserv/http/HttpConstants.hpp"
-#include "webserv/http/HttpResponse.hpp"
-
-#include <webserv/config/LocationConfig.hpp>
 #include <webserv/handler/FileHandler.hpp>
-#include <webserv/handler/MIMETypes.hpp>
-#include <webserv/handler/URIParser.hpp>
-#include <webserv/log/Log.hpp>
-#include <webserv/utils/FileUtils.hpp>
 
-#include <algorithm>
-#include <cerrno>  // for errno
-#include <cstring> // for strerror, strlen
-#include <memory>
-#include <string>
-#include <vector>
+#include <webserv/config/LocationConfig.hpp> // for LocationConfig
+#include <webserv/handler/ErrorHandler.hpp>  // for ErrorHandler
+#include <webserv/handler/MIMETypes.hpp>  // for MIMETypes
+#include <webserv/handler/URIParser.hpp>  // for URIParser
+#include <webserv/http/HttpConstants.hpp> // for NOT_FOUND, FORBIDDEN, OK
+#include <webserv/http/HttpResponse.hpp>  // for HttpResponse
+#include <webserv/log/Log.hpp>            // for Log, LOCATION
+#include <webserv/utils/FileUtils.hpp>    // for joinPath, getExtension, isFile, readBinaryFile
+
+#include <functional> // for identity
+#include <memory>     // for unique_ptr, allocator, make_unique
+#include <optional>   // for optional
+#include <ranges>     // for __find_if_fn, find_if
+#include <string>     // for basic_string, string, operator+, char_traits
+#include <utility>    // for move
+#include <vector>     // for vector
 
 FileHandler::FileHandler(const LocationConfig *location, const URIParser &uriParser)
     : location_(location), uriParser_(uriParser)

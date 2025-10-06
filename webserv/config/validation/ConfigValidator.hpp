@@ -1,9 +1,13 @@
 #pragma once
 
+#include <webserv/config/validation/ValidationEngine.hpp> // for ValidationEngine
+#include <webserv/config/validation/ValidationResult.hpp> // for ValidationResult
 
-#include "webserv/config/config_validator/ValidationEngine.hpp"
-#include <memory>
+#include <memory> // for unique_ptr
+#include <vector> // for vector
+
 class GlobalConfig;
+
 class ConfigValidator
 {
   public:
@@ -22,5 +26,4 @@ class ConfigValidator
 
   private:
     std::unique_ptr<ValidationEngine> engine_;
-    
 };

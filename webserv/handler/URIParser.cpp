@@ -1,8 +1,13 @@
-#include <webserv/config/LocationConfig.hpp>
-#include <webserv/config/ServerConfig.hpp>
 #include <webserv/handler/URIParser.hpp>
 
-#include <sys/stat.h> // for stat, S_ISREG, S_ISDIR
+#include <webserv/config/LocationConfig.hpp> // for LocationConfig
+#include <webserv/config/ServerConfig.hpp>   // for ServerConfig
+
+#include <optional> // for optional
+#include <vector>   // for vector
+
+#include <stddef.h>   // for size_t
+#include <sys/stat.h> // for stat, S_ISDIR, S_ISREG
 
 URIParser::URIParser(const std::string &uri, const ServerConfig &serverConfig) : _locationConfig(nullptr)
 {
@@ -22,7 +27,7 @@ URIParser::URIParser(const std::string &uri, const ServerConfig &serverConfig) :
     }
 
     root_ = _locationConfig != nullptr ? _locationConfig->get<std::string>("root").value_or("") : "";
-    if (!root_.empty() && root_.back() == '/' )
+    if (!root_.empty() && root_.back() == '/')
     {
         root_.pop_back(); // Remove trailing slash to avoid double slashes in path
     }
@@ -60,7 +65,6 @@ std::string URIParser::getExtension() const
     return filename.substr(lastDot + 1);
 }
 
-
 LocationConfig const *URIParser::getLocation() const
 {
     return _locationConfig;
@@ -91,4 +95,3 @@ bool URIParser::isValid() const
     struct stat pathStat{};
     return stat(getFilePath().c_str(), &pathStat) == 0;
 }
-

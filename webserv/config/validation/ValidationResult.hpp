@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <cstdint>
+#include <string>
 
 class ValidationResult
 {
@@ -25,7 +25,7 @@ class ValidationResult
     static ValidationResult warning(const std::string &message);
 
     [[nodiscard]] bool isValidResult() const;
-    [[nodiscard]] ValidationResult::Type getType() const ;
+    [[nodiscard]] ValidationResult::Type getType() const;
     [[nodiscard]] std::string getMessage() const;
 
   private:

@@ -1,9 +1,11 @@
+#include <webserv/config/ServerConfig.hpp>
+
 #include <webserv/config/AConfig.hpp>        // for AConfig
 #include <webserv/config/LocationConfig.hpp> // for LocationConfig
-#include <webserv/config/ServerConfig.hpp>
 #include <webserv/log/Log.hpp>     // for Log, LOCATION
 #include <webserv/utils/utils.hpp> // for findCorrespondingClosingBrace, trim
 
+#include <optional>  // for optional
 #include <stdexcept> // for runtime_error
 #include <utility>   // for pair
 
@@ -79,4 +81,3 @@ std::vector<std::string> ServerConfig::getLocationPaths() const
     }
     return paths;
 }
-

@@ -1,10 +1,12 @@
-#include <webserv/config/ConfigManager.hpp> // for ConfigManager
-#include <webserv/log/Log.hpp>              // for Log, LOCATION
-#include <webserv/server/Server.hpp>        // for Server
-#include <webserv/config/config_validator/ConfigValidator.hpp> // for ConfigValidator
+#include <webserv/config/ConfigManager.hpp>               // for ConfigManager
+#include <webserv/config/validation/ConfigValidator.hpp>  // for ConfigValidator
+#include <webserv/config/validation/ValidationResult.hpp> // for ValidationResult
+#include <webserv/log/Log.hpp>                            // for Log
+#include <webserv/server/Server.hpp>                      // for Server
 
-#include <iostream> // for basic_ostream, operator<<, cerr, ios_base
-#include <string>   // for basic_string, char_traits, allocator, operator+, operator<=>
+#include <iostream> // for ios_base
+#include <string>   // for allocator, basic_string, char_traits, operator+, string
+#include <vector>   // for vector
 
 int main(int argc, char **argv)
 {

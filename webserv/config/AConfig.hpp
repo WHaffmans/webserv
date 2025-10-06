@@ -3,10 +3,10 @@
 #include <webserv/config/directive/ADirective.hpp> // for ADirective
 #include <webserv/config/directive/DirectiveValue.hpp>
 
-#include <memory> // for unique_ptr
-#include <optional>
-#include <string> // for string
-#include <vector> // for vector
+#include <memory>   // for unique_ptr
+#include <optional> // for nullopt, optional
+#include <string>   // for string
+#include <vector>   // for vector
 
 class AConfig
 {
@@ -28,8 +28,7 @@ class AConfig
     [[nodiscard]] const ADirective *getDirective(const std::string &name) const;
     [[nodiscard]] std::vector<const ADirective *> getDirectives() const;
 
-    template <typename T>
-    std::optional<T> get(const std::string &name) const
+    template <typename T> std::optional<T> get(const std::string &name) const
     {
         const auto *directive = getDirective(name);
         if (!directive)
@@ -39,7 +38,7 @@ class AConfig
         return directive->getValue().try_get<T>();
     }
 
-    protected:
+  protected:
     virtual void parseBlock(const std::string &block) = 0;
     void parseDirectives(const std::string &declarations);
     std::vector<std::unique_ptr<ADirective>>

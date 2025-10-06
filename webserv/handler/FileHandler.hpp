@@ -1,12 +1,15 @@
 #pragma once
 
-#include "webserv/config/LocationConfig.hpp"
-#include "webserv/handler/URIParser.hpp"
-#include "webserv/http/HttpResponse.hpp"
+#include <webserv/config/LocationConfig.hpp>
+#include <webserv/handler/URIParser.hpp>
+#include <webserv/http/HttpResponse.hpp> // for HttpResponse
 
-#include <cstdint>
-#include <memory>
-#include <string>
+#include <cstdint> // for uint8_t
+#include <memory>  // for unique_ptr
+#include <string>  // for string
+
+class LocationConfig;
+class URIParser;
 
 class FileHandler
 {

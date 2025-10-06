@@ -1,11 +1,10 @@
-#include "webserv/http/HttpResponse.hpp"
-
 #include <webserv/config/AConfig.hpp>       // for AConfig
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/GlobalConfig.hpp>  // for GlobalConfig
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
 #include <webserv/http/HttpConstants.hpp> // for StatusCodeInfo, CRLF, DOUBLE_CRLF, INTERNAL_SERVER_ERROR, statusCodeInfos
-#include <webserv/log/Log.hpp>            // for Log
+#include <webserv/http/HttpResponse.hpp>
+#include <webserv/log/Log.hpp> // for Log
 
 #include <fstream> // for basic_ifstream, basic_filebuf, basic_ostream::operator<<, ifstream, stringstream
 #include <memory>

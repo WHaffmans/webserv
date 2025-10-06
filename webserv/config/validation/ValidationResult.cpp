@@ -1,5 +1,8 @@
-#include <webserv/config/config_validator/ValidationResult.hpp>
-#include <webserv/log/Log.hpp>
+#include <webserv/config/validation/ValidationResult.hpp>
+
+#include <webserv/log/Log.hpp> // for Log
+
+#include <utility> // for move
 
 ValidationResult::ValidationResult(Type type, std::string message) : type_(type), message_(std::move(message)) {}
 

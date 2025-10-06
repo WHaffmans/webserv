@@ -1,15 +1,21 @@
 #pragma once
 
-#include "webserv/config/GlobalConfig.hpp"
-#include "webserv/config/config_validator/AValidationRule.hpp"
-#include "webserv/config/config_validator/ValidationResult.hpp"
-#include "webserv/config/LocationConfig.hpp"
-#include "webserv/config/ServerConfig.hpp"
-#include "webserv/config/AConfig.hpp"
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
+#include <webserv/config/AConfig.hpp>
+#include <webserv/config/GlobalConfig.hpp>
+#include <webserv/config/LocationConfig.hpp>
+#include <webserv/config/ServerConfig.hpp>
+#include <webserv/config/validation/ValidationResult.hpp>                // for ValidationResult
+#include <webserv/config/validation/directive_rules/AValidationRule.hpp> // for AValidationRule
+
+#include <map>    // for map
+#include <memory> // for unique_ptr
+#include <string> // for basic_string, string, operator<=>
+#include <vector> // for vector
+
+class AConfig;
+class GlobalConfig;
+class LocationConfig;
+class ServerConfig;
 
 class ValidationEngine
 {

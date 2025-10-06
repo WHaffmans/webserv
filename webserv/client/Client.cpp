@@ -1,20 +1,18 @@
-#include "webserv/router/Router.hpp"
-
 #include <webserv/client/Client.hpp>
-#include <webserv/config/ConfigManager.hpp>
-#include <webserv/config/ServerConfig.hpp>
-#include <webserv/handler/ErrorHandler.hpp>
-#include <webserv/http/HttpHeaders.hpp>
-#include <webserv/log/Log.hpp>
-#include <webserv/server/Server.hpp>
-#include <webserv/socket/Socket.hpp>
 
-#include <cstdint>
-#include <functional>
-#include <map>
-#include <utility>
+#include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
+#include <webserv/log/Log.hpp>          // for Log, LOCATION
+#include <webserv/router/Router.hpp>    // for Router
+#include <webserv/server/Server.hpp>    // for Server
+#include <webserv/socket/Socket.hpp>    // for Socket
 
-#include <sys/types.h>
+#include <cstdint>    // for uint8_t
+#include <functional> // for ref, reference_wrapper
+#include <map>        // for map
+#include <string>     // for basic_string, to_string, operator+, operator<=>
+#include <utility>    // for pair, move
+
+#include <sys/types.h> // for ssize_t
 
 Client::Client(std::unique_ptr<Socket> socket, Server &server)
     : client_socket_(std::move(socket)), server_(std::ref(server)), httpRequest_(std::make_unique<HttpRequest>(this)),

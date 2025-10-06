@@ -1,17 +1,19 @@
+#include <webserv/server/Server.hpp>
+
 #include <webserv/client/Client.hpp>        // for Client
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/ServerConfig.hpp>  // for ServerConfig
-#include <webserv/log/Log.hpp>              // for Log
-#include <webserv/server/Server.hpp>
+#include <webserv/log/Log.hpp>              // for Log, LOCATION
 #include <webserv/socket/Socket.hpp> // for Socket
 
 #include <cerrno>        // for errno
-#include <cstring>       // for strerror, strlen
+#include <cstring>       // for strerror
 #include <exception>     // for exception
 #include <memory>        // for unique_ptr, allocator, make_unique
+#include <optional>      // for optional
 #include <stdexcept>     // for runtime_error
 #include <string>        // for basic_string, operator+, to_string, char_traits, string
-#include <unordered_map> // for unordered_map, unordered_map<>::container_type
+#include <unordered_map> // for unordered_map, operator==
 #include <utility>       // for move, pair
 #include <vector>        // for vector
 
@@ -19,6 +21,8 @@
 #include <sys/socket.h> // for send, SOMAXCONN
 #include <sys/types.h>  // for ssize_t
 #include <unistd.h>     // for close
+
+class Router;
 
 Server::Server(const ConfigManager &configManager)
     : epoll_fd_(epoll_create1(0)), configManager_(configManager), router_()
