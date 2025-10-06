@@ -4,6 +4,7 @@
 #include <webserv/config/validation/directive_rules/AValidationRule.hpp>    // for AValidationRule
 #include <webserv/config/validation/directive_rules/AllowedValuesRule.hpp>  // for AllowedValuesRule
 #include <webserv/config/validation/directive_rules/PortValidationRule.hpp> // for PortValidationRule
+#include <webserv/config/validation/structural_rules/StructuralRules.hpp>   // for structural rules
 #include <webserv/log/Log.hpp>                                              // for LOCATION, Log
 
 #include <string> // for basic_string, string
@@ -11,6 +12,11 @@
 ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make_unique<ValidationEngine>(config))
 {
     Log::trace(LOCATION);
+
+    /*Structural Rules*/
+    engine_->addStructuralRule(std::make_unique<MinimumServerBlocksRule>(1));
+    engine_->addStructuralRule(std::make_unique<RequiredLocationBlocksRule>(1));
+    engine_->addStructuralRule(std::make_unique<UniqueServerNamesRule>());
 
     /*Global Directive Rules*/
 

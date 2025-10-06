@@ -6,6 +6,7 @@
 #include <webserv/config/ServerConfig.hpp>
 #include <webserv/config/validation/ValidationResult.hpp>                // for ValidationResult
 #include <webserv/config/validation/directive_rules/AValidationRule.hpp> // for AValidationRule
+#include <webserv/config/validation/structural_rules/AStructuralValidationRule.hpp> // for AStructuralValidationRule
 
 #include <map>    // for map
 #include <memory> // for unique_ptr
@@ -33,6 +34,9 @@ class ValidationEngine
     void addServerRule(const std::string &directiveName, std::unique_ptr<AValidationRule> rule);
     void addLocationRule(const std::string &directiveName, std::unique_ptr<AValidationRule> rule);
 
+    // Structural validation rules
+    void addStructuralRule(std::unique_ptr<AStructuralValidationRule> rule);
+
     void validate();
 
     [[nodiscard]] std::vector<ValidationResult> getValidationResults() const;
@@ -47,9 +51,11 @@ class ValidationEngine
     void validateGlobalConfig(const GlobalConfig *config);
     void validateServerConfig(const ServerConfig *config);
     void validateLocationConfig(const std::string &path, const LocationConfig *config);
+
     RuleMap globalRules_;
     RuleMap serverRules_;
     RuleMap locationRules_;
+    std::vector<std::unique_ptr<AStructuralValidationRule>> structuralRules_;
     const GlobalConfig *globalConfig_;
 
     std::vector<ValidationResult> results_;
