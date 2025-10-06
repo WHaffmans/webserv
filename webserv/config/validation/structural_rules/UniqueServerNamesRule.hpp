@@ -6,7 +6,7 @@ class GlobalConfig;
 
 class UniqueServerNamesRule : public AStructuralValidationRule
 {
-public:
+  public:
     UniqueServerNamesRule();
 
     ~UniqueServerNamesRule() override = default;

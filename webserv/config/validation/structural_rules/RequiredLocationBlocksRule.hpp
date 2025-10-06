@@ -8,10 +8,10 @@ class ServerConfig;
 
 class RequiredLocationBlocksRule : public AStructuralValidationRule
 {
-private:
+  private:
     size_t minimumLocations_;
 
-public:
+  public:
     explicit RequiredLocationBlocksRule(size_t minimumLocations = 1);
 
     ~RequiredLocationBlocksRule() override = default;
