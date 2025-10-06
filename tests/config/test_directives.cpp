@@ -38,7 +38,7 @@ TEST_F(DirectiveTest, StringDirectiveParse)
     StringDirective directive("root", "");
     directive.parse("/var/www/html");
 
-    EXPECT_EQ(directive.getValueAs<std::string>(), "/var/www/html");
+    EXPECT_EQ(directive.getValue().get<std::string>(), "/var/www/html");
 }
 
 TEST_F(DirectiveTest, IntDirectiveCreation)
@@ -55,7 +55,7 @@ TEST_F(DirectiveTest, IntDirectiveParse)
     IntDirective directive("port", "0");
     directive.parse("9000");
 
-    EXPECT_EQ(directive.getValueAs<int>(), 9000);
+    EXPECT_EQ(directive.getValue().get<int>(), 9000);
 }
 
 TEST_F(DirectiveTest, BoolDirectiveCreation)
@@ -72,16 +72,16 @@ TEST_F(DirectiveTest, BoolDirectiveParsing)
     BoolDirective directive("test", "off");
 
     directive.parse("on");
-    EXPECT_TRUE(directive.getValueAs<bool>());
+    EXPECT_TRUE(directive.getValue().get<bool>());
 
     directive.parse("off");
-    EXPECT_FALSE(directive.getValueAs<bool>());
+    EXPECT_FALSE(directive.getValue().get<bool>());
 
     directive.parse("true");
-    EXPECT_TRUE(directive.getValueAs<bool>());
+    EXPECT_TRUE(directive.getValue().get<bool>());
 
     directive.parse("false");
-    EXPECT_FALSE(directive.getValueAs<bool>());
+    EXPECT_FALSE(directive.getValue().get<bool>());
 }
 
 TEST_F(DirectiveTest, DirectiveFactoryCreateStringDirective)
@@ -90,7 +90,8 @@ TEST_F(DirectiveTest, DirectiveFactoryCreateStringDirective)
 
     ASSERT_NE(directive, nullptr);
     EXPECT_EQ(directive->getName(), "server_name");
-    EXPECT_TRUE(directive->getValue().holds<std::vector<std::string>>());
+    EXPECT_TRUE(directive->getValue().holds<std::string>());
+    EXPECT_EQ(directive->getValue().get<std::string>(), "example.com");
 }
 
 TEST_F(DirectiveTest, DirectiveFactoryCreateIntDirective)
