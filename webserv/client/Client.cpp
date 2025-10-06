@@ -62,7 +62,7 @@ void Client::request()
     }
 
     buffer[bytesRead] = '\0'; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-    httpRequest_->receiveData(buffer, static_cast<size_t>(bytesRead));
+    httpRequest_->receiveData(static_cast<const char *>(buffer), static_cast<size_t>(bytesRead));
 
     if (httpRequest_->getState() == HttpRequest::State::Complete ||
         httpRequest_->getState() == HttpRequest::State::ParseError)
