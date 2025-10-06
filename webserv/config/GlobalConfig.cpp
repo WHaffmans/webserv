@@ -12,6 +12,16 @@ GlobalConfig::GlobalConfig(const std::string &block)
     parseBlock(block);
 }
 
+std::string GlobalConfig::getName() const
+{
+    return "global";
+}
+
+std::string GlobalConfig::getType() const
+{
+    return "global";
+}
+
 void GlobalConfig::parseBlock(const std::string &block)
 {
     std::string directives;

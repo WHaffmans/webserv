@@ -21,8 +21,12 @@ class ServerConfig : public AConfig
 
     ~ServerConfig() override = default;
 
+    [[nodiscard]] std::string getName() const override;
+    [[nodiscard]] std::string getType() const override;
+
     [[nodiscard]] const LocationConfig *getLocation(const std::string &path) const;
     [[nodiscard]] std::vector<std::string> getLocationPaths() const;
+
 
   private:
     std::map<std::string, std::unique_ptr<LocationConfig>> locations_;

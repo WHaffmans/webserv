@@ -17,6 +17,8 @@ class LocationConfig : public AConfig
 
     ~LocationConfig() override = default;
 
+    [[nodiscard]] std::string getName() const override;
+    [[nodiscard]] std::string getType() const override;
     [[nodiscard]] const std::string &getPath() const { return _path; }
 
   private:

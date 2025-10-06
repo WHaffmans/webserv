@@ -34,6 +34,17 @@ const ADirective *AConfig::getDirective(const std::string &name) const
     return nullptr;
 }
 
+std::vector<const ADirective *> AConfig::getDirectives() const
+{
+    std::vector<const ADirective *> result;
+    result.reserve(directives_.size());
+    for (const auto &directive : directives_)
+    {
+        result.push_back(directive.get());
+    }
+    return result;
+}
+
 bool AConfig::hasDirective(const std::string &name) const
 {
     for (const auto &directive : directives_)

@@ -19,6 +19,10 @@ class GlobalConfig : public AConfig
     GlobalConfig &operator=(GlobalConfig &&other) noexcept = delete;
 
     ~GlobalConfig() override = default;
+    
+    [[nodiscard]] std::string getName() const override;
+    [[nodiscard]] std::string getType() const override;
+
     [[nodiscard]] std::vector<ServerConfig *> getServerConfigs() const;
 
   private:
