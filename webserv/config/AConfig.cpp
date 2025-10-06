@@ -76,10 +76,10 @@ std::string AConfig::getErrorPage(int statusCode) const
     {
         if (directive->getName() == "error_page")
         {
-            auto value = directive->getValueAs<std::pair<int, std::string>>();
-            if (value.first == statusCode)
+            auto value = directive->getValue().try_get<std::pair<int, std::string>>();
+            if (value && value->first == statusCode)
             {
-                return value.second;
+                return value->second;
             }
         }
     }

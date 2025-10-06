@@ -33,13 +33,7 @@ class AConfig
         {
             return std::nullopt;
         }
-
-        auto value = directive->getValue();
-        if (value.holds<T>())
-        {
-            return value.get<T>();
-        }
-        return std::nullopt;
+        return directive->getValue().try_get<T>();
     }
 
     protected:

@@ -2,6 +2,7 @@
 
 #include <cstddef>  // for size_t
 #include <iostream> // for ostream, operator<<
+#include <optional> // for optional, nullopt
 #include <string>   // for string, basic_string, char_traits, to_string
 #include <utility>  // for pair, move
 #include <variant>  // for variant, visit, get, holds_alternative
@@ -30,6 +31,15 @@ class DirectiveValue
     DirectiveValue(DirectiveValueType value) : value_(std::move(value)) {}
 
     template <typename T> T get() const { return std::get<T>(value_); }
+
+    template <typename T> std::optional<T> try_get() const
+    {
+        if (std::holds_alternative<T>(value_))
+        {
+            return std::get<T>(value_);
+        }
+        return std::nullopt;
+    }
 
     template <typename T> [[nodiscard]] bool holds() const { return std::holds_alternative<T>(value_); }
 
