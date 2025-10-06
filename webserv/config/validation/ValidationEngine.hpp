@@ -4,8 +4,8 @@
 #include <webserv/config/GlobalConfig.hpp>
 #include <webserv/config/LocationConfig.hpp>
 #include <webserv/config/ServerConfig.hpp>
-#include <webserv/config/validation/ValidationResult.hpp>                // for ValidationResult
-#include <webserv/config/validation/directive_rules/AValidationRule.hpp> // for AValidationRule
+#include <webserv/config/validation/ValidationResult.hpp>                           // for ValidationResult
+#include <webserv/config/validation/directive_rules/AValidationRule.hpp>            // for AValidationRule
 #include <webserv/config/validation/structural_rules/AStructuralValidationRule.hpp> // for AStructuralValidationRule
 
 #include <map>    // for map

@@ -1,9 +1,8 @@
-#include <webserv/config/validation/ValidationEngine.hpp>
-
 #include <webserv/config/AConfig.hpp>        // for AConfig
 #include <webserv/config/GlobalConfig.hpp>   // for GlobalConfig
 #include <webserv/config/LocationConfig.hpp> // for LocationConfig
 #include <webserv/config/ServerConfig.hpp>   // for ServerConfig
+#include <webserv/config/validation/ValidationEngine.hpp>
 #include <webserv/config/validation/ValidationResult.hpp>                // for ValidationResult
 #include <webserv/config/validation/directive_rules/AValidationRule.hpp> // for AValidationRule
 #include <webserv/log/Log.hpp>                                           // for Log, LOCATION
@@ -31,7 +30,8 @@ void ValidationEngine::addLocationRule(const std::string &directiveName, std::un
 void ValidationEngine::addStructuralRule(std::unique_ptr<AStructuralValidationRule> rule)
 {
     Log::trace(LOCATION);
-    if (rule != nullptr) {
+    if (rule != nullptr)
+    {
         structuralRules_.push_back(std::move(rule));
     }
 }
@@ -76,7 +76,7 @@ std::vector<ValidationResult> ValidationEngine::getWarnings() const
 
 bool ValidationEngine::hasErrors() const
 {
-    for (const auto &result : results_) //NOLINT(readability-use-anyofallof)
+    for (const auto &result : results_) // NOLINT(readability-use-anyofallof)
     {
         if (!result.isValidResult())
         {
@@ -122,20 +122,25 @@ void ValidationEngine::validateConfig(RuleMap const &rulesMap, const AConfig *co
 void ValidationEngine::validateLocationConfig(const std::string &path, const LocationConfig *config)
 {
     Log::trace(LOCATION);
-    
+
     // Run location structural validation rules
-    for (const auto &rule : structuralRules_) {
-        try {
+    for (const auto &rule : structuralRules_)
+    {
+        try
+        {
             ValidationResult result = rule->validateLocation(config);
-            if (!result.isValidResult()) {
+            if (!result.isValidResult())
+            {
                 results_.push_back(result);
             }
-        } catch (const std::exception &e) {
-            results_.push_back(ValidationResult::error(
-                "Structural rule '" + rule->getRuleName() + "' threw exception for location '" + path + "': " + e.what()));
+        }
+        catch (const std::exception &e)
+        {
+            results_.push_back(ValidationResult::error("Structural rule '" + rule->getRuleName() +
+                                                       "' threw exception for location '" + path + "': " + e.what()));
         }
     }
-    
+
     // Run location directive validation rules
     validateConfig(locationRules_, config);
 }
@@ -143,23 +148,28 @@ void ValidationEngine::validateLocationConfig(const std::string &path, const Loc
 void ValidationEngine::validateServerConfig(const ServerConfig *config)
 {
     Log::trace(LOCATION);
-    
+
     // Run server structural validation rules
-    for (const auto &rule : structuralRules_) {
-        try {
+    for (const auto &rule : structuralRules_)
+    {
+        try
+        {
             ValidationResult result = rule->validateServer(config);
-            if (!result.isValidResult()) {
+            if (!result.isValidResult())
+            {
                 results_.push_back(result);
             }
-        } catch (const std::exception &e) {
-            results_.push_back(ValidationResult::error(
-                "Structural rule '" + rule->getRuleName() + "' threw exception: " + e.what()));
+        }
+        catch (const std::exception &e)
+        {
+            results_.push_back(
+                ValidationResult::error("Structural rule '" + rule->getRuleName() + "' threw exception: " + e.what()));
         }
     }
-    
+
     // Run server directive validation rules
     validateConfig(serverRules_, config);
-    
+
     for (const auto &path : config->getLocationPaths())
     {
         const LocationConfig *locationConfig = config->getLocation(path);
@@ -173,23 +183,28 @@ void ValidationEngine::validateServerConfig(const ServerConfig *config)
 void ValidationEngine::validateGlobalConfig(const GlobalConfig *config)
 {
     Log::trace(LOCATION);
-    
+
     // Run global structural validation rules
-    for (const auto &rule : structuralRules_) {
-        try {
+    for (const auto &rule : structuralRules_)
+    {
+        try
+        {
             ValidationResult result = rule->validateGlobal(config);
-            if (!result.isValidResult()) {
+            if (!result.isValidResult())
+            {
                 results_.push_back(result);
             }
-        } catch (const std::exception &e) {
-            results_.push_back(ValidationResult::error(
-                "Structural rule '" + rule->getRuleName() + "' threw exception: " + e.what()));
+        }
+        catch (const std::exception &e)
+        {
+            results_.push_back(
+                ValidationResult::error("Structural rule '" + rule->getRuleName() + "' threw exception: " + e.what()));
         }
     }
-    
+
     // Run global directive validation rules
     validateConfig(globalRules_, config);
-    
+
     for (const auto *serverConfig : config->getServerConfigs())
     {
         validateServerConfig(serverConfig);
@@ -205,7 +220,7 @@ void ValidationEngine::validate()
 {
     Log::trace(LOCATION);
     results_.clear(); // Clear previous results
-    
+
     if (globalConfig_ != nullptr)
     {
         validateGlobalConfig(globalConfig_);

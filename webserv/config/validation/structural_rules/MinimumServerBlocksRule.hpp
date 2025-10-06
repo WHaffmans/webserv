@@ -8,10 +8,10 @@ class GlobalConfig;
 
 class MinimumServerBlocksRule : public AStructuralValidationRule
 {
-private:
+  private:
     size_t minimumServers_;
 
-public:
+  public:
     explicit MinimumServerBlocksRule(size_t minimumServers = 1);
 
     ~MinimumServerBlocksRule() override = default;
