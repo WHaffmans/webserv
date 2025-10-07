@@ -4,6 +4,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace utils
 {
@@ -103,5 +104,18 @@ void removeComments(std::string &str)
         }
     }
     removeEmptyLines(str);
+}
+
+std::vector<std::string> split(const std::string &str, char delimiter)
+{
+    std::vector<std::string> parts;
+    std::string part;
+    std::istringstream stream(str);
+
+    while (std::getline(stream, part, delimiter))
+    {
+        parts.push_back(part);
+    }
+    return parts;
 }
 } // namespace utils

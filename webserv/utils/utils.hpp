@@ -2,6 +2,7 @@
 
 #include <cstddef> // for size_t
 #include <string>  // for string
+#include <vector>
 
 namespace utils
 {
@@ -11,4 +12,5 @@ std::string trim(const std::string &str);
 size_t findCorrespondingClosingBrace(const std::string &str, size_t openPos);
 void removeEmptyLines(std::string &str);
 void removeComments(std::string &str);
+std::vector<std::string> split(const std::string &str, char delimiter);
 } // namespace utils
