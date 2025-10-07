@@ -19,4 +19,5 @@ class Router
 
   private:
     [[nodiscard]] const LocationConfig *getLocation(const std::string &path, const ServerConfig &serverConfig) const;
+    [[nodiscard]] static bool isMethodSupported(const std::string &method, const LocationConfig &location);
 };
