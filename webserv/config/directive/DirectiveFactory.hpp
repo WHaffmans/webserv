@@ -36,7 +36,7 @@ class DirectiveFactory
         {.name = "client_max_body_size", .type = "SizeDirective", .context = "SL"},
         {.name = "autoindex", .type = "BoolDirective", .context = "L"},
         {.name = "allowed_methods", .type = "VectorDirective", .context = "L"},
-        {.name = "cgi_pass", .type = "StringDirective", .context = "L"},
+        {.name = "cgi_enabled", .type = "BoolDirective", .context = "L"},
         {.name = "cgi_ext", .type = "VectorDirective", .context = "L"},
         {.name = "cgi_timeout", .type = "IntDirective", .context = "L"},
         {.name = "upload_enabled", .type = "BoolDirective", .context = "L"},
