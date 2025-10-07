@@ -86,5 +86,22 @@ test_build: release
 	@echo "Building tests only..."
 	$(CMAKE_BUILD) $(BUILD_DIR) --target webserv_tests
 
+# Coverage targets
+coverage:
+	@echo "Running coverage analysis..."
+	./coverage.sh
+
+coverage_clean:
+	@echo "Cleaning coverage data..."
+	rm -rf build_coverage
+
+# Manual coverage build (advanced users)
+coverage_manual:
+	@echo "Building with coverage manually..."
+	@mkdir -p build_coverage
+	cd build_coverage && $(CMAKE) .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DENABLE_COVERAGE=ON $(CMAKE_FLAGS)
+	$(CMAKE_BUILD) build_coverage
+	cd build_coverage && $(CMAKE_BUILD) . --target coverage
+
 # Mark targets as phony
-.PHONY: all release debug asan run run_release run_debug run_asan clean fclean re test test_verbose test_build
+.PHONY: all release debug asan run run_release run_debug run_asan clean fclean re test test_verbose test_build coverage coverage_clean coverage_manual
