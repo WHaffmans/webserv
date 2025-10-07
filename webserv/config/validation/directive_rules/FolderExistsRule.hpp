@@ -1,8 +1,8 @@
 #pragma once
 
-#include "webserv/config/AConfig.hpp"
-#include "webserv/config/validation/ValidationResult.hpp"
-#include "webserv/config/validation/directive_rules/AValidationRule.hpp"
+#include <webserv/config/AConfig.hpp>
+#include <webserv/config/validation/ValidationResult.hpp>
+#include <webserv/config/validation/directive_rules/AValidationRule.hpp>
 
 class FolderExistsRule : public AValidationRule
 {

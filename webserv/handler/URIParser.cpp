@@ -4,7 +4,6 @@
 #include <webserv/config/ServerConfig.hpp>   // for ServerConfig
 
 #include <optional> // for optional
-#include <vector>   // for vector
 
 #include <stddef.h>   // for size_t
 #include <sys/stat.h> // for stat, S_ISDIR, S_ISREG

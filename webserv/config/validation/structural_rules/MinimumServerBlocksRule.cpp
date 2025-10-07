@@ -1,7 +1,7 @@
-#include "webserv/config/validation/structural_rules/MinimumServerBlocksRule.hpp"
+#include <webserv/config/validation/structural_rules/MinimumServerBlocksRule.hpp>
 
-#include "webserv/config/GlobalConfig.hpp"
-#include "webserv/log/Log.hpp"
+#include <webserv/config/GlobalConfig.hpp>
+#include <webserv/log/Log.hpp>
 
 #include <string>
 

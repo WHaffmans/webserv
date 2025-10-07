@@ -1,6 +1,6 @@
 #pragma once
 
-#include "webserv/config/validation/structural_rules/AStructuralValidationRule.hpp"
+#include <webserv/config/validation/structural_rules/AStructuralValidationRule.hpp>
 
 #include <cstddef>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "webserv/config/validation/ValidationResult.hpp"
+#include <webserv/config/validation/ValidationResult.hpp>
 
 #include <string>
 
