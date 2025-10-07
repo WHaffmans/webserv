@@ -70,6 +70,8 @@ void Socket::bind(const std::string &host, const int port) const
 
     if (::bind(fd_, (struct sockaddr *)&address, sizeof(address)) < 0) // NOLINT(cppcoreguidelines-pro-type-cstyle-cast
     {
+        Log::fatal("Cannot bind to " + host + ":" + std::to_string(port) +
+                   " - address already in use or permission denied");
         throw std::runtime_error("Bind failed");
     }
 }
