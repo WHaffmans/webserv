@@ -1,6 +1,5 @@
-#include <webserv/config/directive/DirectiveFactory.hpp>   // for DirectiveFactory
-
 #include <webserv/config/directive/BoolDirective.hpp>      // for BoolDirective
+#include <webserv/config/directive/DirectiveFactory.hpp>   // for DirectiveFactory
 #include <webserv/config/directive/IntDirective.hpp>       // for IntDirective
 #include <webserv/config/directive/IntStringDirective.hpp> // for IntStringDirective
 #include <webserv/config/directive/SizeDirective.hpp>      // for SizeDirective
@@ -39,6 +38,7 @@ std::unique_ptr<ADirective> DirectiveFactory::createDirective(const std::string 
         throw std::invalid_argument("Unsupported directive: " + name);
     }
 
+    Log::debug("Creating directive of type: " + std::string(type) + " with name: " + name + " and arg: " + arg);
     return create(type, name, arg);
 }
 
