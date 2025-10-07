@@ -1,12 +1,15 @@
+#include "webserv/config/validation/directive_rules/CgiExtValidationRule.hpp"
 #include <webserv/config/validation/ConfigValidator.hpp>
-
-#include <webserv/config/validation/ValidationEngine.hpp>                   // for ValidationEngine
-#include <webserv/config/validation/directive_rules/AValidationRule.hpp>    // for AValidationRule
-#include <webserv/config/validation/directive_rules/AllowedValuesRule.hpp>  // for AllowedValuesRule
+#include <webserv/config/validation/ValidationEngine.hpp>                  // for ValidationEngine
+#include <webserv/config/validation/directive_rules/AValidationRule.hpp>   // for AValidationRule
+#include <webserv/config/validation/directive_rules/AllowedValuesRule.hpp> // for AllowedValuesRule
+#include <webserv/config/validation/directive_rules/FolderExistsRule.hpp>
+#include <webserv/config/validation/directive_rules/HostValidationRule.hpp>
 #include <webserv/config/validation/directive_rules/PortValidationRule.hpp> // for PortValidationRule
 #include <webserv/config/validation/structural_rules/StructuralRules.hpp>   // for structural rules
 #include <webserv/log/Log.hpp>                                              // for LOCATION, Log
 
+#include <memory>
 #include <string> // for basic_string, string
 
 ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make_unique<ValidationEngine>(config))
@@ -22,10 +25,14 @@ ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make
 
     /*Server Directive Rules*/
     engine_->addServerRule("listen", std::make_unique<PortValidationRule>());
+    engine_->addServerRule("host", std::make_unique<HostValidationRule>());
+    engine_->addServerRule("root", std::make_unique<FolderExistsRule>(true));
 
     /*Location Directive Rules*/
     engine_->addLocationRule("allowed_methods",
                              std::make_unique<AllowedValuesRule>(std::vector<std::string>{"GET", "POST", "DELETE"}));
+    engine_->addLocationRule("root", std::make_unique<FolderExistsRule>(true));
+    engine_->addLocationRule("cgi_ext", std::make_unique<CgiExtValidationRule>(true));
 
     engine_->validate();
 }
