@@ -85,6 +85,7 @@ std::unique_ptr<HttpResponse> FileHandler::getResponse() const
 
 FileHandler::ResourceType FileHandler::getResourceType(const std::string &path) const
 {
+    static_cast<void>(path);
     Log::trace(LOCATION);
 
     if (uriParser_.isFile())

@@ -84,7 +84,7 @@ void AConfig::parseDirectives(const std::string &declarations)
 std::string AConfig::getErrorPage(int statusCode) const
 {
     // TODO
-    const ADirective *directive = getDirective("error_page");
+    Log::trace(LOCATION);    
     for (const auto &directive : directives_)
     {
         if (directive->getName() == "error_page")

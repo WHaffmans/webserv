@@ -26,7 +26,7 @@ class GlobalConfig : public AConfig
     [[nodiscard]] std::vector<ServerConfig *> getServerConfigs() const;
 
   private:
-    AConfig *parent_ = nullptr;
+    // AConfig *parent_;
     std::vector<std::unique_ptr<ServerConfig>> servers_;
 
     void parseBlock(const std::string &block) override;

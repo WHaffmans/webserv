@@ -29,7 +29,7 @@ class ServerConfig : public AConfig
 
   private:
     std::map<std::string, std::unique_ptr<LocationConfig>> locations_;
-    AConfig *parent_ = nullptr;
+    // AConfig *parent_;
 
     void parseBlock(const std::string &block) override;
 };

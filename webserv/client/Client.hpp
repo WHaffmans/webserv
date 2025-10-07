@@ -50,5 +50,5 @@ class Client
     std::unique_ptr<HttpResponse> httpResponse_ = nullptr;
     std::unique_ptr<Socket> client_socket_;
     Server &server_;
-    mutable const ServerConfig *server_config_ = nullptr;
+    // mutable const ServerConfig *server_config_ = nullptr;
 };

@@ -11,5 +11,7 @@ RequiredDirectiveRule::RequiredDirectiveRule()
 
 ValidationResult RequiredDirectiveRule::validateValue(const AConfig *config, const std::string &directiveName) const
 {
+    static_cast<void>(config); // Suppress unused parameter warning
+    static_cast<void>(directiveName);
     return ValidationResult::success();
 }

@@ -45,6 +45,7 @@ std::unique_ptr<HttpResponse> Router::handleRequest(const HttpRequest &request)
     URIParser uriParser{request.getTarget(), *config};
 
     const std::string &target = request.getTarget();
+    static_cast<void>(target); // Suppress unused variable warning
     const std::string &method = request.getMethod();
 
     const LocationConfig *location = uriParser.getLocation();

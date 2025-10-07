@@ -15,8 +15,8 @@
 #include <sys/types.h> // for ssize_t
 
 Client::Client(std::unique_ptr<Socket> socket, Server &server)
-    : client_socket_(std::move(socket)), server_(std::ref(server)), httpRequest_(std::make_unique<HttpRequest>(this)),
-      httpResponse_(std::make_unique<HttpResponse>())
+    : httpRequest_(std::make_unique<HttpRequest>(this)), httpResponse_(std::make_unique<HttpResponse>()), client_socket_(std::move(socket)),
+      server_(std::ref(server))
 {
     Log::trace(LOCATION);
     Log::info("New client connected, fd: " + std::to_string(client_socket_->getFd()));
@@ -98,6 +98,7 @@ std::vector<uint8_t> Client::getResponse() const
     Log::trace(LOCATION);
 
     const Router &router = server_.getRouter();
+    static_cast<void>(router); // Suppress unused variable warning
     auto response = Router::handleRequest(*httpRequest_);
     return response->toBytes();
 }
