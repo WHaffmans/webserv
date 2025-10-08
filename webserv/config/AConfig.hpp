@@ -24,7 +24,9 @@ class AConfig
     void addDirective(const std::string &line);
     [[nodiscard]] std::string getErrorPage(int statusCode) const;
 
-    [[nodiscard]] bool hasDirective(const std::string &name) const;
+    [[nodiscard]] bool has(const std::string &name) const;
+    [[nodiscard]] bool owns(const std::string &name) const;
+
     [[nodiscard]] const ADirective *getDirective(const std::string &name) const;
     [[nodiscard]] std::vector<const ADirective *> getDirectives() const;
 

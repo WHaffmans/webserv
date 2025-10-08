@@ -1,5 +1,4 @@
 #include <webserv/config/AConfig.hpp>                    // for AConfig
-
 #include <webserv/config/directive/ADirective.hpp>       // for ADirective
 #include <webserv/config/directive/DirectiveFactory.hpp> // for DirectiveFactory
 #include <webserv/config/directive/DirectiveValue.hpp>   // for DirectiveValue
@@ -47,7 +46,21 @@ std::vector<const ADirective *> AConfig::getDirectives() const
     return result;
 }
 
-bool AConfig::hasDirective(const std::string &name) const
+bool AConfig::has(const std::string &name) const
+{
+    if (owns(name))
+    {
+        return true;
+    }
+    
+    if (parent_ != nullptr)
+    {
+        return parent_->has(name);
+    }
+    return false;
+}
+
+bool AConfig::owns(const std::string &name) const
 {
     for (const auto &directive : directives_)
     {
@@ -56,10 +69,7 @@ bool AConfig::hasDirective(const std::string &name) const
             return true;
         }
     }
-    if (parent_ != nullptr)
-    {
-        return parent_->hasDirective(name);
-    }
+
     return false;
 }
 
@@ -84,7 +94,7 @@ void AConfig::parseDirectives(const std::string &declarations)
 std::string AConfig::getErrorPage(int statusCode) const
 {
     // TODO
-    Log::trace(LOCATION);    
+    Log::trace(LOCATION);
     for (const auto &directive : directives_)
     {
         if (directive->getName() == "error_page")

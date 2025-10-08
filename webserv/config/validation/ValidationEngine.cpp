@@ -1,9 +1,8 @@
-#include <webserv/config/validation/ValidationEngine.hpp>
-
 #include <webserv/config/AConfig.hpp>        // for AConfig
 #include <webserv/config/GlobalConfig.hpp>   // for GlobalConfig
 #include <webserv/config/LocationConfig.hpp> // for LocationConfig
 #include <webserv/config/ServerConfig.hpp>   // for ServerConfig
+#include <webserv/config/validation/ValidationEngine.hpp>
 #include <webserv/config/validation/ValidationResult.hpp>                // for ValidationResult
 #include <webserv/config/validation/directive_rules/AValidationRule.hpp> // for AValidationRule
 #include <webserv/log/Log.hpp>                                           // for Log, LOCATION
@@ -92,7 +91,7 @@ void ValidationEngine::validateConfig(RuleMap const &rulesMap, const AConfig *co
     Log::trace(LOCATION);
     for (const auto &[directiveName, rules] : rulesMap)
     {
-        if (!config->hasDirective(directiveName))
+        if (!config->has(directiveName))
         {
             // Check if any rule requires the directive
             for (const auto &rule : rules)
