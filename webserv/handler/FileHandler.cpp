@@ -1,7 +1,6 @@
-#include <webserv/handler/FileHandler.hpp>
-
 #include <webserv/config/LocationConfig.hpp> // for LocationConfig
 #include <webserv/handler/ErrorHandler.hpp>  // for ErrorHandler
+#include <webserv/handler/FileHandler.hpp>
 #include <webserv/handler/MIMETypes.hpp>  // for MIMETypes
 #include <webserv/handler/URIParser.hpp>  // for URIParser
 #include <webserv/http/HttpConstants.hpp> // for NOT_FOUND, FORBIDDEN, OK
@@ -81,6 +80,7 @@ std::unique_ptr<HttpResponse> FileHandler::getResponse() const
     case DIRECTORY_INDEX: return handleDirectory(filepath, resourceType);
     case NOT_FOUND: return ErrorHandler::getErrorResponse(Http::StatusCode::NOT_FOUND, location_);
     }
+    return ErrorHandler::getErrorResponse(Http::StatusCode::NOT_FOUND, location_);
 }
 
 FileHandler::ResourceType FileHandler::getResourceType(const std::string &path) const
