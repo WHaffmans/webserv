@@ -8,6 +8,9 @@
 #include <string>   // for allocator, basic_string, char_traits, operator+, string
 #include <vector>   // for vector
 
+
+
+
 int main(int argc, char **argv)
 {
     if (argc < 2)
@@ -16,8 +19,8 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    Log::setFileChannel("webserv.log", std::ios_base::trunc, Log::Level::Info);
-    Log::setStdoutChannel(Log::Level::Info);
+    Log::setFileChannel("webserv.log", std::ios_base::trunc);
+    Log::setStdoutChannel();
 
     Log::info("\n======================\nStarting webserv...\n======================\n");
     ConfigManager &configManager = ConfigManager::getInstance();

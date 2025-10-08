@@ -13,12 +13,6 @@ class DirectiveFactory
   public:
     static std::unique_ptr<ADirective> createDirective(const std::string &line);
 
-  private:
-    using CreatorFunc = std::function<std::unique_ptr<ADirective>(const std::string &, const std::string &arg)>;
-
-    static const std::unordered_map<std::string_view, CreatorFunc> &getFactories();
-    static std::unique_ptr<ADirective> create(std::string_view type, const std::string &name, const std::string &arg);
-
     struct DirectiveInfo
     {
         std::string_view name;
@@ -26,21 +20,31 @@ class DirectiveFactory
         std::string_view context;
     };
 
+
     constexpr static std::array<DirectiveInfo, 15> supportedDirectives = {{
-        {.name = "listen", .type = "IntDirective", .context = "SL"},
-        {.name = "host", .type = "StringDirective", .context = "SL"},
-        {.name = "server_name", .type = "StringDirective", .context = "SL"},
-        {.name = "root", .type = "StringDirective", .context = "SL"},
-        {.name = "index", .type = "VectorDirective", .context = "SL"},
-        {.name = "error_page", .type = "IntStringDirective", .context = "SL"},
-        {.name = "client_max_body_size", .type = "SizeDirective", .context = "SL"},
-        {.name = "autoindex", .type = "BoolDirective", .context = "L"},
-        {.name = "allowed_methods", .type = "VectorDirective", .context = "L"},
-        {.name = "cgi_enabled", .type = "BoolDirective", .context = "L"},
-        {.name = "cgi_ext", .type = "VectorDirective", .context = "L"},
-        {.name = "cgi_timeout", .type = "IntDirective", .context = "L"},
-        {.name = "upload_enabled", .type = "BoolDirective", .context = "L"},
-        {.name = "upload_store", .type = "StringDirective", .context = "L"},
-        {.name = "redirect", .type = "VectorDirective", .context = "L"},
+        {.name = "listen", .type = "IntDirective", .context = "S"},
+        {.name = "host", .type = "StringDirective", .context = "S"},
+        {.name = "server_name", .type = "StringDirective", .context = "S"},
+        {.name = "root", .type = "StringDirective", .context = "Sl"},
+        {.name = "index", .type = "VectorDirective", .context = "sl"},
+        {.name = "error_page", .type = "IntStringDirective", .context = "gsl"},
+        {.name = "client_max_body_size", .type = "SizeDirective", .context = "gsl"},
+        {.name = "autoindex", .type = "BoolDirective", .context = "gsl"},
+        {.name = "allowed_methods", .type = "VectorDirective", .context = "gsl"},
+        {.name = "cgi_enabled", .type = "BoolDirective", .context = "gsl"},
+        {.name = "cgi_ext", .type = "VectorDirective", .context = "gsl"},
+        {.name = "cgi_timeout", .type = "IntDirective", .context = "gsl"},
+        {.name = "upload_enabled", .type = "BoolDirective", .context = "gsl"},
+        {.name = "upload_store", .type = "StringDirective", .context = "gsl"},
+        {.name = "redirect", .type = "VectorDirective", .context = "l"},
     }};
+  private:
+    using CreatorFunc = std::function<std::unique_ptr<ADirective>(const std::string &, const std::string &arg)>;
+
+    static const std::unordered_map<std::string_view, CreatorFunc> &getFactories();
+    static std::unique_ptr<ADirective> create(std::string_view type, const std::string &name, const std::string &arg);
+
+
+
+
 };

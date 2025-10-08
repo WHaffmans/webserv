@@ -7,3 +7,4 @@
 #include <webserv/config/validation/structural_rules/MinimumServerBlocksRule.hpp>
 #include <webserv/config/validation/structural_rules/RequiredLocationBlocksRule.hpp>
 #include <webserv/config/validation/structural_rules/UniqueServerNamesRule.hpp>
+#include <webserv/config/validation/structural_rules/RequiredDirectivesRule.hpp>

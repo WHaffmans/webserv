@@ -21,6 +21,7 @@ ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make
     engine_->addStructuralRule(std::make_unique<MinimumServerBlocksRule>(1));
     engine_->addStructuralRule(std::make_unique<RequiredLocationBlocksRule>(1));
     engine_->addStructuralRule(std::make_unique<UniqueServerNamesRule>());
+    engine_->addStructuralRule(std::make_unique<RequiredDirectivesRule>());
 
     /*Global Directive Rules*/
 

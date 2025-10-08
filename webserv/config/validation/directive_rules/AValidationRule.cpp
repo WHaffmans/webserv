@@ -1,7 +1,6 @@
-#include <webserv/config/validation/directive_rules/AValidationRule.hpp>
-
 #include <webserv/config/AConfig.hpp>                     // for AConfig
 #include <webserv/config/validation/ValidationResult.hpp> // for ValidationResult
+#include <webserv/config/validation/directive_rules/AValidationRule.hpp>
 #include <webserv/log/Log.hpp> // for LOCATION, Log
 
 #include <utility> // for move
@@ -19,7 +18,7 @@ ValidationResult AValidationRule::validate(const AConfig *config, const std::str
         return ValidationResult::error("Invalid config or directive name");
     }
 
-    if (!config->hasDirective(directiveName))
+    if (!config->has(directiveName))
     {
         if (requiresValue_)
         {
