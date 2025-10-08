@@ -1,7 +1,6 @@
-#include <webserv/log/Log.hpp>
-
 #include <webserv/log/Channel.hpp>     // for Channel
 #include <webserv/log/FileChannel.hpp> // for FileChannel
+#include <webserv/log/Log.hpp>
 #include <webserv/log/StdoutChannel.hpp> // for StdoutChannel
 
 #include <chrono>    // for duration_cast, operator-, steady_clock, duration, seconds
@@ -16,7 +15,7 @@ Log::Log()
     start_time_ = std::chrono::steady_clock::now();
 }
 
-void Log::setStdoutChannel(Log::Level logLevel)
+void Log::setStdoutChannel()
 {
     Log &log = getInstance();
     if (log.channels_.contains("stdout"))
@@ -25,7 +24,7 @@ void Log::setStdoutChannel(Log::Level logLevel)
     }
     try
     {
-        log.channels_["stdout"] = std::make_unique<StdoutChannel>(logLevel);
+        log.channels_["stdout"] = std::make_unique<StdoutChannel>();
     }
     catch (const std::exception &e)
     {
@@ -33,7 +32,7 @@ void Log::setStdoutChannel(Log::Level logLevel)
     }
 }
 
-void Log::setFileChannel(const std::string &filename, std::ios_base::openmode mode, Log::Level logLevel)
+void Log::setFileChannel(const std::string &filename, std::ios_base::openmode mode)
 {
     Log &log = getInstance();
     if (log.channels_.contains("file"))
@@ -42,7 +41,7 @@ void Log::setFileChannel(const std::string &filename, std::ios_base::openmode mo
     }
     try
     {
-        log.channels_["file"] = std::make_unique<FileChannel>(filename, mode, logLevel);
+        log.channels_["file"] = std::make_unique<FileChannel>(filename, mode);
     }
     catch (const std::exception &e)
     {
@@ -56,7 +55,7 @@ Log &Log::getInstance()
     return instance;
 }
 
-void Log::log(Log::Level level, const std::string &message, const std::map<std::string, std::string> &context)
+void Log::log(Level level, const std::string &message, const std::map<std::string, std::string> &context)
 {
     for (auto &it : channels_)
     {
@@ -75,36 +74,61 @@ int Log::getElapsedTime()
 
 void Log::trace(const std::string &message, const std::map<std::string, std::string> &context)
 {
-    getInstance().log(Log::Level::Trace, message, context);
+    if constexpr (COMPILE_TIME_LOG_LEVEL > Level::Trace)
+    {
+        return;
+    }
+    getInstance().log(Level::Trace, message, context);
 }
 
 void Log::debug(const std::string &message, const std::map<std::string, std::string> &context)
 {
-    getInstance().log(Log::Level::Debug, message, context);
+    if constexpr (COMPILE_TIME_LOG_LEVEL > Level::Debug)
+    {
+        return;
+    }
+    getInstance().log(Level::Debug, message, context);
 }
 
 void Log::info(const std::string &message, const std::map<std::string, std::string> &context)
 {
-    getInstance().log(Log::Level::Info, message, context);
+    if constexpr (COMPILE_TIME_LOG_LEVEL > Level::Info)
+    {
+        return;
+    }
+    getInstance().log(Level::Info, message, context);
 }
 
 void Log::warning(const std::string &message, const std::map<std::string, std::string> &context)
 {
-    getInstance().log(Log::Level::Warn, message, context);
+    if constexpr (COMPILE_TIME_LOG_LEVEL > Level::Warn)
+    {
+        return;
+    }
+    getInstance().log(Level::Warn, message, context);
 }
 
 void Log::error(const std::string &message, const std::map<std::string, std::string> &context)
 {
-    getInstance().log(Log::Level::Error, message, context);
+    if constexpr (COMPILE_TIME_LOG_LEVEL > Level::Error)
+    {
+        return;
+    }
+    getInstance().log(Level::Error, message, context);
 }
 
 void Log::fatal(const std::string &message, const std::map<std::string, std::string> &context)
 {
-    getInstance().log(Log::Level::Fatal, message, context);
+    if constexpr (COMPILE_TIME_LOG_LEVEL > Level::Fatal)
+    {
+        return;
+    }
+    getInstance().log(Level::Fatal, message, context);
 }
 
-std::string Log::logLevelToString(Log::Level level)
+std::string Log::logLevelToString(Level level)
 {
+
     for (const auto &mapping : LOG_LEVEL_MAP)
     {
         if (mapping.level == level)
@@ -115,7 +139,7 @@ std::string Log::logLevelToString(Log::Level level)
     return "UNKNOWN";
 }
 
-const char *Log::logLevelToColor(Log::Level level)
+const char *Log::logLevelToColor(Level level)
 {
     for (const auto &mapping : LOG_LEVEL_MAP)
     {
@@ -127,7 +151,7 @@ const char *Log::logLevelToColor(Log::Level level)
     return RESET_COLOR; // Default to reset
 }
 
-std::string Log::logLevelToColoredString(Log::Level level)
+std::string Log::logLevelToColoredString(Level level)
 {
     return std::string(Log::logLevelToColor(level)) + Log::logLevelToString(level) + RESET_COLOR;
 }
@@ -141,5 +165,5 @@ Log::Level Log::stringToLogLevel(const std::string &level)
             return mapping.level;
         }
     }
-    return Log::Level::Info; // Default fallback
+    return Level::Info; // Default fallback
 }

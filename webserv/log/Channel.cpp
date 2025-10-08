@@ -4,15 +4,6 @@
 #include <sstream> // for basic_ostream, operator<<, basic_stringstream, basic_istream, basic_istringstream, right, istringstream, stringstream
 #include <utility> // for get
 
-Log::Level Channel::getLogLevel() const
-{
-    return logLevel_;
-}
-
-void Channel::setLogLevel(Log::Level level)
-{
-    logLevel_ = level;
-}
 
 std::string Channel::printContext(const std::map<std::string, std::string> &context)
 {

@@ -9,7 +9,7 @@
 class StdoutChannel : public Channel
 {
   public:
-    StdoutChannel(Log::Level logLevel = Log::Level::Trace);
+    StdoutChannel() = default;
 
     StdoutChannel(const StdoutChannel &other) = delete;
     StdoutChannel(StdoutChannel &&other) = delete;

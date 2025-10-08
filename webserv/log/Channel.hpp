@@ -18,10 +18,10 @@ class Channel
                      const std::map<std::string, std::string> &context = {}) = 0;
 
   protected:
-    [[nodiscard]] Log::Level getLogLevel() const;
+
     [[nodiscard]] static std::string printContext(const std::map<std::string, std::string> &context);
-    void setLogLevel(Log::Level level);
+
 
   private:
-    Log::Level logLevel_{Log::Level::Trace};
+
 };

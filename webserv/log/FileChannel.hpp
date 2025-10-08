@@ -10,7 +10,7 @@
 class FileChannel : public Channel
 {
   public:
-    FileChannel(const std::string &filename, std::ios_base::openmode mode, Log::Level logLevel = Log::Level::Trace);
+    FileChannel(const std::string &filename, std::ios_base::openmode mode);
 
     FileChannel(const FileChannel &other) = delete;
     FileChannel(FileChannel &&other) = delete;

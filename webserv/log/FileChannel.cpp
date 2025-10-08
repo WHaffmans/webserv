@@ -9,10 +9,9 @@
 
 struct tm;
 
-FileChannel::FileChannel(const std::string &filename, std::ios_base::openmode mode, Log::Level logLevel)
+FileChannel::FileChannel(const std::string &filename, std::ios_base::openmode mode)
     : filename_(filename), fileStream_(filename, mode)
 {
-    setLogLevel(logLevel);
     if (!fileStream_.is_open())
     {
         std::cerr << "Failed to open log file: " << filename << '\n';
@@ -30,10 +29,7 @@ FileChannel::~FileChannel()
 void FileChannel::log(const Log::Level &logLevel, const std::string &message,
                       const std::map<std::string, std::string> &context)
 {
-    if (logLevel < getLogLevel())
-    {
-        return;
-    }
+
     if (!fileStream_.is_open())
     {
         std::cerr << "Log file is not open: " << filename_ << '\n';

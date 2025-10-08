@@ -29,10 +29,16 @@ constexpr const char *extractFilename(const char *path)
 #define LOCATION                                                                                                       \
     (std::string(extractFilename(__FILE__)) + ":" + std::to_string(__LINE__) + " (" + std::string(__FUNCTION__) + ")")
 
+
 class Log
 {
   public:
-    enum class Level : uint8_t
+    Log(const Log &other) = delete;
+    Log(Log &&other) = delete;
+    Log &operator=(const Log &other) = delete;
+    Log &operator=(Log &&other) = delete;
+
+     enum class Level : uint8_t
     {
         Trace = 0,
         Debug = 1,
@@ -42,16 +48,12 @@ class Log
         Fatal = 5
     };
 
-    Log(const Log &other) = delete;
-    Log(Log &&other) = delete;
-    Log &operator=(const Log &other) = delete;
-    Log &operator=(Log &&other) = delete;
-
     void log(Level level, const std::string &message, const std::map<std::string, std::string> &context);
 
-    static void setFileChannel(const std::string &filename, std::ios_base::openmode mode = std::ios_base::app,
-                               Level logLevel = Level::Trace);
-    static void setStdoutChannel(Level logLevel = Level::Trace);
+    static constexpr Log::Level COMPILE_TIME_LOG_LEVEL = Log::Level::Info;
+
+    static void setFileChannel(const std::string &filename, std::ios_base::openmode mode = std::ios_base::app);
+    static void setStdoutChannel();
 
     static int getElapsedTime();
 
@@ -65,7 +67,7 @@ class Log
     static std::string logLevelToString(Level level);
     static const char *logLevelToColor(Level level);
     static std::string logLevelToColoredString(Level level);
-    static Log::Level stringToLogLevel(const std::string &level);
+    static Level stringToLogLevel(const std::string &level);
 
   private:
     Log();
@@ -78,7 +80,7 @@ class Log
 
     struct LevelMapping
     {
-        Log::Level level;
+        Level level;
         std::string_view name;
         const char *color;
     };
@@ -93,3 +95,5 @@ class Log
 
     constexpr static const char *RESET_COLOR = "\033[0m";
 };
+
+
