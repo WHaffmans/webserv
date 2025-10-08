@@ -118,4 +118,18 @@ std::vector<std::string> split(const std::string &str, char delimiter)
     }
     return parts;
 }
+
+std::string implode(const std::vector<std::string> &elements, const std::string &delimiter)
+{
+    std::ostringstream stream;
+    for (size_t i = 0; i < elements.size(); ++i)
+    {
+        stream << elements[i];
+        if (i < elements.size() - 1)
+        {
+            stream << delimiter;
+        }
+    }
+    return stream.str();
+}
 } // namespace utils
