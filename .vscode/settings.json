@@ -48,5 +48,22 @@
         "unordered_map": "cpp",
         "string_view": "cpp"
     },
-    "cmake.buildDirectory": "${workspaceFolder}/build"
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    
+    // Auto-split editor configuration for header/source files
+    "workbench.editor.splitInGroupLayout": "horizontal",
+    "workbench.editor.openSideBySideDirection": "right",
+    
+    // C++ specific configurations for side-by-side editing
+    "C_Cpp.default.intelliSenseMode": "linux-clang-x64",
+    "C_Cpp.default.compilerPath": "/usr/bin/clang++",
+    "C_Cpp.default.cppStandard": "c++20",
+    // File explorer settings for better C++ development
+    // "explorer.sortOrder": "type",
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.patterns": {
+        // "*.cpp": "${capture}.hpp,${capture}.h",
+        "*.hpp": "${capture}.cpp,${capture}.c,${capture}.tpp",
+        // "*.h": "${capture}.cpp,${capture}.c,${capture}.cc"
+    }
 }
