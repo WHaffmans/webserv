@@ -3,7 +3,8 @@
 # Don't exit on first error - we want to continue checking all files
 # set -e
 
-# Use current working directory as project root
+# Change to project root directory (parent of scripts directory)
+cd "$(dirname "$0")/.." || exit 1
 PROJECT_ROOT="$(pwd)"
 
 # Find the build directory - check multiple possible locations
@@ -87,7 +88,7 @@ if [ ! -f "$BUILD_DIR/compile_commands.json" ]; then
 fi
 
 # Create results directory
-RESULTS_DIR="$PROJECT_ROOT/iwyu_results"
+RESULTS_DIR="$PROJECT_ROOT/scripts/iwyu_results"
 mkdir -p "$RESULTS_DIR"
 
 # Function to run IWYU on a single file

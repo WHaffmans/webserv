@@ -89,7 +89,7 @@ test_build: release
 # Coverage targets
 coverage:
 	@echo "Running coverage analysis..."
-	./coverage.sh
+	./scripts/coverage.sh
 
 coverage_clean:
 	@echo "Cleaning coverage data..."
@@ -103,5 +103,10 @@ coverage_manual:
 	$(CMAKE_BUILD) build_coverage
 	cd build_coverage && $(CMAKE_BUILD) . --target coverage
 
+# Code formatting target
+format:
+	@echo "Running code formatting..."
+	./scripts/format.sh
+
 # Mark targets as phony
-.PHONY: all release debug asan run run_release run_debug run_asan clean fclean re test test_verbose test_build coverage coverage_clean coverage_manual
+.PHONY: all release debug asan run run_release run_debug run_asan clean fclean re test test_verbose test_build coverage coverage_clean coverage_manual format

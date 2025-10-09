@@ -5,6 +5,9 @@
 
 set -e  # Exit on any error
 
+# Change to project root directory
+cd "$(dirname "$0")/.." || exit 1
+
 echo "🚀 Setting up webserv development environment..."
 
 # Detect environment

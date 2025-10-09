@@ -56,6 +56,9 @@ done
 echo -e "${BLUE}🧪 Webserv Test Runner${NC}"
 echo "========================================"
 
+# Change to project root directory
+cd "$(dirname "$0")/.." || exit 1
+
 # Check if we're in the right directory
 if [[ ! -f "CMakeLists.txt" || ! -d "tests" ]]; then
     echo -e "${RED}❌ Error: Please run this script from the webserv project root${NC}"

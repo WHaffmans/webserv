@@ -10,13 +10,11 @@
 #include <webserv/http/HttpHeaders.hpp>                // for HttpHeaders
 #include <webserv/log/Log.hpp>                         // for LOCATION, Log
 
-#include <functional> // for identity
-#include <memory>     // for unique_ptr
-#include <optional>   // for optional
-#include <ranges>     // for __find_fn, find
-#include <string>     // for basic_string, string, operator==
-#include <utility>    // for move
-#include <vector>     // for vector
+#include <memory>   // for unique_ptr
+#include <optional> // for optional
+#include <ranges>   // for __find_fn, find
+#include <string>   // for basic_string, string
+#include <vector>   // for vector
 
 bool Router::isMethodSupported(const std::string &method, const AConfig &config)
 {

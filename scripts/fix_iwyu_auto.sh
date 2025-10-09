@@ -5,9 +5,9 @@
 
 set -e
 
-# Find project root (directory containing this script)
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-RESULTS_DIR="$PROJECT_ROOT/iwyu_results"
+# Find project root (parent directory of scripts)
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+RESULTS_DIR="$PROJECT_ROOT/scripts/iwyu_results"
 
 # Colors for output
 RED='\033[0;31m'
