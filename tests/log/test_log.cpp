@@ -78,7 +78,7 @@ TEST_F(LogTest, LogLevelToColoredString)
 
 TEST_F(LogTest, StdoutChannelConstruction)
 {
-    StdoutChannel channel(Log::Level::Info);
+    StdoutChannel channel();
     // If we reach here without exception, construction was successful
     SUCCEED();
 }
@@ -115,16 +115,16 @@ TEST_F(LogTest, StaticLoggingMethodsWithContext)
 
 TEST_F(LogTest, SetStdoutChannel)
 {
-    EXPECT_NO_THROW(Log::setStdoutChannel(Log::Level::Debug));
+    EXPECT_NO_THROW(Log::setStdoutChannel());
     // Setting again to see if it handles multiple calls
-    EXPECT_NO_THROW(Log::setStdoutChannel(Log::Level::Info));
+    EXPECT_NO_THROW(Log::setStdoutChannel());
 }
 
 TEST_F(LogTest, SetFileChannel)
 {
-    EXPECT_NO_THROW(Log::setFileChannel("test_log.log", std::ios_base::trunc, Log::Level::Info));
+    EXPECT_NO_THROW(Log::setFileChannel("test_log.log", std::ios_base::trunc));
     // Setting again to see if it handles multiple calls
-    EXPECT_NO_THROW(Log::setFileChannel("test_log.log", std::ios_base::app, Log::Level::Debug));
+    EXPECT_NO_THROW(Log::setFileChannel("test_log.log", std::ios_base::app));
 }
 
 // Note: More comprehensive tests would involve checking actual log outputs,

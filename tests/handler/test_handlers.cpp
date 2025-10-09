@@ -1,7 +1,7 @@
 #include <webserv/handler/FileHandler.hpp>
 #include <webserv/handler/ErrorHandler.hpp>
 #include <webserv/handler/MIMETypes.hpp>
-#include <webserv/handler/URIParser.hpp>
+#include <webserv/handler/URI.hpp>
 
 #include <gtest/gtest.h>
 
