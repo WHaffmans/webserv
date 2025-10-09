@@ -39,3 +39,6 @@ AllowShortCaseLabelsOnASingleLine: true
 
 # Add empty line between function definitions
 SeparateDefinitionBlocks: Always
+
+# Place binary operators at the beginning of the line
+BreakBeforeBinaryOperators: All
