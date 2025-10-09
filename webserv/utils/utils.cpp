@@ -23,10 +23,10 @@ size_t stoul(const std::string &str, int base)
     return value;
 }
 
-std::string trim(const std::string &str)
+std::string trim(const std::string &str, const std::string &charset)
 {
-    size_t first = str.find_first_not_of(" \t\n\r");
-    size_t last = str.find_last_not_of(" \t\n\r");
+    size_t first = str.find_first_not_of(charset);
+    size_t last = str.find_last_not_of(charset);
     if (first == std::string::npos || last == std::string::npos)
     {
         return "";
@@ -82,7 +82,7 @@ void removeEmptyLines(std::string &str)
     {
         if (!utils::trim(line).empty())
         {
-            result += utils::trimSemi(utils::trim(line)) + '\n';
+            result += utils::trim(line, " \t\n\r;") + '\n';
         }
     }
     str = result;

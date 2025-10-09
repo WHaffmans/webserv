@@ -1,14 +1,14 @@
-#include <webserv/router/Router.hpp>
-
-#include <webserv/config/directive/ADirective.hpp>
+#include "webserv/config/AConfig.hpp"
 
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/ServerConfig.hpp>  // for ServerConfig
+#include <webserv/config/directive/ADirective.hpp>
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
 #include <webserv/handler/FileHandler.hpp>  // for FileHandler
 #include <webserv/handler/URIParser.hpp>    // for URIParser
 #include <webserv/http/HttpHeaders.hpp>     // for HttpHeaders
 #include <webserv/log/Log.hpp>              // for LOCATION, Log
+#include <webserv/router/Router.hpp>
 
 #include <algorithm>
 #include <memory>   // for unique_ptr
@@ -18,11 +18,9 @@
 
 class LocationConfig;
 
-Router::Router() {}
-
-bool Router::isMethodSupported(const std::string &method, const LocationConfig &location)
+bool Router::isMethodSupported(const std::string &method, const AConfig &config)
 {
-    const ADirective *allowedMethods = location.getDirective("allowed_methods");
+    const ADirective *allowedMethods = config.getDirective("allowed_methods");
     if (allowedMethods == nullptr || !allowedMethods->getValue().try_get<std::vector<std::string>>().has_value())
     {
         return true;
@@ -35,28 +33,24 @@ std::unique_ptr<HttpResponse> Router::handleRequest(const HttpRequest &request)
 {
     Log::trace(LOCATION);
 
-    ServerConfig *config =
+    ServerConfig *serverConfig =
         ConfigManager::getInstance().getMatchingServerConfig(request.getHeaders().getHost().value_or(""));
 
-    if (config == nullptr)
+    if (serverConfig == nullptr)
     {
         return ErrorHandler::getErrorResponse(400);
     }
-    URIParser uriParser{request.getTarget(), *config};
+    URIParser uriParser{request.getTarget(), *serverConfig};
 
     const std::string &target = request.getTarget();
     static_cast<void>(target); // Suppress unused variable warning
     const std::string &method = request.getMethod();
 
-    const LocationConfig *location = uriParser.getLocation();
-    if (location == nullptr)
-    {
-        return ErrorHandler::getErrorResponse(404, config);
-    }
-    if (!isMethodSupported(method, *location))
+    const AConfig *config = uriParser.getConfig();
+    if (!isMethodSupported(method, *config))
     {
         return ErrorHandler::getErrorResponse(405, config);
     }
-    FileHandler fileHandler(location, uriParser);
+    FileHandler fileHandler(config, uriParser);
     return fileHandler.getResponse();
 }

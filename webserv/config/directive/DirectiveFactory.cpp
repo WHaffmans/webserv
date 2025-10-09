@@ -52,7 +52,7 @@ std::unique_ptr<ADirective> DirectiveFactory::create(std::string_view type, cons
     {
         throw std::invalid_argument("No factory found for directive type: " + std::string(type));
     }
-    return it->second(name, utils::trimSemi(utils::trim(arg)));
+    return it->second(name, utils::trim(arg, " \t\n\r;"));
 }
 
 const std::unordered_map<std::string_view, DirectiveFactory::CreatorFunc> &DirectiveFactory::getFactories()

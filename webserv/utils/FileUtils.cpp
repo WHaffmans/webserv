@@ -1,6 +1,5 @@
-#include <webserv/utils/FileUtils.hpp>
-
 #include <webserv/log/Log.hpp> // for Log, LOCATION
+#include <webserv/utils/FileUtils.hpp>
 
 #include <cstring> // for size_t
 #include <fstream> // for basic_ifstream, basic_ios, basic_istream, ios, ifstream, operator|, basic_istream::read, basic_istream::seekg, basic_istream::tellg, streamsize
@@ -29,6 +28,12 @@ bool isFile(const std::string &path)
         return false; // Could not access path
     }
     return S_ISREG(pathStat.st_mode);
+}
+
+bool isValidPath(const std::string &path)
+{
+    struct stat pathStat{};
+    return stat(path.c_str(), &pathStat) == 0;
 }
 
 std::string getExtension(const std::string &filename)

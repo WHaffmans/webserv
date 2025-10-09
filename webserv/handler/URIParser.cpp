@@ -1,96 +1,155 @@
-#include <webserv/handler/URIParser.hpp>
+#include "webserv/config/AConfig.hpp"
+#include "webserv/utils/FileUtils.hpp"
+#include "webserv/utils/utils.hpp"
 
 #include <webserv/config/LocationConfig.hpp> // for LocationConfig
 #include <webserv/config/ServerConfig.hpp>   // for ServerConfig
+#include <webserv/handler/URIParser.hpp>
 
 #include <optional> // for optional
 
 #include <stddef.h>   // for size_t
 #include <sys/stat.h> // for stat, S_ISDIR, S_ISREG
 
-URIParser::URIParser(const std::string &uri, const ServerConfig &serverConfig) : _locationConfig(nullptr)
+URIParser::URIParser(const std::string &uri, const ServerConfig &serverConfig)
+    : uriTrimmed_(utils::trim(uri, "/")), config_(matchConfig(uriTrimmed_, serverConfig))
+{
+    parseUri(uri);
+    parseFullpath();
+}
+
+const AConfig *URIParser::matchConfig(const std::string &uri, const ServerConfig &serverConfig)
 {
     const auto &locations = serverConfig.getLocationPaths();
-    size_t maxMatchLength = 0;
+    const AConfig *bestMatch = &serverConfig;
 
+    size_t maxMatchLength = 0;
     for (const auto &locationPath : locations)
     {
-        if (uri.starts_with((locationPath == "/") ? locationPath : locationPath + "/"))
-        { // TODO HMHMMz why does it need to end on a /?
+        if (uri.empty() && locationPath == "/")
+        {
+            return serverConfig.getLocation(locationPath);
+        }
+        if (uri.starts_with(utils::trim(locationPath, "/")))
+        {
             if (locationPath.length() > maxMatchLength)
             {
                 maxMatchLength = locationPath.length();
-                _locationConfig = serverConfig.getLocation(locationPath);
+                bestMatch = serverConfig.getLocation(locationPath);
             }
         }
     }
+    return bestMatch;
+}
 
-    root_ = _locationConfig != nullptr ? _locationConfig->get<std::string>("root").value_or("") : "";
-    if (!root_.empty() && root_.back() == '/')
+void URIParser::parseUri(const std::string &uri)
+{
+    if (config_->getType() == "server")
     {
-        root_.pop_back(); // Remove trailing slash to avoid double slashes in path
+        fullPath_ = FileUtils::joinPath(config_->get<std::string>("root").value_or(""), uriTrimmed_);
+    }
+    else
+    {
+        auto const *locConfig = dynamic_cast<LocationConfig const *>(config_);
+        std::string locTrimmed = utils::trim(locConfig->getPath(), "/");
+        std::string uriSub = uri.substr(locTrimmed.length());
+        fullPath_ = FileUtils::joinPath(locConfig->get<std::string>("root").value_or(""), uriSub);
     }
 
-    relativePath_ = uri.substr(maxMatchLength);
-    if (relativePath_.empty() || relativePath_[0] != '/')
+    size_t fragmentPos = fullPath_.find_first_of('#');
+    if (fragmentPos != std::string::npos)
     {
-        relativePath_ = "/" + relativePath_;
+        fragment_ = fullPath_.substr(fragmentPos + 1);
+        fullPath_ = fullPath_.substr(0, fragmentPos);
+    }
+
+    size_t queryPos = fullPath_.find_first_of('?');
+    if (queryPos != std::string::npos)
+    {
+        query_ = fullPath_.substr(queryPos + 1);
+        fullPath_ = fullPath_.substr(0, queryPos);
     }
 }
 
-std::string URIParser::getFilePath() const
+void URIParser::parseFullpath()
 {
-    return root_ + relativePath_;
-}
+    auto uriSegments = utils::split(fullPath_, '/');
 
-std::string URIParser::getFilename() const
-{
-    size_t lastSlash = relativePath_.find_last_of('/');
-    if (lastSlash == std::string::npos)
+    for (const auto &segment : uriSegments)
     {
-        return relativePath_; // No slashes, return the whole path
+        std::string curDir = FileUtils::joinPath(dir_, segment);
+        if (segment.empty())
+        {
+            continue;
+        }
+
+        if (FileUtils::isFile(curDir) && baseName_.empty())
+        {
+            baseName_ = segment;
+        }
+        else if (FileUtils::isDirectory(curDir))
+        {
+            dir_ = FileUtils::joinPath(dir_, segment);
+        }
+        else if (!baseName_.empty()) // not file or dir, but we have a baseName already
+        {
+            pathInfo_ = FileUtils::joinPath(pathInfo_, baseName_);
+        }
     }
-    return relativePath_.substr(lastSlash + 1);
+    fullPath_ = FileUtils::joinPath(dir_, baseName_);
 }
 
-std::string URIParser::getExtension() const
+const AConfig *URIParser::getConfig() const
 {
-    std::string filename = getFilename();
-    size_t lastDot = filename.find_last_of('.');
-    if (lastDot == std::string::npos || lastDot == 0 || lastDot == filename.length() - 1)
-    {
-        return ""; // No extension found or dot is at start/end
-    }
-    return filename.substr(lastDot + 1);
-}
-
-LocationConfig const *URIParser::getLocation() const
-{
-    return _locationConfig;
+    return config_;
 }
 
 bool URIParser::isFile() const
 {
-    struct stat pathStat{};
-    if (stat(getFilePath().c_str(), &pathStat) != 0)
-    {
-        return false;
-    }
-    return S_ISREG(pathStat.st_mode);
+    return !baseName_.empty();
 }
 
 bool URIParser::isDirectory() const
 {
-    struct stat pathStat{};
-    if (stat(getFilePath().c_str(), &pathStat) != 0)
-    {
-        return false;
-    }
-    return S_ISDIR(pathStat.st_mode);
+    return baseName_.empty();
 }
 
 bool URIParser::isValid() const
 {
-    struct stat pathStat{};
-    return stat(getFilePath().c_str(), &pathStat) == 0;
+    return FileUtils::isValidPath(fullPath_);
+}
+
+const std::string &URIParser::getBaseName() const
+{
+    return baseName_;
+}
+
+std::string URIParser::getExtension() const
+{
+    return FileUtils::getExtension(baseName_);
+}
+
+const std::string &URIParser::getFullPath() const
+{
+    return fullPath_;
+}
+
+const std::string &URIParser::getDir() const
+{
+    return dir_;
+}
+
+const std::string &URIParser::getPathInfo() const
+{
+    return pathInfo_;
+}
+
+const std::string &URIParser::getQuery() const
+{
+    return query_;
+}
+
+const std::string &URIParser::getFragment() const
+{
+    return fragment_;
 }
