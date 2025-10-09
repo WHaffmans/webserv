@@ -7,7 +7,6 @@
 #include <webserv/log/Log.hpp>
 #include <webserv/utils/utils.hpp>
 
-#include <algorithm>
 #include <cctype>
 
 RequiredDirectivesRule::RequiredDirectivesRule()
