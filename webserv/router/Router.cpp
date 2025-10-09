@@ -5,7 +5,7 @@
 #include <webserv/config/directive/ADirective.hpp>
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
 #include <webserv/handler/FileHandler.hpp>  // for FileHandler
-#include <webserv/handler/URIParser.hpp>    // for URIParser
+#include <webserv/handler/URI.hpp>          // for URI
 #include <webserv/http/HttpHeaders.hpp>     // for HttpHeaders
 #include <webserv/log/Log.hpp>              // for LOCATION, Log
 #include <webserv/router/Router.hpp>
@@ -40,17 +40,17 @@ std::unique_ptr<HttpResponse> Router::handleRequest(const HttpRequest &request)
     {
         return ErrorHandler::getErrorResponse(400);
     }
-    URIParser uriParser{request.getTarget(), *serverConfig};
+    URI uri{request, *serverConfig};
 
     const std::string &target = request.getTarget();
     static_cast<void>(target); // Suppress unused variable warning
     const std::string &method = request.getMethod();
 
-    const AConfig *config = uriParser.getConfig();
+    const AConfig *config = uri.getConfig();
     if (!isMethodSupported(method, *config))
     {
         return ErrorHandler::getErrorResponse(405, config);
     }
-    FileHandler fileHandler(config, uriParser);
+    FileHandler fileHandler(config, uri);
     return fileHandler.getResponse();
 }

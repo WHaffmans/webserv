@@ -4,21 +4,26 @@
 
 #include <webserv/config/LocationConfig.hpp> // for LocationConfig
 #include <webserv/config/ServerConfig.hpp>   // for ServerConfig
-#include <webserv/handler/URIParser.hpp>
+#include <webserv/handler/URI.hpp>
 
 #include <optional> // for optional
 
 #include <stddef.h>   // for size_t
 #include <sys/stat.h> // for stat, S_ISDIR, S_ISREG
 
-URIParser::URIParser(const std::string &uri, const ServerConfig &serverConfig)
-    : uriTrimmed_(utils::trim(uri, "/")), config_(matchConfig(uriTrimmed_, serverConfig))
+URI::URI(const HttpRequest &request, const ServerConfig &serverConfig)
+    : uriTrimmed_(utils::trim(request.getTarget(), "/")), config_(matchConfig(uriTrimmed_, serverConfig))
 {
-    parseUri(uri);
+    parseUri(request.getTarget());
     parseFullpath();
+
+    authority_ = request.getHeaders().getHost().value();
+    authority_ += (serverConfig.get<int>("listen") != 80) // NOFORMAT
+                      ? ":" + std::to_string(serverConfig.get<int>("listen").value())
+                      : "";
 }
 
-const AConfig *URIParser::matchConfig(const std::string &uri, const ServerConfig &serverConfig)
+const AConfig *URI::matchConfig(const std::string &uri, const ServerConfig &serverConfig)
 {
     const auto &locations = serverConfig.getLocationPaths();
     const AConfig *bestMatch = &serverConfig;
@@ -42,7 +47,7 @@ const AConfig *URIParser::matchConfig(const std::string &uri, const ServerConfig
     return bestMatch;
 }
 
-void URIParser::parseUri(const std::string &uri)
+void URI::parseUri(const std::string &uri)
 {
     if (config_->getType() == "server")
     {
@@ -71,7 +76,7 @@ void URIParser::parseUri(const std::string &uri)
     }
 }
 
-void URIParser::parseFullpath()
+void URI::parseFullpath()
 {
     auto uriSegments = utils::split(fullPath_, '/');
 
@@ -99,57 +104,57 @@ void URIParser::parseFullpath()
     fullPath_ = FileUtils::joinPath(dir_, baseName_);
 }
 
-const AConfig *URIParser::getConfig() const
+const AConfig *URI::getConfig() const
 {
     return config_;
 }
 
-bool URIParser::isFile() const
+bool URI::isFile() const
 {
     return !baseName_.empty();
 }
 
-bool URIParser::isDirectory() const
+bool URI::isDirectory() const
 {
     return baseName_.empty();
 }
 
-bool URIParser::isValid() const
+bool URI::isValid() const
 {
     return FileUtils::isValidPath(fullPath_);
 }
 
-const std::string &URIParser::getBaseName() const
+const std::string &URI::getBaseName() const
 {
     return baseName_;
 }
 
-std::string URIParser::getExtension() const
+std::string URI::getExtension() const
 {
     return FileUtils::getExtension(baseName_);
 }
 
-const std::string &URIParser::getFullPath() const
+const std::string &URI::getFullPath() const
 {
     return fullPath_;
 }
 
-const std::string &URIParser::getDir() const
+const std::string &URI::getDir() const
 {
     return dir_;
 }
 
-const std::string &URIParser::getPathInfo() const
+const std::string &URI::getPathInfo() const
 {
     return pathInfo_;
 }
 
-const std::string &URIParser::getQuery() const
+const std::string &URI::getQuery() const
 {
     return query_;
 }
 
-const std::string &URIParser::getFragment() const
+const std::string &URI::getFragment() const
 {
     return fragment_;
 }

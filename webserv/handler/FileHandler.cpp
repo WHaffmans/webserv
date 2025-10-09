@@ -3,7 +3,7 @@
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
 #include <webserv/handler/FileHandler.hpp>
 #include <webserv/handler/MIMETypes.hpp>  // for MIMETypes
-#include <webserv/handler/URIParser.hpp>  // for URIParser
+#include <webserv/handler/URI.hpp>        // for URI
 #include <webserv/http/HttpConstants.hpp> // for NOT_FOUND, FORBIDDEN, OK
 #include <webserv/http/HttpResponse.hpp>  // for HttpResponse
 #include <webserv/log/Log.hpp>            // for Log, LOCATION
@@ -14,7 +14,7 @@
 #include <string> // for basic_string, string, operator+, char_traits
 #include <vector> // for vector
 
-FileHandler::FileHandler(const AConfig *config, const URIParser &uriParser) : config_(config), uriParser_(uriParser)
+FileHandler::FileHandler(const AConfig *config, const URI &URI) : config_(config), uri_(URI)
 {
     Log::trace(LOCATION);
 }
@@ -67,7 +67,7 @@ std::unique_ptr<HttpResponse> FileHandler::handleDirectory(const std::string &di
 std::unique_ptr<HttpResponse> FileHandler::getResponse() const
 {
     Log::trace(LOCATION);
-    std::string filepath = uriParser_.getFullPath();
+    std::string filepath = uri_.getFullPath();
     ResourceType resourceType = getResourceType(filepath);
 
     switch (resourceType)
@@ -85,11 +85,11 @@ FileHandler::ResourceType FileHandler::getResourceType(const std::string &path) 
     static_cast<void>(path);
     Log::trace(LOCATION);
 
-    if (uriParser_.isFile())
+    if (uri_.isFile())
     {
         return FILE;
     }
-    if (uriParser_.isDirectory())
+    if (uri_.isDirectory())
     {
         if (config_->get<std::vector<std::string>>("index").has_value())
         {

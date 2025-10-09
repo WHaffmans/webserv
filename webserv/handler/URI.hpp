@@ -1,6 +1,7 @@
 #pragma once
 
 #include "webserv/config/AConfig.hpp"
+#include "webserv/http/HttpRequest.hpp"
 
 #include <webserv/config/LocationConfig.hpp>
 #include <webserv/config/ServerConfig.hpp>
@@ -11,14 +12,15 @@
 class LocationConfig;
 class ServerConfig;
 
-class URIParser
+class URI
 {
   public:
-    URIParser(const std::string &uri, const ServerConfig &serverConfig);
+    URI(const HttpRequest &request, const ServerConfig &serverConfig);
 
     [[nodiscard]] bool isFile() const;
     [[nodiscard]] bool isDirectory() const;
     [[nodiscard]] bool isValid() const;
+    [[nodiscard]] bool isCgi() const;
 
     [[nodiscard]] std::string getExtension() const;
     [[nodiscard]] const AConfig *getConfig() const;
@@ -28,6 +30,8 @@ class URIParser
     [[nodiscard]] const std::string &getPathInfo() const;
     [[nodiscard]] const std::string &getQuery() const;
     [[nodiscard]] const std::string &getFragment() const;
+    [[nodiscard]] const std::string &getAuthority() const;
+    [[nodiscard]] const std::string &getScheme() const;
 
   private:
     void parseUri(const std::string &uri);
@@ -41,6 +45,8 @@ class URIParser
     std::string pathInfo_;
     std::string query_;
     std::string fragment_;
+    std::string authority_;
+    std::string scheme_;
 
     static const AConfig *matchConfig(const std::string &uri, const ServerConfig &serverConfig);
 };

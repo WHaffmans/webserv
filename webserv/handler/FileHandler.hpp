@@ -3,7 +3,7 @@
 #include "webserv/config/AConfig.hpp"
 
 #include <webserv/config/LocationConfig.hpp>
-#include <webserv/handler/URIParser.hpp>
+#include <webserv/handler/URI.hpp>
 #include <webserv/http/HttpResponse.hpp> // for HttpResponse
 
 #include <cstdint> // for uint8_t
@@ -11,18 +11,18 @@
 #include <string>  // for string
 
 class AConfig;
-class URIParser;
+class URI;
 
 class FileHandler
 {
   public:
-    FileHandler(const AConfig *config, const URIParser &uriParser);
+    FileHandler(const AConfig *config, const URI &uri);
 
     [[nodiscard]] std::unique_ptr<HttpResponse> getResponse() const;
 
   private:
     const AConfig *config_;
-    const URIParser &uriParser_;
+    const URI &uri_;
 
     enum ResourceType : uint8_t
     {
