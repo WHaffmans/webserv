@@ -8,8 +8,7 @@
 
 #include <optional> // for optional
 
-#include <stddef.h>   // for size_t
-#include <sys/stat.h> // for stat, S_ISDIR, S_ISREG
+#include <cstddef>   // for size_t
 
 URI::URI(const HttpRequest &request, const ServerConfig &serverConfig)
     : uriTrimmed_(utils::trim(request.getTarget(), "/")), config_(matchConfig(uriTrimmed_, serverConfig))

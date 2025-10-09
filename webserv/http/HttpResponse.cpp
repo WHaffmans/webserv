@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <sys/types.h>
 
 HttpResponse::HttpResponse() : headers_(std::make_unique<HttpHeaders>()) {}
 
@@ -34,7 +35,7 @@ void HttpResponse::setBody(const std::string &body)
     setComplete();
 }
 
-void HttpResponse::setStatus(int statusCode)
+void HttpResponse::setStatus(uint16_t statusCode)
 {
     statusCode_ = statusCode;
 }

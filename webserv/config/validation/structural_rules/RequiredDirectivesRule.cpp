@@ -22,13 +22,13 @@ ValidationResult validateUniversal(const AConfig *config, std::string configType
 
     for (const auto &directive : DirectiveFactory::supportedDirectives)
     {
-        if (directive.context.find(std::toupper(configType[0])) != std::string::npos &&
+        if (directive.context.find(static_cast<char>(std::toupper(configType[0]))) != std::string::npos &&
             !config->owns(std::string(directive.name)))
         {
             missingDirectives.emplace_back(directive.name);
         }
-        if ((directive.context.find(std::toupper(configType[0])) == std::string::npos &&
-             directive.context.find(std::tolower(configType[0])) == std::string::npos) &&
+        if ((directive.context.find(static_cast<char>(std::toupper(static_cast<unsigned char>(configType[0])))) == std::string::npos &&
+             directive.context.find(static_cast<char>(std::tolower(static_cast<unsigned char>(configType[0])))) == std::string::npos) &&
             config->owns(std::string(directive.name)))
         {
             prohibitedDirectives.emplace_back(directive.name);

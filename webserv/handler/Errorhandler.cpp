@@ -10,8 +10,9 @@
 #include <memory>
 #include <sstream> // for basic_stringstream
 #include <string>  // for basic_string, operator+, allocator, char_traits, string, to_string
+#include <sys/types.h>
 
-std::unique_ptr<HttpResponse> ErrorHandler::getErrorResponse(int statusCode, const AConfig *config)
+std::unique_ptr<HttpResponse> ErrorHandler::getErrorResponse(uint16_t statusCode, const AConfig *config)
 {
     std::string statusMessage = Http::getStatusCodeReason(statusCode);
     Log::warning("Generating error response: " + std::to_string(statusCode) + " " + statusMessage);
@@ -25,7 +26,7 @@ std::unique_ptr<HttpResponse> ErrorHandler::getErrorResponse(int statusCode, con
     return response;
 }
 
-std::string ErrorHandler::generateErrorPage(int statusCode, const AConfig *config)
+std::string ErrorHandler::generateErrorPage(uint16_t statusCode, const AConfig *config)
 {
     Log::trace(LOCATION);
     if (config == nullptr)
@@ -46,7 +47,7 @@ std::string ErrorHandler::generateErrorPage(int statusCode, const AConfig *confi
     return generateDefaultErrorPage(statusCode);
 }
 
-std::string ErrorHandler::generateDefaultErrorPage(int statusCode)
+std::string ErrorHandler::generateDefaultErrorPage(uint16_t statusCode)
 {
     Log::info("Generating default error page");
     std::string statusMessage = Http::getStatusCodeReason(statusCode);

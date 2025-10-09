@@ -80,9 +80,14 @@ std::vector<char> readBinaryFile(const std::string &filepath)
     }
 
     std::streamsize size = file.tellg();
+    if (size < 0)
+    {
+        Log::error("Failed to determine file size: " + filepath);
+        return {};
+    }
     file.seekg(0, std::ios::beg);
 
-    std::vector<char> buffer(size);
+    std::vector<char> buffer(static_cast<size_t>(size));
     if (!file.read(buffer.data(), size))
     {
         Log::error("Failed to read file: " + filepath);

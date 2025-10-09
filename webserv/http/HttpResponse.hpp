@@ -32,7 +32,7 @@ class HttpResponse
 
     void setComplete();
 
-    void setStatus(int statusCode);
+    void setStatus(uint16_t statusCode);
 
     [[nodiscard]] bool isComplete() const;
 
@@ -47,5 +47,5 @@ class HttpResponse
     std::vector<uint8_t> body_;
     std::unique_ptr<HttpHeaders> headers_;
     bool complete_ = false;
-    int statusCode_ = 200;
+    uint16_t statusCode_ = 200;
 };
