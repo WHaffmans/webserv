@@ -17,6 +17,8 @@ class URI
   public:
     URI(const HttpRequest &request, const ServerConfig &serverConfig);
 
+    [[nodiscard]] std::map<std::string, std::string> getCGIEnvironment() const;
+
     [[nodiscard]] bool isFile() const;
     [[nodiscard]] bool isDirectory() const;
     [[nodiscard]] bool isValid() const;
@@ -31,7 +33,6 @@ class URI
     [[nodiscard]] const std::string &getQuery() const;
     [[nodiscard]] const std::string &getFragment() const;
     [[nodiscard]] const std::string &getAuthority() const;
-    [[nodiscard]] const std::string &getScheme() const;
 
   private:
     void parseUri(const std::string &uri);
@@ -46,7 +47,6 @@ class URI
     std::string query_;
     std::string fragment_;
     std::string authority_;
-    std::string scheme_;
 
     static const AConfig *matchConfig(const std::string &uri, const ServerConfig &serverConfig);
 };
