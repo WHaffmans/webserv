@@ -6,11 +6,9 @@
 #include <webserv/config/validation/ValidationResult.hpp>                // for ValidationResult
 #include <webserv/config/validation/directive_rules/AValidationRule.hpp> // for AValidationRule
 
-#include <functional> // for identity
-#include <ranges>     // for __find_fn, find
-#include <string>     // for basic_string, allocator, operator+, char_traits, string, operator==
-#include <utility>    // for move
-#include <vector>     // for vector
+#include <ranges> // for __find_fn, find
+#include <string> // for basic_string, allocator, operator+, char_traits, string
+#include <vector> // for vector
 
 AllowedValuesRule::AllowedValuesRule(const std::vector<std::string> &allowedValues, bool requiresValue)
     : AValidationRule("AllowedValuesRule", "Ensures that the directive's value is within the allowed set",

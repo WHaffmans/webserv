@@ -1,13 +1,18 @@
-#include <webserv/config/GlobalConfig.hpp>
-#include <webserv/config/LocationConfig.hpp>
-#include <webserv/config/ServerConfig.hpp>
-#include <webserv/config/directive/DirectiveFactory.hpp>
-#include <webserv/config/validation/structural_rules/AStructuralValidationRule.hpp>
 #include <webserv/config/validation/structural_rules/RequiredDirectivesRule.hpp>
-#include <webserv/log/Log.hpp>
-#include <webserv/utils/utils.hpp>
 
-#include <cctype>
+#include <webserv/config/AConfig.hpp>                                               // for AConfig
+#include <webserv/config/GlobalConfig.hpp>                                          // for GlobalConfig
+#include <webserv/config/LocationConfig.hpp>                                        // for LocationConfig
+#include <webserv/config/ServerConfig.hpp>                                          // for ServerConfig
+#include <webserv/config/directive/DirectiveFactory.hpp>                            // for DirectiveFactory
+#include <webserv/config/validation/ValidationResult.hpp>                           // for ValidationResult
+#include <webserv/config/validation/structural_rules/AStructuralValidationRule.hpp> // for AStructuralValidationRule
+#include <webserv/utils/utils.hpp> // for implode
+
+#include <array>  // for array
+#include <cctype> // for toupper, tolower
+#include <string> // for basic_string, allocator, char_traits, string, operator+
+#include <vector> // for vector
 
 RequiredDirectivesRule::RequiredDirectivesRule()
     : AStructuralValidationRule("RequiredDirectivesRule", "Ensures required directives are present in each context")
@@ -21,14 +26,16 @@ ValidationResult validateUniversal(const AConfig *config, std::string configType
 
     for (const auto &directive : DirectiveFactory::supportedDirectives)
     {
-        if (directive.context.find(static_cast<char>(std::toupper(configType[0]))) != std::string::npos &&
-            !config->owns(std::string(directive.name)))
+        if (directive.context.find(static_cast<char>(std::toupper(configType[0]))) != std::string::npos
+            && !config->owns(std::string(directive.name)))
         {
             missingDirectives.emplace_back(directive.name);
         }
-        if ((directive.context.find(static_cast<char>(std::toupper(static_cast<unsigned char>(configType[0])))) == std::string::npos &&
-             directive.context.find(static_cast<char>(std::tolower(static_cast<unsigned char>(configType[0])))) == std::string::npos) &&
-            config->owns(std::string(directive.name)))
+        if ((directive.context.find(static_cast<char>(std::toupper(static_cast<unsigned char>(configType[0]))))
+                 == std::string::npos
+             && directive.context.find(static_cast<char>(std::tolower(static_cast<unsigned char>(configType[0]))))
+                    == std::string::npos)
+            && config->owns(std::string(directive.name)))
         {
             prohibitedDirectives.emplace_back(directive.name);
         }

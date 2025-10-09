@@ -52,19 +52,19 @@ struct StatusCodeInfo
     std::string_view reason;
 };
 
-static constexpr std::array<StatusCodeInfo, 12> statusCodeInfos = {
-    {{.code = StatusCode::OK, .reason = "OK"},
-     {.code = StatusCode::CREATED, .reason = "Created"},
-     {.code = StatusCode::NO_CONTENT, .reason = "No Content"},
-     {.code = StatusCode::BAD_REQUEST, .reason = "Bad Request"},
-     {.code = StatusCode::UNAUTHORIZED, .reason = "Unauthorized"},
-     {.code = StatusCode::FORBIDDEN, .reason = "Forbidden"},
-     {.code = StatusCode::NOT_FOUND, .reason = "Not Found"},
-     {.code = StatusCode::METHOD_NOT_ALLOWED, .reason = "Method Not Allowed"},
-     {.code = StatusCode::INTERNAL_SERVER_ERROR, .reason = "Internal Server Error"},
-     {.code = StatusCode::NOT_IMPLEMENTED, .reason = "Not Implemented"},
-     {.code = StatusCode::BAD_GATEWAY, .reason = "Bad Gateway"},
-     {.code = StatusCode::SERVICE_UNAVAILABLE, .reason = "Service Unavailable"}}};
+static constexpr std::array<StatusCodeInfo, 12> statusCodeInfos
+    = {{{.code = StatusCode::OK, .reason = "OK"},
+        {.code = StatusCode::CREATED, .reason = "Created"},
+        {.code = StatusCode::NO_CONTENT, .reason = "No Content"},
+        {.code = StatusCode::BAD_REQUEST, .reason = "Bad Request"},
+        {.code = StatusCode::UNAUTHORIZED, .reason = "Unauthorized"},
+        {.code = StatusCode::FORBIDDEN, .reason = "Forbidden"},
+        {.code = StatusCode::NOT_FOUND, .reason = "Not Found"},
+        {.code = StatusCode::METHOD_NOT_ALLOWED, .reason = "Method Not Allowed"},
+        {.code = StatusCode::INTERNAL_SERVER_ERROR, .reason = "Internal Server Error"},
+        {.code = StatusCode::NOT_IMPLEMENTED, .reason = "Not Implemented"},
+        {.code = StatusCode::BAD_GATEWAY, .reason = "Bad Gateway"},
+        {.code = StatusCode::SERVICE_UNAVAILABLE, .reason = "Service Unavailable"}}};
 
 std::string getStatusCodeReason(uint16_t statusCode);
 

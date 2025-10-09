@@ -1,11 +1,14 @@
 #include <webserv/config/validation/directive_rules/CgiExtValidationRule.hpp>
 
-#include <webserv/config/AConfig.hpp>
-#include <webserv/config/validation/ValidationResult.hpp>
-#include <webserv/utils/FileUtils.hpp>
+#include <webserv/config/AConfig.hpp>                                    // for AConfig
+#include <webserv/config/directive/ADirective.hpp>                       // for ADirective
+#include <webserv/config/directive/DirectiveValue.hpp>                   // for DirectiveValue
+#include <webserv/config/validation/ValidationResult.hpp>                // for ValidationResult
+#include <webserv/config/validation/directive_rules/AValidationRule.hpp> // for AValidationRule
+#include <webserv/utils/FileUtils.hpp> // for isFile
 
-#include <algorithm>
-#include <vector>
+#include <algorithm> // for __any_of_fn, any_of
+#include <vector>    // for vector
 
 CgiExtValidationRule::CgiExtValidationRule(bool requiresValue)
     : AValidationRule("CgiExt", "Ensure CGI extension is valid", requiresValue)
@@ -29,20 +32,20 @@ ValidationResult CgiExtValidationRule::validateValue(const AConfig *config, cons
     auto cgiExt = directive->getValue().get<std::vector<std::string>>();
     if (cgiExt.size() != 2)
     {
-        return ValidationResult::error("Directive '" + directive->getName() +
-                                       "' has invalid format, expected extension and path");
+        return ValidationResult::error("Directive '" + directive->getName()
+                                       + "' has invalid format, expected extension and path");
     }
     auto extension = std::string(cgiExt[0]);
     auto path = std::string(cgiExt[1]);
     if (extension.empty() || extension[0] != '.')
     {
-        return ValidationResult::error("Directive '" + directive->getName() + "' has invalid extension '" + extension +
-                                       "'");
+        return ValidationResult::error("Directive '" + directive->getName() + "' has invalid extension '" + extension
+                                       + "'");
     }
     if (!isAllowedCGIExtension(extension))
     {
-        return ValidationResult::error("Directive '" + directive->getName() + "' has unsupported extension '" +
-                                       extension + "'");
+        return ValidationResult::error("Directive '" + directive->getName() + "' has unsupported extension '"
+                                       + extension + "'");
     }
     if (!FileUtils::isFile(path))
     {

@@ -1,10 +1,15 @@
 #pragma once
 
 #include <webserv/config/AConfig.hpp>
-#include <webserv/http/HttpResponse.hpp>
+#include <webserv/http/HttpResponse.hpp> // for HttpResponse
 
-#include <memory>
+#include <memory> // for unique_ptr
+#include <string> // for string
+
+#include <stdint.h> // for uint16_t
 #include <sys/types.h>
+
+class AConfig;
 
 class ErrorHandler
 {

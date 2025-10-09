@@ -1,22 +1,22 @@
-#include "webserv/config/AConfig.hpp"
-
-#include <webserv/config/ConfigManager.hpp> // for ConfigManager
-#include <webserv/config/ServerConfig.hpp>  // for ServerConfig
-#include <webserv/config/directive/ADirective.hpp>
-#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
-#include <webserv/handler/FileHandler.hpp>  // for FileHandler
-#include <webserv/handler/URI.hpp>          // for URI
-#include <webserv/http/HttpHeaders.hpp>     // for HttpHeaders
-#include <webserv/log/Log.hpp>              // for LOCATION, Log
 #include <webserv/router/Router.hpp>
 
-#include <algorithm>
-#include <memory>   // for unique_ptr
-#include <optional> // for optional
-#include <string>   // for basic_string, string
-#include <vector>
+#include <webserv/config/AConfig.hpp>                  // for AConfig
+#include <webserv/config/ConfigManager.hpp>            // for ConfigManager
+#include <webserv/config/directive/ADirective.hpp>     // for ADirective
+#include <webserv/config/directive/DirectiveValue.hpp> // for DirectiveValue
+#include <webserv/handler/ErrorHandler.hpp>            // for ErrorHandler
+#include <webserv/handler/FileHandler.hpp>             // for FileHandler
+#include <webserv/handler/URI.hpp>                     // for URI
+#include <webserv/http/HttpHeaders.hpp>                // for HttpHeaders
+#include <webserv/log/Log.hpp>                         // for LOCATION, Log
 
-class LocationConfig;
+#include <functional> // for identity
+#include <memory>     // for unique_ptr
+#include <optional>   // for optional
+#include <ranges>     // for __find_fn, find
+#include <string>     // for basic_string, string, operator==
+#include <utility>    // for move
+#include <vector>     // for vector
 
 bool Router::isMethodSupported(const std::string &method, const AConfig &config)
 {
@@ -33,8 +33,8 @@ std::unique_ptr<HttpResponse> Router::handleRequest(const HttpRequest &request)
 {
     Log::trace(LOCATION);
 
-    ServerConfig *serverConfig =
-        ConfigManager::getInstance().getMatchingServerConfig(request.getHeaders().getHost().value_or(""));
+    ServerConfig *serverConfig
+        = ConfigManager::getInstance().getMatchingServerConfig(request.getHeaders().getHost().value_or(""));
 
     if (serverConfig == nullptr)
     {

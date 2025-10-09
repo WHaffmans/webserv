@@ -1,16 +1,16 @@
+#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
+
 #include <webserv/config/AConfig.hpp>       // for AConfig
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/GlobalConfig.hpp>  // for GlobalConfig
-#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
-#include <webserv/http/HttpConstants.hpp> // for StatusCodeInfo, CRLF, DOUBLE_CRLF, INTERNAL_SERVER_ERROR, statusCodeInfos
-#include <webserv/http/HttpResponse.hpp>
-#include <webserv/log/Log.hpp> // for Log
+#include <webserv/http/HttpConstants.hpp>   // for getStatusCodeReason, INTERNAL_SERVER_ERROR
+#include <webserv/http/HttpResponse.hpp>    // for HttpResponse
+#include <webserv/log/Log.hpp>              // for Log, LOCATION
 
 #include <fstream> // for basic_ifstream, basic_filebuf, basic_ostream::operator<<, ifstream, stringstream
-#include <memory>
+#include <memory>  // for allocator, make_unique, unique_ptr
 #include <sstream> // for basic_stringstream
-#include <string>  // for basic_string, operator+, allocator, char_traits, string, to_string
-#include <sys/types.h>
+#include <string>  // for basic_string, char_traits, operator+, string, to_string
 
 std::unique_ptr<HttpResponse> ErrorHandler::getErrorResponse(uint16_t statusCode, const AConfig *config)
 {
@@ -51,9 +51,9 @@ std::string ErrorHandler::generateDefaultErrorPage(uint16_t statusCode)
 {
     Log::info("Generating default error page");
     std::string statusMessage = Http::getStatusCodeReason(statusCode);
-    std::string html = "<html><head><title>" + std::to_string(statusCode) + " " + statusMessage +
-                       "</title></head><body><h1>" + std::to_string(statusCode) + " " + statusMessage +
-                       "</h1><hr><p>webserv</p></body></html>";
+    std::string html = "<html><head><title>" + std::to_string(statusCode) + " " + statusMessage
+                       + "</title></head><body><h1>" + std::to_string(statusCode) + " " + statusMessage
+                       + "</h1><hr><p>webserv</p></body></html>";
     return html;
 }
 

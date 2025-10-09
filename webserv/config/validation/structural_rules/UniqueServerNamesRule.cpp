@@ -1,12 +1,15 @@
 #include <webserv/config/validation/structural_rules/UniqueServerNamesRule.hpp>
 
-#include <webserv/config/GlobalConfig.hpp>
-#include <webserv/config/ServerConfig.hpp>
-#include <webserv/log/Log.hpp>
+#include <webserv/config/GlobalConfig.hpp>                                          // for GlobalConfig
+#include <webserv/config/ServerConfig.hpp>                                          // for ServerConfig
+#include <webserv/config/validation/ValidationResult.hpp>                           // for ValidationResult
+#include <webserv/config/validation/structural_rules/AStructuralValidationRule.hpp> // for AStructuralValidationRule
+#include <webserv/log/Log.hpp> // for LOCATION, Log
 
-#include <optional>
-#include <set>
-#include <string>
+#include <optional> // for optional
+#include <set>      // for set
+#include <string>   // for basic_string, operator+, to_string, allocator, char_traits, string, operator<=>
+#include <vector>   // for vector
 
 UniqueServerNamesRule::UniqueServerNamesRule()
     : AStructuralValidationRule("UniqueServerNamesRule", "Ensures all server blocks have unique server names")

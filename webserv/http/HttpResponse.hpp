@@ -3,7 +3,7 @@
 #include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
 #include <webserv/log/Log.hpp>          // for LOCATION, Log
 
-#include <cstdint> // for uint8_t
+#include <cstdint> // for uint8_t, uint16_t
 #include <memory>  // for unique_ptr
 #include <string>  // for string
 #include <vector>  // for vector

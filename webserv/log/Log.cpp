@@ -1,6 +1,7 @@
+#include <webserv/log/Log.hpp>
+
 #include <webserv/log/Channel.hpp>     // for Channel
 #include <webserv/log/FileChannel.hpp> // for FileChannel
-#include <webserv/log/Log.hpp>
 #include <webserv/log/StdoutChannel.hpp> // for StdoutChannel
 
 #include <chrono>    // for duration_cast, operator-, steady_clock, duration, seconds

@@ -224,8 +224,8 @@ void Server::eventLoop()
                 ssize_t bytesSent = send(event.data.fd, httpResponse.data(), httpResponse.size(), 0);
                 if (bytesSent < 0)
                 {
-                    Log::error("Send failed for fd: " + std::to_string(event.data.fd) +
-                               " with error: " + std::strerror(errno));
+                    Log::error("Send failed for fd: " + std::to_string(event.data.fd)
+                               + " with error: " + std::strerror(errno));
                 }
                 else
                 {

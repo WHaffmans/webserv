@@ -18,8 +18,8 @@ ServerConfig::ServerConfig(const std::string &block, const AConfig *parent) : AC
 
 std::string ServerConfig::getName() const
 {
-    return "server: " + get<std::string>("server_name").value_or("unnamed") + " (port " +
-           std::to_string(get<int>("listen").value_or(-1)) + ")";
+    return "server: " + get<std::string>("server_name").value_or("unnamed") + " (port "
+           + std::to_string(get<int>("listen").value_or(-1)) + ")";
 }
 
 std::string ServerConfig::getType() const
@@ -45,8 +45,8 @@ void ServerConfig::parseBlock(const std::string &block)
             directives += block.substr(pos);
             break;
         }
-        std::string locationPath =
-            utils::trim(block.substr(locationPos + 9, bracePos - (locationPos + 9))); // TODO magic numbers
+        std::string locationPath
+            = utils::trim(block.substr(locationPos + 9, bracePos - (locationPos + 9))); // TODO magic numbers
         // Add global declarations before this server block
         directives += block.substr(pos, locationPos - pos);
         size_t closeBrace = utils::findCorrespondingClosingBrace(block, bracePos);

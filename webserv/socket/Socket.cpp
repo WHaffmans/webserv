@@ -68,10 +68,11 @@ void Socket::bind(const std::string &host, const int port) const
     address.sin_addr.s_addr = inet_addr(host.c_str());
     address.sin_port = htons(port);
 
-    if (::bind(fd_, reinterpret_cast<struct sockaddr *>(&address), sizeof(address)) < 0) //NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    if (::bind(fd_, reinterpret_cast<struct sockaddr *>(&address), sizeof(address))
+        < 0) // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
     {
-        Log::fatal("Cannot bind to " + host + ":" + std::to_string(port) +
-                   " - address already in use or permission denied");
+        Log::fatal("Cannot bind to " + host + ":" + std::to_string(port)
+                   + " - address already in use or permission denied");
         throw std::runtime_error("Bind failed");
     }
 }

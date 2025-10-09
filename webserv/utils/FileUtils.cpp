@@ -1,5 +1,6 @@
-#include <webserv/log/Log.hpp> // for Log, LOCATION
 #include <webserv/utils/FileUtils.hpp>
+
+#include <webserv/log/Log.hpp> // for Log, LOCATION
 
 #include <cstring> // for size_t
 #include <fstream> // for basic_ifstream, basic_ios, basic_istream, ios, ifstream, operator|, basic_istream::read, basic_istream::seekg, basic_istream::tellg, streamsize

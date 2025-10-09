@@ -29,7 +29,6 @@ constexpr const char *extractFilename(const char *path)
 #define LOCATION                                                                                                       \
     (std::string(extractFilename(__FILE__)) + ":" + std::to_string(__LINE__) + " (" + std::string(__FUNCTION__) + ")")
 
-
 class Log
 {
   public:
@@ -38,7 +37,7 @@ class Log
     Log &operator=(const Log &other) = delete;
     Log &operator=(Log &&other) = delete;
 
-     enum class Level : uint8_t
+    enum class Level : uint8_t
     {
         Trace = 0,
         Debug = 1,
@@ -85,15 +84,13 @@ class Log
         const char *color;
     };
 
-    constexpr static std::array<LevelMapping, 6> LOG_LEVEL_MAP = {
-        {{.level = Log::Level::Trace, .name = "TRACE", .color = "\033[36m"},
-         {.level = Log::Level::Debug, .name = "DEBUG", .color = "\033[90m"},
-         {.level = Log::Level::Info, .name = "INFO", .color = "\033[37m"},
-         {.level = Log::Level::Warn, .name = "WARN", .color = "\033[33m"},
-         {.level = Log::Level::Error, .name = "ERROR", .color = "\033[31m"},
-         {.level = Log::Level::Fatal, .name = "FATAL", .color = "\033[1;31m"}}};
+    constexpr static std::array<LevelMapping, 6> LOG_LEVEL_MAP
+        = {{{.level = Log::Level::Trace, .name = "TRACE", .color = "\033[36m"},
+            {.level = Log::Level::Debug, .name = "DEBUG", .color = "\033[90m"},
+            {.level = Log::Level::Info, .name = "INFO", .color = "\033[37m"},
+            {.level = Log::Level::Warn, .name = "WARN", .color = "\033[33m"},
+            {.level = Log::Level::Error, .name = "ERROR", .color = "\033[31m"},
+            {.level = Log::Level::Fatal, .name = "FATAL", .color = "\033[1;31m"}}};
 
     constexpr static const char *RESET_COLOR = "\033[0m";
 };
-
-

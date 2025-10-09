@@ -1,7 +1,7 @@
-#include "webserv/config/AConfig.hpp"
-
-#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
 #include <webserv/handler/FileHandler.hpp>
+
+#include <webserv/config/AConfig.hpp>       // for AConfig
+#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
 #include <webserv/handler/MIMETypes.hpp>  // for MIMETypes
 #include <webserv/handler/URI.hpp>        // for URI
 #include <webserv/http/HttpConstants.hpp> // for NOT_FOUND, FORBIDDEN, OK
@@ -9,10 +9,11 @@
 #include <webserv/log/Log.hpp>            // for Log, LOCATION
 #include <webserv/utils/FileUtils.hpp>    // for joinPath, getExtension, isFile, readBinaryFile
 
-#include <memory> // for unique_ptr, allocator, make_unique
-#include <ranges>
-#include <string> // for basic_string, string, operator+, char_traits
-#include <vector> // for vector
+#include <memory>   // for unique_ptr, allocator, make_unique
+#include <optional> // for optional
+#include <ranges>   // for __find_if_fn, find_if
+#include <string>   // for basic_string, string, operator+, char_traits
+#include <vector>   // for vector
 
 FileHandler::FileHandler(const AConfig *config, const URI &URI) : config_(config), uri_(URI)
 {

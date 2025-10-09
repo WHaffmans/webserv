@@ -15,8 +15,8 @@
 #include <sys/types.h> // for ssize_t
 
 Client::Client(std::unique_ptr<Socket> socket, Server &server)
-    : httpRequest_(std::make_unique<HttpRequest>(this)), httpResponse_(std::make_unique<HttpResponse>()), client_socket_(std::move(socket)),
-      server_(std::ref(server))
+    : httpRequest_(std::make_unique<HttpRequest>(this)), httpResponse_(std::make_unique<HttpResponse>()),
+      client_socket_(std::move(socket)), server_(std::ref(server))
 {
     Log::trace(LOCATION);
     Log::info("New client connected, fd: " + std::to_string(client_socket_->getFd()));
@@ -45,8 +45,8 @@ void Client::request()
 {
     Log::trace(LOCATION);
     char buffer[bufferSize_] = {}; // NOLINT(cppcoreguidelines-avoid-c-arrays)
-    ssize_t bytesRead =
-        client_socket_->recv(buffer, sizeof(buffer) - 1); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
+    ssize_t bytesRead = client_socket_->recv(
+        buffer, sizeof(buffer) - 1); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
     if (bytesRead < 0)
     {
         Log::error("Read error");
@@ -62,8 +62,8 @@ void Client::request()
     buffer[bytesRead] = '\0'; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
     httpRequest_->receiveData(static_cast<const char *>(buffer), static_cast<size_t>(bytesRead));
 
-    if (httpRequest_->getState() == HttpRequest::State::Complete ||
-        httpRequest_->getState() == HttpRequest::State::ParseError)
+    if (httpRequest_->getState() == HttpRequest::State::Complete
+        || httpRequest_->getState() == HttpRequest::State::ParseError)
     {
         Log::info("Received complete request",
                   {

@@ -1,10 +1,9 @@
 #include <webserv/http/HttpResponse.hpp>
 
-#include <webserv/http/HttpConstants.hpp>
+#include <webserv/http/HttpConstants.hpp> // for getStatusCodeReason
 
-#include <string>
-#include <vector>
-#include <sys/types.h>
+#include <string> // for basic_string, operator+, string, char_traits, to_string
+#include <vector> // for vector
 
 HttpResponse::HttpResponse() : headers_(std::make_unique<HttpHeaders>()) {}
 

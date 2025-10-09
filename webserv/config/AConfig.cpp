@@ -1,4 +1,5 @@
 #include <webserv/config/AConfig.hpp>                    // for AConfig
+
 #include <webserv/config/directive/ADirective.hpp>       // for ADirective
 #include <webserv/config/directive/DirectiveFactory.hpp> // for DirectiveFactory
 #include <webserv/config/directive/DirectiveValue.hpp>   // for DirectiveValue
@@ -52,7 +53,7 @@ bool AConfig::has(const std::string &name) const
     {
         return true;
     }
-    
+
     if (parent_ != nullptr)
     {
         return parent_->has(name);

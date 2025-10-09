@@ -1,13 +1,16 @@
+#include <webserv/config/validation/ValidationEngine.hpp>
+
 #include <webserv/config/AConfig.hpp>        // for AConfig
 #include <webserv/config/GlobalConfig.hpp>   // for GlobalConfig
 #include <webserv/config/LocationConfig.hpp> // for LocationConfig
 #include <webserv/config/ServerConfig.hpp>   // for ServerConfig
-#include <webserv/config/validation/ValidationEngine.hpp>
-#include <webserv/config/validation/ValidationResult.hpp>                // for ValidationResult
-#include <webserv/config/validation/directive_rules/AValidationRule.hpp> // for AValidationRule
-#include <webserv/log/Log.hpp>                                           // for Log, LOCATION
+#include <webserv/config/validation/ValidationResult.hpp>                           // for ValidationResult
+#include <webserv/config/validation/directive_rules/AValidationRule.hpp>            // for AValidationRule
+#include <webserv/config/validation/structural_rules/AStructuralValidationRule.hpp> // for AStructuralValidationRule
+#include <webserv/log/Log.hpp>                                                      // for Log, LOCATION
 
-#include <utility> // for move, get
+#include <exception> // for exception
+#include <utility>   // for move, get
 
 void ValidationEngine::addGlobalRule(const std::string &directiveName, std::unique_ptr<AValidationRule> rule)
 {
@@ -136,8 +139,8 @@ void ValidationEngine::validateLocationConfig(const std::string &path, const Loc
         }
         catch (const std::exception &e)
         {
-            results_.push_back(ValidationResult::error("Structural rule '" + rule->getRuleName() +
-                                                       "' threw exception for location '" + path + "': " + e.what()));
+            results_.push_back(ValidationResult::error("Structural rule '" + rule->getRuleName()
+                                                       + "' threw exception for location '" + path + "': " + e.what()));
         }
     }
 

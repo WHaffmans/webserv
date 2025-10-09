@@ -4,7 +4,6 @@
 #include <sstream> // for basic_ostream, operator<<, basic_stringstream, basic_istream, basic_istringstream, right, istringstream, stringstream
 #include <utility> // for get
 
-
 std::string Channel::printContext(const std::map<std::string, std::string> &context)
 {
     std::stringstream ss;

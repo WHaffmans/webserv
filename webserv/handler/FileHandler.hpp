@@ -1,7 +1,6 @@
 #pragma once
 
-#include "webserv/config/AConfig.hpp"
-
+#include <webserv/config/AConfig.hpp>
 #include <webserv/config/LocationConfig.hpp>
 #include <webserv/handler/URI.hpp>
 #include <webserv/http/HttpResponse.hpp> // for HttpResponse

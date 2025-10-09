@@ -20,7 +20,6 @@ class DirectiveFactory
         std::string_view context;
     };
 
-
     constexpr static std::array<DirectiveInfo, 15> supportedDirectives = {{
         {.name = "listen", .type = "IntDirective", .context = "S"},
         {.name = "host", .type = "StringDirective", .context = "S"},
@@ -38,13 +37,10 @@ class DirectiveFactory
         {.name = "upload_store", .type = "StringDirective", .context = "gsl"},
         {.name = "redirect", .type = "VectorDirective", .context = "l"},
     }};
+
   private:
     using CreatorFunc = std::function<std::unique_ptr<ADirective>(const std::string &, const std::string &arg)>;
 
     static const std::unordered_map<std::string_view, CreatorFunc> &getFactories();
     static std::unique_ptr<ADirective> create(std::string_view type, const std::string &name, const std::string &arg);
-
-
-
-
 };

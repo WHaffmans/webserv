@@ -78,7 +78,7 @@ TEST_F(LogTest, LogLevelToColoredString)
 
 TEST_F(LogTest, StdoutChannelConstruction)
 {
-    StdoutChannel channel();
+    StdoutChannel channel;
     // If we reach here without exception, construction was successful
     SUCCEED();
 }

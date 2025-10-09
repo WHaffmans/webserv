@@ -1,14 +1,15 @@
-#include "webserv/config/AConfig.hpp"
-#include "webserv/utils/FileUtils.hpp"
-#include "webserv/utils/utils.hpp"
-
-#include <webserv/config/LocationConfig.hpp> // for LocationConfig
-#include <webserv/config/ServerConfig.hpp>   // for ServerConfig
 #include <webserv/handler/URI.hpp>
 
-#include <optional> // for optional
+#include <webserv/config/AConfig.hpp>        // for AConfig
+#include <webserv/config/LocationConfig.hpp> // for LocationConfig
+#include <webserv/config/ServerConfig.hpp>   // for ServerConfig
+#include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
+#include <webserv/utils/FileUtils.hpp>  // for joinPath, getExtension, isDirectory, isFile, isValidPath
+#include <webserv/utils/utils.hpp>      // for trim, split
 
-#include <cstddef>   // for size_t
+#include <cstddef>  // for size_t
+#include <optional> // for optional, operator!=
+#include <vector>   // for vector
 
 URI::URI(const HttpRequest &request, const ServerConfig &serverConfig)
     : uriTrimmed_(utils::trim(request.getTarget(), "/")), config_(matchConfig(uriTrimmed_, serverConfig))

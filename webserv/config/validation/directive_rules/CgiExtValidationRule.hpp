@@ -1,7 +1,9 @@
 #pragma once
 
-#include <webserv/config/validation/directive_rules/AValidationRule.hpp>
-#include <webserv/config/validation/ValidationResult.hpp> // for ValidationResult
+#include <webserv/config/validation/ValidationResult.hpp>                // for ValidationResult
+#include <webserv/config/validation/directive_rules/AValidationRule.hpp> // for AValidationRule
+
+#include <string> // for string
 
 class CgiExtValidationRule : public AValidationRule
 {

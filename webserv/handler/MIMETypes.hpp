@@ -1,5 +1,4 @@
-#ifndef MIMETYPES_HPP
-#define MIMETYPES_HPP
+#pragma once
 
 #include <map>
 #include <string>
@@ -20,5 +19,3 @@ class MIMETypes
 
     void initializeDefaults();
 };
-
-#endif // MIMETYPES_HPP

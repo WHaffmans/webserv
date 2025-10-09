@@ -1,6 +1,7 @@
+#include <webserv/config/validation/directive_rules/AValidationRule.hpp>
+
 #include <webserv/config/AConfig.hpp>                     // for AConfig
 #include <webserv/config/validation/ValidationResult.hpp> // for ValidationResult
-#include <webserv/config/validation/directive_rules/AValidationRule.hpp>
 #include <webserv/log/Log.hpp> // for LOCATION, Log
 
 #include <utility> // for move

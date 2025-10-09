@@ -5,8 +5,6 @@
 #include <iomanip>  // for operator<<, setfill, setw
 #include <iostream> // for basic_ostream, operator<<, basic_ostream::operator<<, cerr, cout, flush, ostream
 
-
-
 void StdoutChannel::log(const Log::Level &logLevel, const std::string &message,
                         const std::map<std::string, std::string> &context)
 {
