@@ -1,0 +1,7 @@
+- Better error page generation
+- CGI
+- Error handling (check mallocs, exceptions, etc)
+- Make an impressive website
+- URIParser: Include authority
+- Check if host header is present
+- Cookies
