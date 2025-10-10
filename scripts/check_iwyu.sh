@@ -21,7 +21,7 @@ for build_candidate in "$PROJECT_ROOT/build-container" "$PROJECT_ROOT/build-loca
     fi
 done
 
-IWYU_MAPPING="$PROJECT_ROOT/.iwyu.imp"
+IWYU_MAPPING="$PROJECT_ROOT/scripts/.iwyu.imp"
 
 # Colors for output
 RED='\033[0;31m'

@@ -122,9 +122,9 @@ TEST_F(LogTest, SetStdoutChannel)
 
 TEST_F(LogTest, SetFileChannel)
 {
-    EXPECT_NO_THROW(Log::setFileChannel("test_log.log", std::ios_base::trunc));
+    EXPECT_NO_THROW(Log::setFileChannel("logs/test_log.log", std::ios_base::trunc));
     // Setting again to see if it handles multiple calls
-    EXPECT_NO_THROW(Log::setFileChannel("test_log.log", std::ios_base::app));
+    EXPECT_NO_THROW(Log::setFileChannel("logs/test_log.log", std::ios_base::app));
 }
 
 // Note: More comprehensive tests would involve checking actual log outputs,
