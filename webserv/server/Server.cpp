@@ -27,7 +27,7 @@
 class Router;
 
 Server::Server(const ConfigManager &configManager)
-    : epoll_fd_(epoll_create1(0)), configManager_(configManager), router_()
+    : epoll_fd_(epoll_create1(0)), configManager_(configManager)
 {
     Log::trace(LOCATION);
     const auto &serverConfigs = configManager.getServerConfigs();
@@ -243,9 +243,4 @@ void Server::run()
             handleEvent(&events[i]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
         }
     }
-}
-
-const Router &Server::getRouter() const
-{
-    return router_;
 }

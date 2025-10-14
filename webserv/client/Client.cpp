@@ -97,8 +97,6 @@ std::vector<uint8_t> Client::getResponse() const
 {
     Log::trace(LOCATION);
 
-    const Router &router = server_.getRouter();
-    static_cast<void>(router); // Suppress unused variable warning
     auto response = Router::handleRequest(*httpRequest_);
     return response->toBytes();
 }

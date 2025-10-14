@@ -8,7 +8,6 @@
 #include <webserv/http/HttpResponse.hpp>   // for HttpResponse
 #include <webserv/server/Server.hpp>
 #include <webserv/socket/ClientSocket.hpp> // for ClientSocket
-#include <webserv/socket/ClientSocket.hpp>
 
 #include <cstddef> // for size_t
 #include <cstdint> // for uint8_t

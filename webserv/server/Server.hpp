@@ -43,12 +43,10 @@ class Server
 
     ServerSocket &getListener(int fd) const;
     Client &getClient(int fd) const;
-    const Router &getRouter() const;
 
   private:
     int epoll_fd_;
     const ConfigManager &configManager_;
-    const Router router_;
     std::vector<std::unique_ptr<ServerSocket>> listeners_;
     std::set<int> listener_fds_;
     // std::unordered_map<int, std::unique_ptr<Client>> clients_;
