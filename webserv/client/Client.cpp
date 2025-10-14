@@ -1,5 +1,4 @@
 #include <webserv/client/Client.hpp>
-
 #include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
 #include <webserv/log/Log.hpp>          // for Log, LOCATION
 #include <webserv/router/Router.hpp>    // for Router
@@ -26,7 +25,7 @@ Client::~Client()
 {
     Log::trace(LOCATION);
     Log::info("Client disconnected, fd: " + std::to_string(client_socket_->getFd()));
-    server_.removeFromEpoll(*client_socket_);
+    server_.remove(*client_socket_);
 };
 
 int Client::getStatusCode() const
@@ -55,7 +54,7 @@ void Client::request()
     if (bytesRead == 0)
     {
         Log::info("Client closed connection, fd: " + std::to_string(client_socket_->getFd())); // TODO weird
-        server_.removeClient(*this); // CRITICAL: RETURN IMMEDIATELY
+        server_.disconnect(*this); // CRITICAL: RETURN IMMEDIATELY
         return;
     }
 

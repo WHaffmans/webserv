@@ -33,14 +33,10 @@ class Server
     ~Server();
 
     void start();
-    void addToEpoll(const Socket &socket, uint32_t events) const;
-    void removeClient(const Client &client);
-    void removeFromEpoll(const Socket &socket) const;
-    void setupServerSocket(const ServerConfig &config);
-    void handleConnection(struct epoll_event *event);
-    void handleRequest(struct epoll_event *event) const;
+    void add(const Socket &socket, uint32_t events) const;
+    void remove(const Socket &socket) const;
+    void disconnect(const Client &client);
     void responseReady(int client_fd) const;
-    void eventLoop();
 
     Socket &getListener(int fd) const;
     Client &getClient(int fd) const;
@@ -53,4 +49,12 @@ class Server
     std::vector<std::unique_ptr<Socket>> listeners_;
     std::set<int> listener_fds_;
     std::unordered_map<int, std::unique_ptr<Client>> clients_;
-};
+
+    void handleEvent(struct epoll_event *event);
+    void handleConnection(struct epoll_event *event);
+    void handleRequest(struct epoll_event *event) const;
+    void handleResponse(struct epoll_event *event);
+
+    void setupServerSocket(const ServerConfig &config);
+    void eventLoop();
+  };

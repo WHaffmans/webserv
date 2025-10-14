@@ -1,9 +1,8 @@
-#include <webserv/server/Server.hpp>
-
 #include <webserv/client/Client.hpp>        // for Client
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/ServerConfig.hpp>  // for ServerConfig
 #include <webserv/log/Log.hpp>              // for Log, LOCATION
+#include <webserv/server/Server.hpp>
 #include <webserv/socket/Socket.hpp> // for Socket
 
 #include <cerrno>        // for errno
@@ -69,7 +68,7 @@ void Server::start()
     eventLoop();
 }
 
-void Server::addToEpoll(const Socket &socket, uint32_t events) const
+void Server::add(const Socket &socket, uint32_t events) const
 {
     Log::trace(LOCATION);
     int fd = socket.getFd();
@@ -83,14 +82,14 @@ void Server::addToEpoll(const Socket &socket, uint32_t events) const
     }
 }
 
-void Server::removeClient(const Client &client)
+void Server::disconnect(const Client &client)
 {
     Log::trace(LOCATION);
     int client_fd = client.getSocket().getFd();
     clients_.erase(client_fd);
 }
 
-void Server::removeFromEpoll(const Socket &socket) const
+void Server::remove(const Socket &socket) const
 {
     Log::trace(LOCATION);
     int filedes = socket.getFd();
@@ -114,7 +113,7 @@ void Server::setupServerSocket(const ServerConfig &config)
         serverSocket->listen(SOMAXCONN);
         int server_fd = serverSocket->getFd();
 
-        addToEpoll(*serverSocket, EPOLLIN);
+        add(*serverSocket, EPOLLIN);
 
         listeners_.push_back(std::move(serverSocket));
         listener_fds_.insert(server_fd);
@@ -132,7 +131,7 @@ void Server::handleConnection(struct epoll_event *event)
     Log::trace(LOCATION);
     Socket &listener = getListener(event->data.fd);
     std::unique_ptr<Socket> clientSocket = listener.accept();
-    addToEpoll(*clientSocket, EPOLLIN);
+    add(*clientSocket, EPOLLIN);
     clients_.insert({clientSocket->getFd(), std::make_unique<Client>(std::move(clientSocket), *this)});
 }
 
@@ -185,6 +184,46 @@ void Server::responseReady(int client_fd) const
     }
 }
 
+void Server::handleResponse(struct epoll_event *event)
+{
+    Log::debug("Attempting to send data to fd: " + std::to_string(event->data.fd));
+    Client &client = getClient(event->data.fd);
+    auto httpResponse = client.getResponse();
+    ssize_t bytesSent = send(event->data.fd, httpResponse.data(), httpResponse.size(), 0);
+    if (bytesSent < 0)
+    {
+        Log::error("Send failed for fd: " + std::to_string(event->data.fd) + " with error: " + std::strerror(errno));
+    }
+    else
+    {
+        Log::debug("Sent " + std::to_string(bytesSent) + " bytes to fd: " + std::to_string(event->data.fd));
+    }
+    clients_.erase(event->data.fd);
+}
+
+void Server::handleEvent(struct epoll_event *event)
+{
+    Log::trace(LOCATION);
+    if ((event->events & EPOLLERR) > 0 || (event->events & EPOLLHUP) > 0)
+    {
+        Log::error("Epoll error on fd " + std::to_string(event->data.fd));
+        remove(getListener(event->data.fd));
+        close(event->data.fd);
+    }
+    else if (listener_fds_.contains(event->data.fd))
+    {
+        handleConnection(event);
+    }
+    else if ((event->events & EPOLLIN) > 0)
+    {
+        handleRequest(event);
+    }
+    else if ((event->events & EPOLLOUT) > 0)
+    {
+        handleResponse(event);
+    }
+}
+
 void Server::eventLoop()
 {
     Log::trace(LOCATION);
@@ -201,38 +240,7 @@ void Server::eventLoop()
         }
         for (int i = 0; i < nfds; ++i)
         {
-            epoll_event &event = events[i]; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-            if ((event.events & EPOLLERR) > 0 || (event.events & EPOLLHUP) > 0)
-            {
-                Log::error("Epoll error on fd " + std::to_string(event.data.fd));
-                removeFromEpoll(getListener(event.data.fd));
-                close(event.data.fd);
-            }
-            else if (listener_fds_.contains(event.data.fd))
-            {
-                handleConnection(&event);
-            }
-            else if ((event.events & EPOLLIN) > 0)
-            {
-                handleRequest(&event);
-            }
-            else if ((event.events & EPOLLOUT) > 0)
-            {
-                Log::debug("Attempting to send data to fd: " + std::to_string(event.data.fd));
-                Client &client = getClient(event.data.fd);
-                auto httpResponse = client.getResponse();
-                ssize_t bytesSent = send(event.data.fd, httpResponse.data(), httpResponse.size(), 0);
-                if (bytesSent < 0)
-                {
-                    Log::error("Send failed for fd: " + std::to_string(event.data.fd)
-                               + " with error: " + std::strerror(errno));
-                }
-                else
-                {
-                    Log::debug("Sent " + std::to_string(bytesSent) + " bytes to fd: " + std::to_string(event.data.fd));
-                }
-                clients_.erase(event.data.fd);
-            }
+            handleEvent(&events[i]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
         }
     }
 }
