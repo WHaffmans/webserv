@@ -1,8 +1,7 @@
-#include <webserv/handler/URI.hpp>
-
 #include <webserv/config/AConfig.hpp>        // for AConfig
 #include <webserv/config/LocationConfig.hpp> // for LocationConfig
 #include <webserv/config/ServerConfig.hpp>   // for ServerConfig
+#include <webserv/handler/URI.hpp>
 #include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
 #include <webserv/utils/FileUtils.hpp>  // for joinPath, getExtension, isDirectory, isFile, isValidPath
 #include <webserv/utils/utils.hpp>      // for trim, split
@@ -145,6 +144,17 @@ bool URI::isDirectory() const
 bool URI::isValid() const
 {
     return FileUtils::isValidPath(fullPath_);
+}
+
+bool URI::isCgi() const
+{
+    if (isFile() || getExtension().empty() || !config_->get<std::string>("cgi_enabled").has_value()
+        || config_->get<std::string>("cgi_enabled").value() != "on")
+    {
+        return false;
+    }
+    auto cgiPath = config_->getCGIPath(getExtension());
+    return !cgiPath.empty();
 }
 
 const std::string &URI::getBaseName() const

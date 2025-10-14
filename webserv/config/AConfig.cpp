@@ -8,6 +8,7 @@
 
 #include <sstream> // for basic_stringstream, stringstream
 #include <utility> // for pair, move
+#include <ranges>  // for filter
 
 AConfig::AConfig(const AConfig *parent) : parent_(parent) {}
 
@@ -112,4 +113,35 @@ std::string AConfig::getErrorPage(int statusCode) const
         return parent_->getErrorPage(statusCode);
     }
     return ""; // Return empty string if not found
+}
+
+std::string AConfig::getCGIPath(const std::string &extension) const
+{
+    Log::trace(LOCATION);
+    for (const auto &directive : directives_ | std::views::filter([](const auto &d) {
+                                     return d->getName() == "cgi_ext";
+                                 }))
+    {
+        
+        if (!directive->getValue().holds<std::vector<std::string>>())
+        {
+            continue;
+        }
+        auto exts = directive->getValue().try_get<std::vector<std::string>>().value();
+        {
+            continue;
+        }
+        auto cgiPath = exts.back();
+        exts.pop_back(); // Last element is the CGI path
+        auto it = std::ranges::find(exts, extension);
+        if (it != exts.end())
+        {
+            return cgiPath;
+        }
+    }
+    if (parent_ != nullptr)
+    {
+        return parent_->getCGIPath(extension);
+    }
+    return {}; // Return empty string if not found
 }
