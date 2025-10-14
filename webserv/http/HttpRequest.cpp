@@ -223,3 +223,19 @@ void HttpRequest::reset()
     body_.clear();
     // contentLength_ = 0;
 }
+
+const std::string &HttpRequest::getMethod() const
+{
+    return method_;
+}
+
+const std::string &HttpRequest::getTarget() const
+{
+    return target_;
+}
+
+const std::string &HttpRequest::getHttpVersion() const
+{
+    return httpVersion_;
+}
+

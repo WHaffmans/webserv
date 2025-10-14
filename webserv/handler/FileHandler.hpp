@@ -17,6 +17,13 @@ class FileHandler
   public:
     FileHandler(const AConfig *config, const URI &uri);
 
+    FileHandler(const FileHandler &other) = delete;
+    FileHandler(FileHandler &&other) noexcept = delete;
+    FileHandler &operator=(const FileHandler &other) = delete;
+    FileHandler &operator=(FileHandler &&other) noexcept = delete;
+
+    ~FileHandler() = default;
+
     [[nodiscard]] std::unique_ptr<HttpResponse> getResponse() const;
 
   private:

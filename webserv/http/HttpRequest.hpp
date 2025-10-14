@@ -32,27 +32,24 @@ class HttpRequest
     ~HttpRequest();
 
     [[nodiscard]] State getState() const;
-    void setState(State state);
     [[nodiscard]] const HttpHeaders &getHeaders() const;
     [[nodiscard]] const std::string &getBody() const;
+    [[nodiscard]] const std::string &getMethod() const;
+    [[nodiscard]] const std::string &getTarget() const;
+    [[nodiscard]] const std::string &getHttpVersion() const;
 
-    [[nodiscard]] const std::string &getMethod() const { return method_; }
-
-    [[nodiscard]] const std::string &getTarget() const { return target_; }
-
-    [[nodiscard]] const std::string &getHttpVersion() const { return httpVersion_; }
-
+    void setState(State state);
     void receiveData(const char *data, size_t length);
     void reset();
 
   private:
-    void parseBuffer();
     [[nodiscard]] bool parseBufferforRequestLine();
     [[nodiscard]] bool parseBufferforHeaders();
     [[nodiscard]] bool parseHeaderLine();
     [[nodiscard]] bool parseBufferforBody();
     [[nodiscard]] bool parseBufferforChunkedBody();
 
+    void parseBuffer();
     void parseContentLength();
 
     Client *client_;
@@ -66,7 +63,4 @@ class HttpRequest
     std::string method_;
     std::string target_;
     std::string httpVersion_;
-    // std::string requestLine_;
-    // std::string headers_;
-    // size_t contentLength_ = 0;
 };

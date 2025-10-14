@@ -18,18 +18,17 @@
 class HttpHeaders
 {
   public:
-    const std::string &get(const std::string &name) const;
-    bool has(const std::string &name) const;
+    [[nodiscard]] const std::string &get(const std::string &name) const;
+    [[nodiscard]] bool has(const std::string &name) const;
 
     void parse(const std::string &rawHeaders);
     void add(const std::string &name, const std::string &value);
     void remove(const std::string &name);
 
-    std::string toString() const;
-
-    std::optional<size_t> getContentLength() const;
-    std::optional<std::string> getContentType() const;
-    std::optional<std::string> getHost() const;
+    [[nodiscard]] std::string toString() const;
+    [[nodiscard]] std::optional<size_t> getContentLength() const;
+    [[nodiscard]] std::optional<std::string> getContentType() const;
+    [[nodiscard]] std::optional<std::string> getHost() const;
 
   private:
     std::unordered_map<std::string, std::string> headers_;

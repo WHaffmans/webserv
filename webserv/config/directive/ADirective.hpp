@@ -4,14 +4,13 @@
 
 #include <iostream> // for ostream
 #include <string>   // for string, basic_string
-#include <utility>  // for move
 
 class ADirective
 {
   public:
     ADirective() = delete;
 
-    ADirective(std::string name) : name_(std::move(name)) {}
+    ADirective(std::string name);
 
     ADirective(const ADirective &other) = delete;
     ADirective &operator=(const ADirective &other) = delete;

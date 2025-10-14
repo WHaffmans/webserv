@@ -25,13 +25,10 @@ class Server
     Server() = delete;
     Server(const ConfigManager &configManager);
 
-    Server(const Server &other) = delete;                // Disable copy constructor
-    Server &operator=(const Server &other) = delete;     // Disable copy assignment
-    Server(Server &&other) noexcept = delete;            // Move constructor
-    Server &operator=(Server &&other) noexcept = delete; // Move assignment
-
-    // The constructor must initialize the reference member 'configManager'
-    // Implementation should be in the .cpp file using an initializer list
+    Server(const Server &other) = delete;
+    Server &operator=(const Server &other) = delete;
+    Server(Server &&other) noexcept = delete;
+    Server &operator=(Server &&other) noexcept = delete;
 
     ~Server();
 
@@ -49,7 +46,6 @@ class Server
     const ConfigManager &configManager_;
     std::vector<std::unique_ptr<ServerSocket>> listeners_;
     std::set<int> listener_fds_;
-    // std::unordered_map<int, std::unique_ptr<Client>> clients_;
     std::vector<std::unique_ptr<Client>> clients_;
     std::unordered_map<int, Client *> socketToClient_;
 

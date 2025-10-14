@@ -1,6 +1,11 @@
 #include <webserv/config/directive/ADirective.hpp>
 
 #include <webserv/config/directive/DirectiveValue.hpp> // for DirectiveValue, operator<<
+#include <utility>                                     // for move
+
+ADirective::ADirective(std::string name) : name_(std::move(name)) //TODO Move here but derived classes take const ref
+{
+}
 
 DirectiveValue ADirective::getValue() const
 {

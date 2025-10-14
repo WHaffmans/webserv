@@ -9,7 +9,7 @@
 class CGISocket : public ASocket
 {
   public:
-    [[nodiscard]] ASocket::Type getType() const override;
-
     explicit CGISocket(int fd);
+
+    [[nodiscard]] ASocket::Type getType() const override;
 };
