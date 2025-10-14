@@ -28,7 +28,7 @@ using DirectiveValueType = std::variant<int, // listen, error_page status, cgi_t
 class DirectiveValue
 {
   public:
-    DirectiveValue(DirectiveValueType value) : value_(std::move(value)) {}
+    DirectiveValue(DirectiveValueType value) : value_(std::move(value)) {} //TODO foei
 
     template <typename T> T get() const { return std::get<T>(value_); }
 
