@@ -2,14 +2,13 @@
 
 // #include <webserv/http/HttpResponse.hpp>
 
-#include "webserv/socket/ClientSocket.hpp"
-
 #include <webserv/config/ServerConfig.hpp> // for ServerConfig
 #include <webserv/http/HttpConstants.hpp>  // for OK
 #include <webserv/http/HttpRequest.hpp>    // for HttpRequest
 #include <webserv/http/HttpResponse.hpp>   // for HttpResponse
 #include <webserv/server/Server.hpp>
-#include <webserv/socket/ClientSocket.hpp> // for Socket
+#include <webserv/socket/ClientSocket.hpp> // for ClientSocket
+#include <webserv/socket/ClientSocket.hpp>
 
 #include <cstddef> // for size_t
 #include <cstdint> // for uint8_t

@@ -1,4 +1,5 @@
 #include <webserv/client/Client.hpp>
+
 #include <webserv/http/HttpHeaders.hpp>    // for HttpHeaders
 #include <webserv/log/Log.hpp>             // for Log, LOCATION
 #include <webserv/router/Router.hpp>       // for Router

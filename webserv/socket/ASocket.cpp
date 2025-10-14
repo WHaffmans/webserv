@@ -1,9 +1,15 @@
-#include <webserv/log/Log.hpp> // for Log, LOCATION
 #include <webserv/socket/ASocket.hpp>
 
-#include <fcntl.h> // For fcntl()
-#include <sys/socket.h>
-#include <unistd.h> // For close()
+#include <webserv/log/Log.hpp> // for Log, LOCATION
+
+#include <stdexcept>    // for runtime_error
+#include <string>       // for basic_string
+#include <system_error> // for generic_category, system_error
+
+#include <errno.h>      // for errno
+#include <fcntl.h>      // for fcntl, F_SETFL, O_NONBLOCK
+#include <sys/socket.h> // for recv, send
+#include <unistd.h>     // for close
 
 ASocket::ASocket(int fd) : fd_(fd)
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <webserv/socket/ASocket.hpp>
+#include <webserv/socket/ASocket.hpp> // for ASocket
 
 #include <sys/socket.h>
 #include <sys/types.h>

@@ -1,17 +1,16 @@
-#include "webserv/socket/ASocket.hpp"
-#include "webserv/socket/ClientSocket.hpp"
-
-#include <webserv/log/Log.hpp>
 #include <webserv/socket/ServerSocket.hpp>
 
-#include <memory>
-#include <stdexcept>
+#include <webserv/log/Log.hpp>             // for Log, LOCATION
+#include <webserv/socket/ASocket.hpp>      // for ASocket
+#include <webserv/socket/ClientSocket.hpp> // for ClientSocket
 
-#include <arpa/inet.h>  // For inet_addr
-#include <fcntl.h>      // For fcntl()"
-#include <netinet/in.h> // For sockaddr_in
-#include <sys/socket.h>
-#include <unistd.h> // For close()
+#include <memory>    // for allocator, make_unique, unique_ptr
+#include <stdexcept> // for runtime_error
+
+#include <arpa/inet.h>  // for htons, inet_addr
+#include <netinet/in.h> // for sockaddr_in, in_addr
+#include <sys/socket.h> // for AF_INET, accept, bind, listen, setsockopt, socket, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
+#include <unistd.h>     // for close
 
 ServerSocket::ServerSocket() : ASocket(socket(AF_INET, SOCK_STREAM, 0))
 {

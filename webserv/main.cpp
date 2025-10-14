@@ -6,6 +6,7 @@
 
 #include <iostream> // for ios_base
 #include <string>   // for allocator, basic_string, char_traits, operator+, string
+#include <vector>   // for vector
 
 int main(int argc, char **argv)
 {

@@ -1,11 +1,10 @@
 #pragma once
 
-#include "webserv/socket/ASocket.hpp"
-
 #include <webserv/client/Client.hpp>
 #include <webserv/config/ConfigManager.hpp>
 #include <webserv/config/ServerConfig.hpp> // for ServerConfig
 #include <webserv/router/Router.hpp>       // for Router
+#include <webserv/socket/ASocket.hpp>
 #include <webserv/socket/ServerSocket.hpp> // for ServerSocket
 
 #include <cstdint>       // for uint32_t
@@ -17,6 +16,8 @@
 class Client;
 class ConfigManager;
 class ServerConfig;
+class ASocket;
+class ServerSocket;
 
 class Server
 {

@@ -1,5 +1,7 @@
-#include <webserv/log/Log.hpp>
 #include <webserv/socket/ClientSocket.hpp>
+
+#include <webserv/log/Log.hpp>        // for LOCATION, Log
+#include <webserv/socket/ASocket.hpp> // for ASocket
 
 ClientSocket::ClientSocket(int fd) : ASocket(fd)
 {
