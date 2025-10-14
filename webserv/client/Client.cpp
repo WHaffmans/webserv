@@ -1,12 +1,12 @@
 #include <webserv/client/Client.hpp>
-
 #include <webserv/http/HttpHeaders.hpp>    // for HttpHeaders
 #include <webserv/log/Log.hpp>             // for Log, LOCATION
 #include <webserv/router/Router.hpp>       // for Router
 #include <webserv/server/Server.hpp>       // for Server
 #include <webserv/socket/ClientSocket.hpp> // for Socket
 
-#include <cstdint>    // for uint8_t
+#include <cstdint> // for uint8_t
+#include <exception>
 #include <functional> // for ref, reference_wrapper
 #include <map>        // for map
 #include <string>     // for basic_string, to_string, operator+, operator<=>
@@ -50,11 +50,11 @@ void Client::request()
     if (bytesRead < 0)
     {
         Log::error("Read error");
-        return;
+        throw std::runtime_error("Read error");
     }
     if (bytesRead == 0)
     {
-        Log::info("Client closed connection, fd: " + std::to_string(client_socket_->getFd())); // TODO weird
+        Log::info("Client closed connection, fd: " + std::to_string(client_socket_->getFd()));
         server_.disconnect(*this); // CRITICAL: RETURN IMMEDIATELY
         return;
     }
