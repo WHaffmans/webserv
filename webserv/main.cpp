@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 {
     if (argc < 2)
     {
-        Log::error("Usage: " + std::string(argv[0]) + " <config_file_path>"); // NOLINT
+        std::cerr << "Usage: " + std::string(argv[0]) + " <config_file_path>"; // NOLINT
         return 1;
     }
 
