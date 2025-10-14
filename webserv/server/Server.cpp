@@ -1,9 +1,12 @@
+#include "webserv/socket/ASocket.hpp"
+
 #include <webserv/client/Client.hpp>        // for Client
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/ServerConfig.hpp>  // for ServerConfig
 #include <webserv/log/Log.hpp>              // for Log, LOCATION
 #include <webserv/server/Server.hpp>
-#include <webserv/socket/Socket.hpp> // for Socket
+#include <webserv/socket/ClientSocket.hpp> // for ClientSocket
+#include <webserv/socket/ServerSocket.hpp> // for ServerSocket
 
 #include <cerrno>        // for errno
 #include <cstring>       // for strerror
@@ -38,6 +41,15 @@ Server::Server(const ConfigManager &configManager)
         Log::fatal("epoll_create1 failed");
         throw std::runtime_error("epoll_create1 failed");
     }
+    for (const auto &config : configManager_.getServerConfigs())
+    {
+        setupServerSocket(*config);
+    }
+    if (listener_fds_.empty())
+    {
+        Log::fatal("No server sockets created.");
+        throw std::runtime_error("No server sockets created.");
+    }
 }
 
 Server::~Server()
@@ -49,27 +61,13 @@ Server::~Server()
     }
 }
 
-void Server::start()
+void Server::add(const ASocket &socket, uint32_t events, Client *client)
 {
-    Log::trace(LOCATION);
-    Log::info("Starting servers...");
-    // 1. Load server configurations
-
-    for (const auto &config : configManager_.getServerConfigs())
+    if (socket.getType() != ASocket::Type::SERVER_SOCKET && client == nullptr)
     {
-        setupServerSocket(*config);
+        Log::error("Client pointer must be provided for non-server sockets");
+        throw std::invalid_argument("Client pointer must be provided for non-server sockets");
     }
-    if (listener_fds_.empty())
-    {
-        Log::fatal("No server sockets created.");
-        throw std::runtime_error("No server sockets created.");
-    }
-
-    eventLoop();
-}
-
-void Server::add(const Socket &socket, uint32_t events) const
-{
     Log::trace(LOCATION);
     int fd = socket.getFd();
     struct epoll_event event{};
@@ -80,24 +78,27 @@ void Server::add(const Socket &socket, uint32_t events) const
         Log::error("epoll_ctl ADD failed for fd: " + std::to_string(fd));
         throw std::runtime_error("epoll_ctl ADD failed");
     }
+    socketToClient_[fd] = client;
+}
+
+void Server::remove(const ASocket &socket)
+{
+    Log::trace(LOCATION);
+    int fd = socket.getFd();
+    if (epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, fd, nullptr) == -1)
+    {
+        Log::error("epoll_ctl DEL failed for fd: " + std::to_string(fd));
+        throw std::runtime_error("epoll_ctl DEL failed");
+    }
+    socketToClient_.erase(fd);
 }
 
 void Server::disconnect(const Client &client)
 {
     Log::trace(LOCATION);
     int client_fd = client.getSocket().getFd();
-    clients_.erase(client_fd);
-}
 
-void Server::remove(const Socket &socket) const
-{
-    Log::trace(LOCATION);
-    int filedes = socket.getFd();
-    if (epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, filedes, nullptr) == -1)
-    {
-        Log::error("epoll_ctl DEL failed for fd: " + std::to_string(filedes));
-        throw std::runtime_error("epoll_ctl DEL failed");
-    }
+    std::erase_if(clients_, [&](const std::unique_ptr<Client> &c) { return c->getSocket().getFd() == client_fd; });
 }
 
 void Server::setupServerSocket(const ServerConfig &config)
@@ -106,9 +107,8 @@ void Server::setupServerSocket(const ServerConfig &config)
     try
     {
         auto host = config.get<std::string>("host").value_or(std::string()); // TODO should not be a default host
-
-        auto port = config.get<int>("listen").value_or(0); // TODO should not be a default port
-        std::unique_ptr<Socket> serverSocket = std::make_unique<Socket>();
+        auto port = config.get<int>("listen").value_or(0);                   // TODO should not be a default port
+        std::unique_ptr<ServerSocket> serverSocket = std::make_unique<ServerSocket>();
         serverSocket->bind(host, port);
         serverSocket->listen(SOMAXCONN);
         int server_fd = serverSocket->getFd();
@@ -118,7 +118,6 @@ void Server::setupServerSocket(const ServerConfig &config)
         listeners_.push_back(std::move(serverSocket));
         listener_fds_.insert(server_fd);
         Log::info("Server listening on " + host + ":" + std::to_string(port) + "...");
-        // static_cast<std::string>(config["listen"]) + "...");
     }
     catch (const std::exception &e)
     {
@@ -129,13 +128,15 @@ void Server::setupServerSocket(const ServerConfig &config)
 void Server::handleConnection(struct epoll_event *event)
 {
     Log::trace(LOCATION);
-    Socket &listener = getListener(event->data.fd);
-    std::unique_ptr<Socket> clientSocket = listener.accept();
-    add(*clientSocket, EPOLLIN);
-    clients_.insert({clientSocket->getFd(), std::make_unique<Client>(std::move(clientSocket), *this)});
+    ServerSocket &listener = getListener(event->data.fd);
+    std::unique_ptr<ClientSocket> clientSocket = listener.accept();
+
+    auto client = std::make_unique<Client>(std::move(clientSocket), *this);
+    add(client->getSocket(), EPOLLIN, client.get());
+    clients_.emplace_back(std::move(client));
 }
 
-Socket &Server::getListener(int fd) const
+ServerSocket &Server::getListener(int fd) const
 {
     Log::trace(LOCATION);
     for (const auto &listener : listeners_)
@@ -152,10 +153,9 @@ Socket &Server::getListener(int fd) const
 Client &Server::getClient(int fd) const
 {
     Log::trace(LOCATION);
-    auto it = clients_.find(fd);
-    if (it != clients_.end())
+    if (socketToClient_.contains(fd))
     {
-        return *(it->second);
+        return *(socketToClient_.at(fd));
     }
     Log::error("Client not found for fd: " + std::to_string(fd));
     throw std::runtime_error("Client not found for fd: " + std::to_string(fd));
@@ -198,7 +198,7 @@ void Server::handleResponse(struct epoll_event *event)
     {
         Log::debug("Sent " + std::to_string(bytesSent) + " bytes to fd: " + std::to_string(event->data.fd));
     }
-    clients_.erase(event->data.fd);
+    disconnect(client);
 }
 
 void Server::handleEvent(struct epoll_event *event)
@@ -224,7 +224,7 @@ void Server::handleEvent(struct epoll_event *event)
     }
 }
 
-void Server::eventLoop()
+void Server::run()
 {
     Log::trace(LOCATION);
     Log::info("Listening...");

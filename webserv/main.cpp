@@ -6,7 +6,6 @@
 
 #include <iostream> // for ios_base
 #include <string>   // for allocator, basic_string, char_traits, operator+, string
-#include <vector>   // for vector
 
 int main(int argc, char **argv)
 {
@@ -37,6 +36,6 @@ int main(int argc, char **argv)
     Log::debug("ConfigManager initialized successfully.");
     Server server(configManager);
 
-    server.start();
+    server.run();
     return 0;
 }

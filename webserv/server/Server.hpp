@@ -1,10 +1,12 @@
 #pragma once
 
+#include "webserv/socket/ASocket.hpp"
+
 #include <webserv/client/Client.hpp>
 #include <webserv/config/ConfigManager.hpp>
 #include <webserv/config/ServerConfig.hpp> // for ServerConfig
 #include <webserv/router/Router.hpp>       // for Router
-#include <webserv/socket/Socket.hpp>       // for Socket
+#include <webserv/socket/ServerSocket.hpp> // for ServerSocket
 
 #include <cstdint>       // for uint32_t
 #include <memory>        // for unique_ptr
@@ -32,13 +34,13 @@ class Server
 
     ~Server();
 
-    void start();
-    void add(const Socket &socket, uint32_t events) const;
-    void remove(const Socket &socket) const;
+    void run();
+    void add(const ASocket &socket, uint32_t events, Client *client = nullptr);
+    void remove(const ASocket &socket);
     void disconnect(const Client &client);
     void responseReady(int client_fd) const;
 
-    Socket &getListener(int fd) const;
+    ServerSocket &getListener(int fd) const;
     Client &getClient(int fd) const;
     const Router &getRouter() const;
 
@@ -46,9 +48,11 @@ class Server
     int epoll_fd_;
     const ConfigManager &configManager_;
     const Router router_;
-    std::vector<std::unique_ptr<Socket>> listeners_;
+    std::vector<std::unique_ptr<ServerSocket>> listeners_;
     std::set<int> listener_fds_;
-    std::unordered_map<int, std::unique_ptr<Client>> clients_;
+    // std::unordered_map<int, std::unique_ptr<Client>> clients_;
+    std::vector<std::unique_ptr<Client>> clients_;
+    std::unordered_map<int, Client *> socketToClient_;
 
     void handleEvent(struct epoll_event *event);
     void handleConnection(struct epoll_event *event);
@@ -56,5 +60,4 @@ class Server
     void handleResponse(struct epoll_event *event);
 
     void setupServerSocket(const ServerConfig &config);
-    void eventLoop();
-  };
+};

@@ -1,9 +1,9 @@
 #include <webserv/client/Client.hpp>
-#include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
-#include <webserv/log/Log.hpp>          // for Log, LOCATION
-#include <webserv/router/Router.hpp>    // for Router
-#include <webserv/server/Server.hpp>    // for Server
-#include <webserv/socket/Socket.hpp>    // for Socket
+#include <webserv/http/HttpHeaders.hpp>    // for HttpHeaders
+#include <webserv/log/Log.hpp>             // for Log, LOCATION
+#include <webserv/router/Router.hpp>       // for Router
+#include <webserv/server/Server.hpp>       // for Server
+#include <webserv/socket/ClientSocket.hpp> // for Socket
 
 #include <cstdint>    // for uint8_t
 #include <functional> // for ref, reference_wrapper
@@ -13,7 +13,7 @@
 
 #include <sys/types.h> // for ssize_t
 
-Client::Client(std::unique_ptr<Socket> socket, Server &server)
+Client::Client(std::unique_ptr<ClientSocket> socket, Server &server)
     : httpRequest_(std::make_unique<HttpRequest>(this)), httpResponse_(std::make_unique<HttpResponse>()),
       client_socket_(std::move(socket)), server_(std::ref(server))
 {
@@ -44,7 +44,7 @@ void Client::request()
 {
     Log::trace(LOCATION);
     char buffer[bufferSize_] = {}; // NOLINT(cppcoreguidelines-avoid-c-arrays)
-    ssize_t bytesRead = client_socket_->recv(
+    ssize_t bytesRead = client_socket_->read(
         buffer, sizeof(buffer) - 1); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
     if (bytesRead < 0)
     {

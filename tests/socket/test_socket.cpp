@@ -1,4 +1,4 @@
-#include <webserv/socket/Socket.hpp>
+#include <webserv/socket/ServerSocket.hpp>
 
 #include <gtest/gtest.h>
 
@@ -23,7 +23,7 @@ class SocketTest : public ::testing::Test
 
 TEST_F(SocketTest, DefaultConstructor)
 {
-    Socket socket;
+    ServerSocket socket;
     // Socket should be created successfully
     // We can't test much without actually creating network resources
     SUCCEED();
@@ -32,7 +32,7 @@ TEST_F(SocketTest, DefaultConstructor)
 TEST_F(SocketTest, ConstructorWithFd)
 {
     // Socket constructor with invalid fd throws an exception
-    EXPECT_THROW(Socket socket(-1), std::runtime_error);
+    EXPECT_THROW(ServerSocket socket(-1), std::runtime_error);
 }
 
 TEST_F(SocketTest, MoveConstructor)
