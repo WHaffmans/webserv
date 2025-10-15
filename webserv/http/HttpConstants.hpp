@@ -66,7 +66,7 @@ static constexpr std::array<StatusCodeInfo, 12> statusCodeInfos
         {.code = StatusCode::BAD_GATEWAY, .reason = "Bad Gateway"},
         {.code = StatusCode::SERVICE_UNAVAILABLE, .reason = "Service Unavailable"}}};
 
-std::string getStatusCodeReason(uint16_t statusCode);
+std::string getStatusCodeReason(uint16_t statusCode) noexcept;
 
 // Header Names
 namespace Header

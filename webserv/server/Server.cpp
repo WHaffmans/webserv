@@ -182,7 +182,7 @@ void Server::responseReady(int client_fd) const
     }
 }
 
-void Server::handleResponse(struct epoll_event *event)
+void Server::handleResponse(struct epoll_event *event) const
 {
     int socket_fd = event->data.fd;
     Log::debug("Attempting to send data to fd: " + std::to_string(socket_fd));
@@ -191,7 +191,7 @@ void Server::handleResponse(struct epoll_event *event)
     // disconnect(client);
 }
 
-void Server::handleEpollHangUp(struct epoll_event *event)
+void Server::handleEpollHangUp(struct epoll_event *event) const
 {
     Client &client = getClient(event->data.fd);
     ASocket &socket = client.getSocket(event->data.fd);

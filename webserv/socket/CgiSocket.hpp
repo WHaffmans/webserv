@@ -11,8 +11,8 @@ class CgiSocket : public ASocket
   public:
     explicit CgiSocket(int fd);
 
-    [[nodiscard]] ASocket::Type getType() const override;
+    [[nodiscard]] ASocket::Type getType() const noexcept override;
 
-    ssize_t read(void *buf, size_t len) const override;
-    ssize_t write(const void *buf, size_t len) const override;
+    ssize_t read(void *buf, size_t len) const  override;
+    ssize_t write(const void *buf, size_t len) const  override;
 };

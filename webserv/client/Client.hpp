@@ -52,7 +52,7 @@ class Client
 
   private:
     int statusCode_ = Http::StatusCode::OK;
-    constexpr static size_t bufferSize_ = 8192 * 300; // 8KB buffer for reading CGI output
+    constexpr static size_t bufferSize_ = 8192; // 8KB buffer for reading CGI output
     std::unique_ptr<HttpRequest> httpRequest_;
     std::unique_ptr<HttpResponse> httpResponse_;
     std::unique_ptr<Router> router_;

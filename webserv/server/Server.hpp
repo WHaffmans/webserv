@@ -52,11 +52,11 @@ class Server
     void pollClients() const;
     void handleEpoll(struct epoll_event *events, int max_events);
 
-    void handleEpollHangUp(struct epoll_event *event);
+    void handleEpollHangUp(struct epoll_event *event) const;
     void handleEvent(struct epoll_event *event);
     void handleConnection(struct epoll_event *event);
     void handleRequest(struct epoll_event *event) const;
-    void handleResponse(struct epoll_event *event);
+    void handleResponse(struct epoll_event *event) const;
 
     void setupServerSocket(const ServerConfig &config);
 };

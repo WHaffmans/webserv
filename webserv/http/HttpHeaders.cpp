@@ -7,7 +7,7 @@
 #include <cctype>    // for tolower
 #include <utility>   // for pair
 
-std::optional<size_t> HttpHeaders::getContentLength() const
+std::optional<size_t> HttpHeaders::getContentLength() const noexcept
 {
     const auto &value = this->get("Content-Length");
     if (value.empty())
@@ -17,7 +17,7 @@ std::optional<size_t> HttpHeaders::getContentLength() const
     return utils::stoul(value);
 }
 
-std::optional<std::string> HttpHeaders::getContentType() const
+std::optional<std::string> HttpHeaders::getContentType() const noexcept
 {
     const auto &value = this->get("Content-Type");
     if (value.empty())
@@ -27,7 +27,7 @@ std::optional<std::string> HttpHeaders::getContentType() const
     return value;
 }
 
-std::optional<std::string> HttpHeaders::getHost() const
+std::optional<std::string> HttpHeaders::getHost() const noexcept
 {
     const auto &value = this->get("Host");
     if (value.empty())
@@ -37,19 +37,19 @@ std::optional<std::string> HttpHeaders::getHost() const
     return value;
 }
 
-void HttpHeaders::add(const std::string &name, const std::string &value) // NOLINT(bugprone-easily-swappable-parameters)
+void HttpHeaders::add(const std::string &name, const std::string &value) noexcept// NOLINT(bugprone-easily-swappable-parameters)
 {
     std::string lower = name;
     std::ranges::transform(lower, lower.begin(), ::tolower);
     headers_[lower] = value;
 }
 
-void HttpHeaders::remove(const std::string &name)
+void HttpHeaders::remove(const std::string &name) noexcept
 {
     headers_.erase(name);
 }
 
-const std::string &HttpHeaders::get(const std::string &name) const
+const std::string &HttpHeaders::get(const std::string &name) const noexcept
 {
     std::string lower = name;
     std::ranges::transform(lower, lower.begin(), ::tolower);
@@ -62,14 +62,14 @@ const std::string &HttpHeaders::get(const std::string &name) const
     return empty;
 }
 
-bool HttpHeaders::has(const std::string &name) const
+bool HttpHeaders::has(const std::string &name) const noexcept
 {
     std::string lower = name;
     std::ranges::transform(lower, lower.begin(), ::tolower);
     return headers_.contains(lower);
 }
 
-void HttpHeaders::parse(const std::string &rawHeaders)
+void HttpHeaders::parse(const std::string &rawHeaders) noexcept
 {
     Log::trace(LOCATION);
     size_t start = 0;
@@ -92,7 +92,7 @@ void HttpHeaders::parse(const std::string &rawHeaders)
     }
 }
 
-std::string HttpHeaders::toString() const
+std::string HttpHeaders::toString() const noexcept
 {
     std::string result;
     for (const auto &pair : headers_)

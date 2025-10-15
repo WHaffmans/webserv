@@ -62,7 +62,7 @@ void ServerSocket::bind(const std::string &host, const int port) const
     }
 }
 
-ASocket::Type ServerSocket::getType() const
+ASocket::Type ServerSocket::getType() const noexcept
 {
     return ASocket::Type::SERVER_SOCKET;
 }

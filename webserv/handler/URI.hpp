@@ -20,21 +20,21 @@ class URI
 
     [[nodiscard]] std::map<std::string, std::string> getCGIEnvironment() const;
 
-    [[nodiscard]] bool isFile() const;
-    [[nodiscard]] bool isDirectory() const;
-    [[nodiscard]] bool isValid() const;
+    [[nodiscard]] bool isFile() const noexcept;
+    [[nodiscard]] bool isDirectory() const noexcept;
+    [[nodiscard]] bool isValid() const noexcept;
     [[nodiscard]] bool isCgi() const;
 
-    [[nodiscard]] std::string getExtension() const;
+    [[nodiscard]] std::string getExtension() const noexcept;
     [[nodiscard]] std::string getCgiPath() const;
-    [[nodiscard]] const AConfig *getConfig() const;
-    [[nodiscard]] const std::string &getBaseName() const;
-    [[nodiscard]] const std::string &getFullPath() const;
-    [[nodiscard]] const std::string &getDir() const;
-    [[nodiscard]] const std::string &getPathInfo() const;
-    [[nodiscard]] const std::string &getQuery() const;
-    [[nodiscard]] const std::string &getFragment() const;
-    [[nodiscard]] const std::string &getAuthority() const;
+    [[nodiscard]] const AConfig *getConfig() const noexcept;
+    [[nodiscard]] const std::string &getBaseName() const noexcept;
+    [[nodiscard]] const std::string &getFullPath() const noexcept;
+    [[nodiscard]] const std::string &getDir() const noexcept;
+    [[nodiscard]] const std::string &getPathInfo() const noexcept;
+    [[nodiscard]] const std::string &getQuery() const noexcept;
+    [[nodiscard]] const std::string &getFragment() const noexcept;
+    [[nodiscard]] const std::string &getAuthority() const noexcept;
 
   private:
     void parseUri(const std::string &uri);

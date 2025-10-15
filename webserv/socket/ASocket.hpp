@@ -26,8 +26,8 @@ class ASocket
 
     virtual ~ASocket();
 
-    [[nodiscard]] virtual Type getType() const = 0;
-    [[nodiscard]] int getFd() const;
+    [[nodiscard]] virtual Type getType() const noexcept = 0;
+    [[nodiscard]] int getFd() const noexcept;
 
     void callback() const;
     void setCallback(std::function<void()> callback);

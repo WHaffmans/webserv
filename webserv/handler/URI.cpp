@@ -129,22 +129,22 @@ std::map<std::string, std::string> URI::getCGIEnvironment() const
     return env;
 }
 
-const AConfig *URI::getConfig() const
+const AConfig *URI::getConfig() const noexcept
 {
     return config_;
 }
 
-bool URI::isFile() const
+bool URI::isFile() const noexcept
 {
     return !baseName_.empty();
 }
 
-bool URI::isDirectory() const
+bool URI::isDirectory() const noexcept
 {
     return baseName_.empty();
 }
 
-bool URI::isValid() const
+bool URI::isValid() const noexcept
 {
     return FileUtils::isValidPath(fullPath_);
 }
@@ -172,42 +172,42 @@ std::string URI::getCgiPath() const
     return cgiPath;
 }
 
-const std::string &URI::getBaseName() const
+const std::string &URI::getBaseName() const noexcept
 {
     return baseName_;
 }
 
-std::string URI::getExtension() const
+std::string URI::getExtension() const noexcept
 {
     return FileUtils::getExtension(baseName_);
 }
 
-const std::string &URI::getFullPath() const
+const std::string &URI::getFullPath() const noexcept
 {
     return fullPath_;
 }
 
-const std::string &URI::getDir() const
+const std::string &URI::getDir() const noexcept
 {
     return dir_;
 }
 
-const std::string &URI::getPathInfo() const
+const std::string &URI::getPathInfo() const noexcept
 {
     return pathInfo_;
 }
 
-const std::string &URI::getQuery() const
+const std::string &URI::getQuery() const noexcept
 {
     return query_;
 }
 
-const std::string &URI::getFragment() const
+const std::string &URI::getFragment() const noexcept
 {
     return fragment_;
 }
 
-const std::string &URI::getAuthority() const
+const std::string &URI::getAuthority() const noexcept
 {
     return authority_;
 }

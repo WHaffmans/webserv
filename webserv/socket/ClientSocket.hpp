@@ -11,5 +11,5 @@ class ClientSocket : public ASocket
   public:
     explicit ClientSocket(int fd);
 
-    [[nodiscard]] ASocket::Type getType() const override;
+    [[nodiscard]] ASocket::Type getType() const noexcept override;
 };

@@ -60,7 +60,7 @@ void ASocket::setNonBlocking() const
     }
 }
 
-int ASocket::getFd() const
+int ASocket::getFd() const noexcept
 {
     return fd_;
 }

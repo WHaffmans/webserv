@@ -4,7 +4,7 @@
 
 namespace Http
 {
-std::string getStatusCodeReason(uint16_t statusCode)
+std::string getStatusCodeReason(uint16_t statusCode) noexcept
 {
     for (const auto &info : statusCodeInfos)
     {
