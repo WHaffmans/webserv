@@ -69,3 +69,16 @@ void ASocket::setFd(int fd)
 {
     fd_ = fd;
 }
+
+void ASocket::callback() const
+{
+    if (callback_ != nullptr)
+    {
+        callback_();
+    }
+}
+
+void ASocket::setCallback(std::function<void()> callback)
+{
+    callback_ = std::move(callback);
+}

@@ -163,8 +163,10 @@ void Server::handleRequest(struct epoll_event *event) const
     Log::trace(LOCATION);
     int client_fd = event->data.fd;
 
+
     Client &client = getClient(client_fd);
-    client.request();
+    client.getSocket().callback();
+    
 }
 
 void Server::responseReady(int client_fd) const
@@ -185,16 +187,7 @@ void Server::handleResponse(struct epoll_event *event)
 {
     Log::debug("Attempting to send data to fd: " + std::to_string(event->data.fd));
     Client &client = getClient(event->data.fd);
-    auto payload = client.getResponse();
-    ssize_t bytesSent = send(event->data.fd, payload.data(), payload.size(), 0);
-    if (bytesSent < 0)
-    {
-        Log::error("Send failed for fd: " + std::to_string(event->data.fd) + " with error: " + std::strerror(errno));
-    }
-    else
-    {
-        Log::debug("Sent " + std::to_string(bytesSent) + " bytes to fd: " + std::to_string(event->data.fd));
-    }
+    client.getSocket().callback();
     disconnect(client);
 }
 

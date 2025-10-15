@@ -1,3 +1,4 @@
+#include "webserv/socket/ASocket.hpp"
 #include "webserv/socket/CgiSocket.hpp"
 
 #include <webserv/client/Client.hpp>
@@ -24,6 +25,7 @@ Client::Client(std::unique_ptr<ClientSocket> socket, Server &server)
 {
     Log::trace(LOCATION);
     Log::info("New client connected, fd: " + std::to_string(client_socket_->getFd()));
+    client_socket_->setCallback([this]() { request(); });
 }
 
 Client::~Client()
@@ -41,6 +43,20 @@ int Client::getStatusCode() const
 void Client::setStatusCode(int code)
 {
     statusCode_ = code;
+}
+
+ASocket &Client::getSocket(int fd) const
+{
+    if (fd == -1 || client_socket_->getFd() == fd)
+    {
+        return *client_socket_;
+    }
+    if (cgi_socket_ && cgi_socket_->getFd() == fd)
+    {
+        return *client_socket_; // TODO return cgi socket
+    }
+    Log::error("Socket not found for fd: " + std::to_string(fd));
+    throw std::runtime_error("Socket not found for fd: " + std::to_string(fd));
 }
 
 void Client::request()
@@ -101,14 +117,23 @@ void Client::poll() const
     if (httpResponse_->isComplete())
     {
         Log::info("Response is ready to be sent to client, fd: " + std::to_string(client_socket_->getFd()));
+        client_socket_->setCallback([this]() { respond(); });
         server_.responseReady(client_socket_->getFd());
     }
 }
 
-std::vector<uint8_t> Client::getResponse() const
+void Client::respond() const
 {
-
-    return httpResponse_->toBytes();
+    auto payload = httpResponse_->toBytes();
+    ssize_t bytesSent = send(client_socket_->getFd(), payload.data(), payload.size(), 0);
+    if (bytesSent < 0)
+    {
+        Log::error("Send failed for fd: " + std::to_string(client_socket_->getFd()));
+    }
+    else
+    {
+        Log::debug("Sent " + std::to_string(bytesSent) + " bytes to fd: " + std::to_string(client_socket_->getFd()));
+    }
 }
 
 HttpRequest &Client::getHttpRequest() const

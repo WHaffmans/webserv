@@ -35,12 +35,12 @@ class Client
     ~Client();
 
     void request();
+    void respond() const;
     void poll() const;
 
-    [[nodiscard]] std::vector<uint8_t> getResponse() const;
     [[nodiscard]] int getStatusCode() const;
 
-    [[nodiscard]] ClientSocket &getSocket() const { return *client_socket_; }
+    [[nodiscard]] ASocket &getSocket(int fd = -1) const;
 
     void setStatusCode(int code);
     void setCgiSocket(std::unique_ptr<CgiSocket> cgiSocket);
