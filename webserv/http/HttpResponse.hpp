@@ -34,9 +34,9 @@ class HttpResponse
 
     void setStatus(uint16_t statusCode);
 
-    [[nodiscard]] bool isComplete() const;
+    [[nodiscard]] bool isComplete() const noexcept;
 
-    [[nodiscard]] const HttpHeaders &getHeaders() const;
+    [[nodiscard]] const HttpHeaders &getHeaders() const noexcept;
 
     [[nodiscard]] std::vector<uint8_t> toBytes() const;
 

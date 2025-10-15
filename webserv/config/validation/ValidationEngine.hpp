@@ -42,7 +42,7 @@ class ValidationEngine
     [[nodiscard]] std::vector<ValidationResult> getValidationResults() const;
     [[nodiscard]] std::vector<ValidationResult> getErrors() const;
     [[nodiscard]] std::vector<ValidationResult> getWarnings() const;
-    [[nodiscard]] bool hasErrors() const;
+    [[nodiscard]] bool hasErrors() const noexcept;
 
   private:
     static void addRule(RuleMap &ruleMap, const std::string &directiveName, std::unique_ptr<AValidationRule> rule);

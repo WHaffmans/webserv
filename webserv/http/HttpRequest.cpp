@@ -24,7 +24,7 @@ HttpRequest::~HttpRequest()
     Log::trace(LOCATION);
 }
 
-HttpRequest::State HttpRequest::getState() const
+HttpRequest::State HttpRequest::getState() const noexcept
 {
     return state_;
 }
@@ -39,12 +39,12 @@ void HttpRequest::setState(State state)
     state_ = state;
 }
 
-const HttpHeaders &HttpRequest::getHeaders() const
+const HttpHeaders &HttpRequest::getHeaders() const noexcept
 {
     return headers_;
 }
 
-const std::string &HttpRequest::getBody() const
+const std::string &HttpRequest::getBody() const noexcept
 {
     return body_;
 }
@@ -233,27 +233,27 @@ void HttpRequest::reset()
     // contentLength_ = 0;
 }
 
-const URI &HttpRequest::getUri() const
+const URI &HttpRequest::getUri() const noexcept
 {
     return *uri_;
 }
 
-const std::string &HttpRequest::getMethod() const
+const std::string &HttpRequest::getMethod() const noexcept
 {
     return method_;
 }
 
-const std::string &HttpRequest::getTarget() const
+const std::string &HttpRequest::getTarget() const noexcept
 {
     return target_;
 }
 
-const std::string &HttpRequest::getHttpVersion() const
+const std::string &HttpRequest::getHttpVersion() const noexcept
 {
     return httpVersion_;
 }
 
-Client &HttpRequest::getClient() const
+Client &HttpRequest::getClient() const noexcept
 {
     return *client_;
 }

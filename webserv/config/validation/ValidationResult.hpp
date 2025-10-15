@@ -24,8 +24,8 @@ class ValidationResult
     static ValidationResult error(const std::string &message);
     static ValidationResult warning(const std::string &message);
 
-    [[nodiscard]] bool isValidResult() const;
-    [[nodiscard]] ValidationResult::Type getType() const;
+    [[nodiscard]] bool isValidResult() const noexcept;
+    [[nodiscard]] ValidationResult::Type getType() const noexcept;
     [[nodiscard]] std::string getMessage() const;
 
   private:

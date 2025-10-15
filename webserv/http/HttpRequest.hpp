@@ -33,14 +33,14 @@ class HttpRequest
     HttpRequest &operator=(HttpRequest &&other) noexcept = delete;
     ~HttpRequest();
 
-    [[nodiscard]] State getState() const;
-    [[nodiscard]] const URI &getUri() const;
-    [[nodiscard]] const HttpHeaders &getHeaders() const;
-    [[nodiscard]] const std::string &getBody() const;
-    [[nodiscard]] const std::string &getMethod() const;
-    [[nodiscard]] const std::string &getTarget() const;
-    [[nodiscard]] const std::string &getHttpVersion() const;
-    [[nodiscard]] Client &getClient() const;
+    [[nodiscard]] State getState() const noexcept;
+    [[nodiscard]] const URI &getUri() const noexcept;
+    [[nodiscard]] const HttpHeaders &getHeaders() const noexcept;
+    [[nodiscard]] const std::string &getBody() const noexcept;
+    [[nodiscard]] const std::string &getMethod() const noexcept;
+    [[nodiscard]] const std::string &getTarget() const noexcept;
+    [[nodiscard]] const std::string &getHttpVersion() const noexcept;
+    [[nodiscard]] Client &getClient() const noexcept;
 
     void setState(State state);
     void receiveData(const char *data, size_t length);

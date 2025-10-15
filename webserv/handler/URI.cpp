@@ -149,14 +149,15 @@ bool URI::isValid() const noexcept
     return FileUtils::isValidPath(fullPath_);
 }
 
-bool URI::isCgi() const
+bool URI::isCgi() const noexcept
 {
     return !getCgiPath().empty();
 }
 
 std::string URI::getCgiPath() const
 {
-    // Log::debug("BaseName: " + baseName_ + ", FullPath: " + fullPath_ + ", Dir: " + dir_ + ", PathInfo: " + pathInfo_ +
+    // Log::debug("BaseName: " + baseName_ + ", FullPath: " + fullPath_ + ", Dir: " + dir_ + ", PathInfo: " + pathInfo_
+    // +
     //            ", Extension: " + getExtension());
     if (!isFile() || getExtension().empty() || !config_->get<bool>("cgi_enabled").has_value()
         || !config_->get<bool>("cgi_enabled").value())

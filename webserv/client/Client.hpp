@@ -40,15 +40,15 @@ class Client
 
     void poll() const;
 
-    [[nodiscard]] int getStatusCode() const;
+    [[nodiscard]] int getStatusCode() const noexcept;
 
     [[nodiscard]] ASocket &getSocket(int fd = -1) const;
 
     void setStatusCode(int code);
     void setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_ptr<CgiSocket> cgiStdOut);
 
-    [[nodiscard]] HttpRequest &getHttpRequest() const;
-    [[nodiscard]] HttpResponse &getHttpResponse() const;
+    [[nodiscard]] HttpRequest &getHttpRequest() const noexcept;
+    [[nodiscard]] HttpResponse &getHttpResponse() const noexcept;
 
   private:
     int statusCode_ = Http::StatusCode::OK;

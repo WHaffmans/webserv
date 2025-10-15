@@ -35,7 +35,7 @@ Client::~Client()
     server_.remove(*clientSocket_);
 };
 
-int Client::getStatusCode() const
+int Client::getStatusCode() const noexcept
 {
     return statusCode_;
 }
@@ -210,12 +210,12 @@ void Client::respond() const
     server_.disconnect(*this); // ! CRITICAL: RETURN IMMEDIATELY
 }
 
-HttpRequest &Client::getHttpRequest() const
+HttpRequest &Client::getHttpRequest() const noexcept
 {
     return *httpRequest_;
 }
 
-HttpResponse &Client::getHttpResponse() const
+HttpResponse &Client::getHttpResponse() const noexcept
 {
     return *httpResponse_;
 }

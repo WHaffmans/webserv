@@ -19,5 +19,5 @@ class Router
 
   private:
     Client *client_;
-    [[nodiscard]] bool isMethodSupported(const std::string &method, const AConfig &config);
+    [[nodiscard]] bool isMethodSupported(const std::string &method, const AConfig &config) noexcept;
 };

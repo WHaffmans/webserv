@@ -1,5 +1,4 @@
 #include <webserv/config/validation/ValidationResult.hpp>
-
 #include <webserv/log/Log.hpp> // for Log
 
 #include <utility> // for move
@@ -23,12 +22,12 @@ ValidationResult ValidationResult::warning(const std::string &message)
     return {ValidationResult::Type::WARNING, message};
 }
 
-bool ValidationResult::isValidResult() const
+bool ValidationResult::isValidResult() const noexcept
 {
     return type_ == Type::SUCCESS;
 }
 
-ValidationResult::Type ValidationResult::getType() const
+ValidationResult::Type ValidationResult::getType() const noexcept
 {
     return type_;
 }

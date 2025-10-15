@@ -22,7 +22,7 @@ class ConfigValidator
     [[nodiscard]] std::vector<ValidationResult> getValidationResults() const;
     [[nodiscard]] std::vector<ValidationResult> getErrors() const;
     [[nodiscard]] std::vector<ValidationResult> getWarnings() const;
-    [[nodiscard]] bool hasErrors() const;
+    [[nodiscard]] bool hasErrors() const noexcept;
 
   private:
     std::unique_ptr<ValidationEngine> engine_;

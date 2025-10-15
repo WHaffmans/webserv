@@ -1,6 +1,5 @@
-#include <webserv/http/HttpResponse.hpp>
-
 #include <webserv/http/HttpConstants.hpp> // for getStatusCodeReason
+#include <webserv/http/HttpResponse.hpp>
 
 #include <string> // for basic_string, operator+, string, char_traits, to_string
 #include <vector> // for vector
@@ -44,12 +43,12 @@ void HttpResponse::setComplete()
     complete_ = true;
 }
 
-bool HttpResponse::isComplete() const
+bool HttpResponse::isComplete() const noexcept
 {
     return complete_;
 }
 
-const HttpHeaders &HttpResponse::getHeaders() const
+const HttpHeaders &HttpResponse::getHeaders() const noexcept
 {
     return *headers_;
 }

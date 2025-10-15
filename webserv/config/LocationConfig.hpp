@@ -20,7 +20,7 @@ class LocationConfig : public AConfig
     [[nodiscard]] std::string getName() const override;
     [[nodiscard]] std::string getType() const override;
 
-    [[nodiscard]] const std::string &getPath() const { return _path; }
+    [[nodiscard]] const std::string &getPath() const noexcept { return _path; }
 
   private:
     void parseBlock(const std::string &block) override;

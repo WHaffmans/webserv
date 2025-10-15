@@ -71,7 +71,7 @@ std::vector<ValidationResult> ValidationEngine::getWarnings() const
     return warnings;
 }
 
-bool ValidationEngine::hasErrors() const
+bool ValidationEngine::hasErrors() const noexcept
 {
     for (const auto &result : results_) // NOLINT(readability-use-anyofallof)
     {

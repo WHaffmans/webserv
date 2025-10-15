@@ -23,7 +23,7 @@ class URI
     [[nodiscard]] bool isFile() const noexcept;
     [[nodiscard]] bool isDirectory() const noexcept;
     [[nodiscard]] bool isValid() const noexcept;
-    [[nodiscard]] bool isCgi() const;
+    [[nodiscard]] bool isCgi() const noexcept;
 
     [[nodiscard]] std::string getExtension() const noexcept;
     [[nodiscard]] std::string getCgiPath() const;

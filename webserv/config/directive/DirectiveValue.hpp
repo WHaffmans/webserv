@@ -28,7 +28,7 @@ using DirectiveValueType = std::variant<int, // listen, error_page status, cgi_t
 class DirectiveValue
 {
   public:
-    DirectiveValue(DirectiveValueType value) : value_(std::move(value)) {} //TODO foei
+    DirectiveValue(DirectiveValueType value) : value_(std::move(value)) {} // TODO foei
 
     template <typename T> T get() const { return std::get<T>(value_); }
 
@@ -41,7 +41,7 @@ class DirectiveValue
         return std::nullopt;
     }
 
-    template <typename T> [[nodiscard]] bool holds() const { return std::holds_alternative<T>(value_); }
+    template <typename T> [[nodiscard]] bool holds() const noexcept { return std::holds_alternative<T>(value_); }
 
     [[nodiscard]] std::string toString() const;
 
