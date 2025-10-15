@@ -13,9 +13,7 @@
 #include <webserv/socket/ClientSocket.hpp> // for ClientSocket
 
 #include <cstddef> // for size_t
-#include <cstdint> // for uint8_t
 #include <memory>  // for unique_ptr
-#include <vector>  // for vector
 
 class Server;
 class ClientSocket;
@@ -36,6 +34,10 @@ class Client
 
     void request();
     void respond() const;
+
+    void writeToCgi();
+    void readFromCgi();
+
     void poll() const;
 
     [[nodiscard]] int getStatusCode() const;
@@ -43,18 +45,19 @@ class Client
     [[nodiscard]] ASocket &getSocket(int fd = -1) const;
 
     void setStatusCode(int code);
-    void setCgiSocket(std::unique_ptr<CgiSocket> cgiSocket);
+    void setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_ptr<CgiSocket> cgiStdOut);
 
     [[nodiscard]] HttpRequest &getHttpRequest() const;
     [[nodiscard]] HttpResponse &getHttpResponse() const;
 
   private:
     int statusCode_ = Http::StatusCode::OK;
-    constexpr static size_t bufferSize_ = 4096;
+    constexpr static size_t bufferSize_ = 8192 * 300; // 8KB buffer for reading CGI output
     std::unique_ptr<HttpRequest> httpRequest_;
     std::unique_ptr<HttpResponse> httpResponse_;
     std::unique_ptr<Router> router_;
-    std::unique_ptr<ClientSocket> client_socket_;
-    std::unique_ptr<CgiSocket> cgi_socket_ = nullptr;
+    std::unique_ptr<ClientSocket> clientSocket_;
+    std::unique_ptr<CgiSocket> cgiStdIn_ = nullptr;
+    std::unique_ptr<CgiSocket> cgiStdOut_ = nullptr;
     Server &server_;
 };

@@ -76,6 +76,7 @@ void Server::add(const ASocket &socket, uint32_t events, Client *client)
         Log::error("epoll_ctl ADD failed for fd: " + std::to_string(fd) + " with error: " + std::strerror(errno));
         throw std::runtime_error("epoll_ctl ADD failed");
     }
+    Log::debug("Socket added to epoll, fd: " + std::to_string(fd));
     socketToClient_[fd] = client;
 }
 
@@ -144,7 +145,7 @@ ServerSocket &Server::getListener(int fd) const
             return *listener;
         }
     }
-    Log::error("Listener not found for fd: " + std::to_string(fd));
+    Log::error("Listener not found for fd: " + std::to_string(fd) + ": " + std::strerror(errno));
     throw std::runtime_error("Listener not found for fd: " + std::to_string(fd));
 }
 
@@ -165,8 +166,7 @@ void Server::handleRequest(struct epoll_event *event) const
 
 
     Client &client = getClient(client_fd);
-    client.getSocket().callback();
-    
+    client.getSocket(client_fd).callback();
 }
 
 void Server::responseReady(int client_fd) const
@@ -185,10 +185,11 @@ void Server::responseReady(int client_fd) const
 
 void Server::handleResponse(struct epoll_event *event)
 {
-    Log::debug("Attempting to send data to fd: " + std::to_string(event->data.fd));
-    Client &client = getClient(event->data.fd);
-    client.getSocket().callback();
-    disconnect(client);
+    int socket_fd = event->data.fd;
+    Log::debug("Attempting to send data to fd: " + std::to_string(socket_fd));
+    Client &client = getClient(socket_fd);
+    client.getSocket(socket_fd).callback();
+    // disconnect(client);
 }
 
 void Server::handleEvent(struct epoll_event *event)
@@ -196,7 +197,7 @@ void Server::handleEvent(struct epoll_event *event)
     Log::trace(LOCATION);
     if ((event->events & EPOLLERR) > 0 || (event->events & EPOLLHUP) > 0)
     {
-        Log::error("Epoll error on fd " + std::to_string(event->data.fd));
+        Log::error("Epoll error on fd " + std::to_string(event->data.fd) + ": " + std::strerror(errno));
         remove(getListener(event->data.fd));
         close(event->data.fd);
     }

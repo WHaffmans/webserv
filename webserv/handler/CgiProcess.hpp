@@ -19,7 +19,7 @@ class CgiProcess
     const HttpRequest &request_;
 
     int _pid;
-    int _cgiFd;
+    // int _cgiFd;
 
     void spawn();
 };

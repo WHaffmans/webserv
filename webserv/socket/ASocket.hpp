@@ -1,9 +1,8 @@
 #pragma once
 
-#include <functional> // for function
-
 #include <cstddef> // for size_t
 #include <cstdint>
+#include <functional> // for function
 
 #include <sys/types.h> // for ssize_t
 
@@ -29,12 +28,12 @@ class ASocket
 
     [[nodiscard]] virtual Type getType() const = 0;
     [[nodiscard]] int getFd() const;
-    
+
     void callback() const;
     void setCallback(std::function<void()> callback);
 
-    ssize_t read(void *buf, size_t len) const;
-    ssize_t write(const void *buf, size_t len) const;
+    virtual ssize_t read(void *buf, size_t len) const;
+    virtual ssize_t write(const void *buf, size_t len) const;
 
   protected:
     void setNonBlocking() const;
