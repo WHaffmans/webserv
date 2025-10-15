@@ -164,7 +164,6 @@ void Server::handleRequest(struct epoll_event *event) const
     Log::trace(LOCATION);
     int client_fd = event->data.fd;
 
-
     Client &client = getClient(client_fd);
     client.getSocket(client_fd).callback();
 }
@@ -192,14 +191,32 @@ void Server::handleResponse(struct epoll_event *event)
     // disconnect(client);
 }
 
+void Server::handleEpollHangUp(struct epoll_event *event)
+{
+    Client &client = getClient(event->data.fd);
+    ASocket &socket = client.getSocket(event->data.fd);
+    if (socket.getType() == ASocket::Type::CGI_SOCKET)
+    {
+        Log::info("CGI socket hang up on fd " + std::to_string(event->data.fd));
+        socket.callback();
+        return;
+    }
+    Log::warning("Epoll hang up on fd " + std::to_string(event->data.fd) + ": " + std::strerror(errno));
+}
+
 void Server::handleEvent(struct epoll_event *event)
 {
     Log::trace(LOCATION);
-    if ((event->events & EPOLLERR) > 0 || (event->events & EPOLLHUP) > 0)
+    if ((event->events & EPOLLERR) > 0)
     {
         Log::error("Epoll error on fd " + std::to_string(event->data.fd) + ": " + std::strerror(errno));
         remove(getListener(event->data.fd));
         close(event->data.fd);
+        return;
+    }
+    if ((event->events & EPOLLHUP) > 0)
+    {
+        handleEpollHangUp(event);
     }
     else if (listener_fds_.contains(event->data.fd))
     {
@@ -217,7 +234,7 @@ void Server::handleEvent(struct epoll_event *event)
 
 void Server::handleEpoll(struct epoll_event *events, int max_events)
 {
-    int nfds = epoll_wait(epoll_fd_, events, max_events, 0); // NOLINT
+    int nfds = epoll_wait(epoll_fd_, events, max_events, 10); // NOLINT
     if (nfds == -1)
     {
         Log::error("epoll_wait failed");
@@ -247,6 +264,5 @@ void Server::run()
     {
         pollClients();
         handleEpoll(events, MAX_EVENTS);
-        // usleep(1000);
     }
 }

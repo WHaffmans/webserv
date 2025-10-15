@@ -134,6 +134,8 @@ void Client::writeToCgi()
         Log::debug("Wrote " + std::to_string(bytesWritten)
                    + " bytes to CGI stdin, fd: " + std::to_string(cgiStdIn_->getFd()));
     }
+    server_.remove(*cgiStdIn_);
+    cgiStdIn_ = nullptr;
 }
 
 void Client::readFromCgi()
@@ -156,13 +158,14 @@ void Client::readFromCgi()
         Log::info("CGI process closed stdout, fd: " + std::to_string(cgiStdOut_->getFd()));
         server_.remove(*cgiStdOut_);
         cgiStdOut_ = nullptr;
+        httpResponse_->addHeader("Content-Type", "text/html");
+        httpResponse_->setComplete();
         return;
     }
     else
     {
         buffer[bytesRead] = '\0'; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        httpResponse_->addHeader("Content-Type", "text/html");
-        httpResponse_->setBody(std::string(buffer, static_cast<size_t>(bytesRead)));
+        httpResponse_->appendBody(std::string(buffer, static_cast<size_t>(bytesRead)));
         Log::debug("Read " + std::to_string(bytesRead)
                    + " bytes from CGI stdout, fd: " + std::to_string(cgiStdOut_->getFd()));
     }
