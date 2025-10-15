@@ -1,9 +1,8 @@
-#include <webserv/config/validation/ValidationEngine.hpp>
-
 #include <webserv/config/AConfig.hpp>        // for AConfig
 #include <webserv/config/GlobalConfig.hpp>   // for GlobalConfig
 #include <webserv/config/LocationConfig.hpp> // for LocationConfig
 #include <webserv/config/ServerConfig.hpp>   // for ServerConfig
+#include <webserv/config/validation/ValidationEngine.hpp>
 #include <webserv/config/validation/ValidationResult.hpp>                           // for ValidationResult
 #include <webserv/config/validation/directive_rules/AValidationRule.hpp>            // for AValidationRule
 #include <webserv/config/validation/structural_rules/AStructuralValidationRule.hpp> // for AStructuralValidationRule
@@ -14,25 +13,21 @@
 
 void ValidationEngine::addGlobalRule(const std::string &directiveName, std::unique_ptr<AValidationRule> rule)
 {
-    Log::trace(LOCATION);
     addRule(globalRules_, directiveName, std::move(rule));
 }
 
 void ValidationEngine::addServerRule(const std::string &directiveName, std::unique_ptr<AValidationRule> rule)
 {
-    Log::trace(LOCATION);
     addRule(serverRules_, directiveName, std::move(rule));
 }
 
 void ValidationEngine::addLocationRule(const std::string &directiveName, std::unique_ptr<AValidationRule> rule)
 {
-    Log::trace(LOCATION);
     addRule(locationRules_, directiveName, std::move(rule));
 }
 
 void ValidationEngine::addStructuralRule(std::unique_ptr<AStructuralValidationRule> rule)
 {
-    Log::trace(LOCATION);
     if (rule != nullptr)
     {
         structuralRules_.push_back(std::move(rule));
@@ -42,7 +37,6 @@ void ValidationEngine::addStructuralRule(std::unique_ptr<AStructuralValidationRu
 void ValidationEngine::addRule(RuleMap &ruleMap, const std::string &directiveName,
                                std::unique_ptr<AValidationRule> rule)
 {
-    Log::trace(LOCATION);
     ruleMap[directiveName].emplace_back(std::move(rule));
 }
 

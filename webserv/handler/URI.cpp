@@ -1,3 +1,4 @@
+#include "webserv/log/Log.hpp"
 #include <webserv/config/AConfig.hpp>        // for AConfig
 #include <webserv/config/LocationConfig.hpp> // for LocationConfig
 #include <webserv/config/ServerConfig.hpp>   // for ServerConfig
@@ -13,6 +14,7 @@
 URI::URI(const HttpRequest &request, const ServerConfig &serverConfig)
     : uriTrimmed_(utils::trim(request.getTarget(), "/")), config_(matchConfig(uriTrimmed_, serverConfig))
 {
+    Log::trace(LOCATION);
     parseUri(request.getTarget());
     parseFullpath();
 
@@ -148,13 +150,18 @@ bool URI::isValid() const
 
 bool URI::isCgi() const
 {
+    return !getCgiPath().empty();
+}
+
+std::string URI::getCgiPath() const
+{
     if (isFile() || getExtension().empty() || !config_->get<std::string>("cgi_enabled").has_value()
         || config_->get<std::string>("cgi_enabled").value() != "on")
     {
-        return false;
+        return "";
     }
     auto cgiPath = config_->getCGIPath(getExtension());
-    return !cgiPath.empty();
+    return cgiPath;
 }
 
 const std::string &URI::getBaseName() const

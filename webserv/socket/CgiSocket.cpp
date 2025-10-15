@@ -1,14 +1,13 @@
-#include <webserv/socket/CGISocket.hpp>
-
 #include <webserv/log/Log.hpp>        // for LOCATION, Log
 #include <webserv/socket/ASocket.hpp> // for ASocket
+#include <webserv/socket/CgiSocket.hpp>
 
-CGISocket::CGISocket(int fd) : ASocket(fd)
+CgiSocket::CgiSocket(int fd) : ASocket(fd)
 {
     Log::trace(LOCATION);
 }
 
-ASocket::Type CGISocket::getType() const
+ASocket::Type CgiSocket::getType() const
 {
     return ASocket::Type::CGI_SOCKET;
 }

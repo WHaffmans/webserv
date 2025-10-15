@@ -1,6 +1,5 @@
-#include <webserv/socket/ASocket.hpp>
-
 #include <webserv/log/Log.hpp> // for Log, LOCATION
+#include <webserv/socket/ASocket.hpp>
 
 #include <stdexcept>    // for runtime_error
 #include <string>       // for basic_string
@@ -33,6 +32,7 @@ ASocket::~ASocket()
 
 ssize_t ASocket::read(void *buf, size_t len) const
 {
+    Log::trace(LOCATION);
     ssize_t bytesRead = ::recv(fd_, buf, len, 0);
     if (bytesRead == -1)
     {
@@ -62,7 +62,6 @@ void ASocket::setNonBlocking() const
 
 int ASocket::getFd() const
 {
-    Log::trace(LOCATION);
     return fd_;
 }
 

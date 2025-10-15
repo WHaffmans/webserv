@@ -1,6 +1,5 @@
-#include <webserv/http/HttpHeaders.hpp>   // for HttpHeaders
-
 #include <webserv/http/HttpConstants.hpp> // for CRLF
+#include <webserv/http/HttpHeaders.hpp>   // for HttpHeaders
 #include <webserv/log/Log.hpp>
 #include <webserv/utils/utils.hpp> // for trim
 
@@ -10,7 +9,6 @@
 
 std::optional<size_t> HttpHeaders::getContentLength() const
 {
-    Log::trace(LOCATION);
     const auto &value = this->get("Content-Length");
     if (value.empty())
     {
@@ -21,7 +19,6 @@ std::optional<size_t> HttpHeaders::getContentLength() const
 
 std::optional<std::string> HttpHeaders::getContentType() const
 {
-    Log::trace(LOCATION);
     const auto &value = this->get("Content-Type");
     if (value.empty())
     {
@@ -32,7 +29,6 @@ std::optional<std::string> HttpHeaders::getContentType() const
 
 std::optional<std::string> HttpHeaders::getHost() const
 {
-    Log::trace(LOCATION);
     const auto &value = this->get("Host");
     if (value.empty())
     {
@@ -43,7 +39,6 @@ std::optional<std::string> HttpHeaders::getHost() const
 
 void HttpHeaders::add(const std::string &name, const std::string &value) // NOLINT(bugprone-easily-swappable-parameters)
 {
-    Log::trace(LOCATION);
     std::string lower = name;
     std::ranges::transform(lower, lower.begin(), ::tolower);
     headers_[lower] = value;
@@ -51,13 +46,11 @@ void HttpHeaders::add(const std::string &name, const std::string &value) // NOLI
 
 void HttpHeaders::remove(const std::string &name)
 {
-    Log::trace(LOCATION);
     headers_.erase(name);
 }
 
 const std::string &HttpHeaders::get(const std::string &name) const
 {
-    Log::trace(LOCATION);
     std::string lower = name;
     std::ranges::transform(lower, lower.begin(), ::tolower);
     auto it = headers_.find(lower);
@@ -71,7 +64,6 @@ const std::string &HttpHeaders::get(const std::string &name) const
 
 bool HttpHeaders::has(const std::string &name) const
 {
-    Log::trace(LOCATION);
     std::string lower = name;
     std::ranges::transform(lower, lower.begin(), ::tolower);
     return headers_.contains(lower);
@@ -102,7 +94,6 @@ void HttpHeaders::parse(const std::string &rawHeaders)
 
 std::string HttpHeaders::toString() const
 {
-    Log::trace(LOCATION);
     std::string result;
     for (const auto &pair : headers_)
     {

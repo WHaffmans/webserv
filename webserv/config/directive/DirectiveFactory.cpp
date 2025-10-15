@@ -17,7 +17,6 @@ class ADirective;
 
 std::unique_ptr<ADirective> DirectiveFactory::createDirective(const std::string &line)
 {
-    Log::trace(LOCATION);
     std::stringstream ss(line);
     std::string name;
     ss >> name;

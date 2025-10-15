@@ -1,7 +1,6 @@
-#include <webserv/handler/FileHandler.hpp>
-
 #include <webserv/config/AConfig.hpp>       // for AConfig
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
+#include <webserv/handler/FileHandler.hpp>
 #include <webserv/handler/MIMETypes.hpp>  // for MIMETypes
 #include <webserv/handler/URI.hpp>        // for URI
 #include <webserv/http/HttpConstants.hpp> // for NOT_FOUND, FORBIDDEN, OK
@@ -15,33 +14,35 @@
 #include <string>   // for basic_string, string, operator+, char_traits
 #include <vector>   // for vector
 
-FileHandler::FileHandler(const AConfig *config, const URI &URI) : config_(config), uri_(URI)
+FileHandler::FileHandler(const HttpRequest &request, HttpResponse &response)
+    : config_(request.getUri().getConfig()), uri_(request.getUri()), response_(response)
 {
     Log::trace(LOCATION);
 }
 
-std::unique_ptr<HttpResponse> FileHandler::handleFile(const std::string &filepath) const
+void FileHandler::handleFile(const std::string &filepath) const
 {
     Log::trace(LOCATION);
-    auto response = std::make_unique<HttpResponse>();
+    // auto response = std::make_unique<HttpResponse>();
 
     std::string extension = FileUtils::getExtension(filepath);
     std::string mimeType = MIMETypes().getType(extension);
-    response->addHeader("Content-Type", mimeType);
+    response_.addHeader("Content-Type", mimeType);
 
     std::vector<char> fileData = FileUtils::readBinaryFile(filepath);
     Log::debug("Serving file: " + filepath + " with MIME type: " + mimeType);
     if (fileData.empty())
     {
-        return ErrorHandler::getErrorResponse(Http::StatusCode::NOT_FOUND, config_);
+        ErrorHandler::createErrorResponse(Http::StatusCode::NOT_FOUND, response_, config_);
+        return;
     }
     // TODO: annoying: For reading files, vector<char> is preferred, but for http data vector<uint8_t> is preferred
-    response->setBody(std::vector<uint8_t>{fileData.begin(), fileData.end()});
-    response->setStatus(Http::StatusCode::OK);
-    return response;
+    response_.setBody(std::vector<uint8_t>{fileData.begin(), fileData.end()});
+    response_.setStatus(Http::StatusCode::OK);
+    // return response;
 }
 
-std::unique_ptr<HttpResponse> FileHandler::handleDirectory(const std::string &dirpath, ResourceType type) const
+void FileHandler::handleDirectory(const std::string &dirpath, ResourceType type) const
 {
     Log::trace(LOCATION);
 
@@ -53,19 +54,22 @@ std::unique_ptr<HttpResponse> FileHandler::handleDirectory(const std::string &di
         });
         if (first_matching == possible_indexes.end())
         {
-            return ErrorHandler::getErrorResponse(Http::StatusCode::FORBIDDEN, config_);
+            ErrorHandler::createErrorResponse(Http::StatusCode::FORBIDDEN, response_, config_);
+            return;
         }
-        return handleFile(FileUtils::joinPath(dirpath, *first_matching));
+        handleFile(FileUtils::joinPath(dirpath, *first_matching));
+        return;
     }
     if (type == DIRECTORY_AUTOINDEX)
     {
         Log::debug("Requested path is a directory: " + dirpath);
-        return ErrorHandler::getErrorResponse(Http::StatusCode::FORBIDDEN, config_);
+        ErrorHandler::createErrorResponse(Http::StatusCode::FORBIDDEN, response_, config_);
+        return;
     }
-    return ErrorHandler::getErrorResponse(Http::StatusCode::NOT_FOUND, config_);
+    ErrorHandler::createErrorResponse(Http::StatusCode::NOT_FOUND, response_, config_);
 }
 
-std::unique_ptr<HttpResponse> FileHandler::getResponse() const
+void FileHandler::handle() const
 {
     Log::trace(LOCATION);
     std::string filepath = uri_.getFullPath();
@@ -73,12 +77,12 @@ std::unique_ptr<HttpResponse> FileHandler::getResponse() const
 
     switch (resourceType)
     {
-    case FILE: return handleFile(filepath);
+    case FILE: handleFile(filepath); return;
     case DIRECTORY_AUTOINDEX:
-    case DIRECTORY_INDEX: return handleDirectory(filepath, resourceType);
-    case NOT_FOUND: return ErrorHandler::getErrorResponse(Http::StatusCode::NOT_FOUND, config_);
+    case DIRECTORY_INDEX: handleDirectory(filepath, resourceType); return;
+    case NOT_FOUND: ErrorHandler::createErrorResponse(Http::StatusCode::NOT_FOUND, response_, config_); return;
     }
-    return ErrorHandler::getErrorResponse(Http::StatusCode::NOT_FOUND, config_);
+    ErrorHandler::createErrorResponse(Http::StatusCode::NOT_FOUND, response_, config_);
 }
 
 FileHandler::ResourceType FileHandler::getResourceType(const std::string &path) const

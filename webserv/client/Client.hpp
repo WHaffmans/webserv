@@ -2,6 +2,9 @@
 
 // #include <webserv/http/HttpResponse.hpp>
 
+#include "webserv/router/Router.hpp"
+#include "webserv/socket/CgiSocket.hpp"
+
 #include <webserv/config/ServerConfig.hpp> // for ServerConfig
 #include <webserv/http/HttpConstants.hpp>  // for OK
 #include <webserv/http/HttpRequest.hpp>    // for HttpRequest
@@ -32,23 +35,25 @@ class Client
     ~Client();
 
     void request();
-    [[nodiscard]] std::vector<uint8_t> getResponse() const;
+    void poll() const;
 
-    [[nodiscard]] bool isResponseReady() const;
+    [[nodiscard]] std::vector<uint8_t> getResponse() const;
     [[nodiscard]] int getStatusCode() const;
 
     [[nodiscard]] ClientSocket &getSocket() const { return *client_socket_; }
 
-    // void setError(int statusCode);
-
     void setStatusCode(int code);
+    void setCgiSocket(CgiSocket &cgiSocket);
+
+    [[nodiscard]] HttpRequest &getHttpRequest() const;
+    [[nodiscard]] HttpResponse &getHttpResponse() const;
 
   private:
     int statusCode_ = Http::StatusCode::OK;
     constexpr static size_t bufferSize_ = 4096;
-    std::unique_ptr<HttpRequest> httpRequest_ = nullptr;
-    std::unique_ptr<HttpResponse> httpResponse_ = nullptr;
+    std::unique_ptr<HttpRequest> httpRequest_;
+    std::unique_ptr<HttpResponse> httpResponse_;
+    std::unique_ptr<Router> router_;
     std::unique_ptr<ClientSocket> client_socket_;
     Server &server_;
-    // mutable const ServerConfig *server_config_ = nullptr;
 };

@@ -1,6 +1,5 @@
-#include <webserv/config/LocationConfig.hpp>
-
 #include <webserv/config/AConfig.hpp> // for AConfig
+#include <webserv/config/LocationConfig.hpp>
 #include <webserv/log/Log.hpp> // for Log, LOCATION
 
 LocationConfig::LocationConfig(const std::string &block, const std::string &path, const AConfig *parent)
@@ -22,6 +21,5 @@ std::string LocationConfig::getType() const
 
 void LocationConfig::parseBlock(const std::string &block)
 {
-    Log::trace(LOCATION);
     parseDirectives(block);
 }

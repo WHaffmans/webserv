@@ -26,6 +26,7 @@ class URI
     [[nodiscard]] bool isCgi() const;
 
     [[nodiscard]] std::string getExtension() const;
+    [[nodiscard]] std::string getCgiPath() const;
     [[nodiscard]] const AConfig *getConfig() const;
     [[nodiscard]] const std::string &getBaseName() const;
     [[nodiscard]] const std::string &getFullPath() const;

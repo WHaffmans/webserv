@@ -49,6 +49,9 @@ class Server
     std::vector<std::unique_ptr<Client>> clients_;
     std::unordered_map<int, Client *> socketToClient_;
 
+    void pollClients() const;
+    void handleEpoll(struct epoll_event *events, int max_events);
+
     void handleEvent(struct epoll_event *event);
     void handleConnection(struct epoll_event *event);
     void handleRequest(struct epoll_event *event) const;

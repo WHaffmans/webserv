@@ -5,10 +5,12 @@
 
 #include <cstddef> // for size_t
 #include <cstdint> // for uint8_t
-#include <string>  // for string, basic_string
+#include <memory>
+#include <string> // for string, basic_string
 
 class Client;
 class ServerConfig;
+class URI;
 
 class HttpRequest
 {
@@ -32,11 +34,13 @@ class HttpRequest
     ~HttpRequest();
 
     [[nodiscard]] State getState() const;
+    [[nodiscard]] const URI &getUri() const;
     [[nodiscard]] const HttpHeaders &getHeaders() const;
     [[nodiscard]] const std::string &getBody() const;
     [[nodiscard]] const std::string &getMethod() const;
     [[nodiscard]] const std::string &getTarget() const;
     [[nodiscard]] const std::string &getHttpVersion() const;
+    [[nodiscard]] Client &getClient() const;
 
     void setState(State state);
     void receiveData(const char *data, size_t length);
@@ -57,6 +61,8 @@ class HttpRequest
     State state_ = State::RequestLine;
 
     HttpHeaders headers_;
+
+    std::unique_ptr<URI> uri_;
 
     std::string buffer_;
     std::string body_;

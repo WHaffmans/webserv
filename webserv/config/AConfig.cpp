@@ -1,14 +1,13 @@
 #include <webserv/config/AConfig.hpp>                    // for AConfig
-
 #include <webserv/config/directive/ADirective.hpp>       // for ADirective
 #include <webserv/config/directive/DirectiveFactory.hpp> // for DirectiveFactory
 #include <webserv/config/directive/DirectiveValue.hpp>   // for DirectiveValue
 #include <webserv/log/Log.hpp>                           // for Log, LOCATION
 #include <webserv/utils/utils.hpp>                       // for trim
 
+#include <ranges>  // for filter
 #include <sstream> // for basic_stringstream, stringstream
 #include <utility> // for pair, move
-#include <ranges>  // for filter
 
 AConfig::AConfig(const AConfig *parent) : parent_(parent) {}
 
@@ -118,19 +117,17 @@ std::string AConfig::getErrorPage(int statusCode) const
 std::string AConfig::getCGIPath(const std::string &extension) const
 {
     Log::trace(LOCATION);
-    for (const auto &directive : directives_ | std::views::filter([](const auto &d) {
-                                     return d->getName() == "cgi_ext";
-                                 }))
+    for (const auto &directive : directives_)
     {
-        
+        if (directive->getName() != "cgi_ext")
+        {
+            continue;
+        }
         if (!directive->getValue().holds<std::vector<std::string>>())
         {
             continue;
         }
         auto exts = directive->getValue().try_get<std::vector<std::string>>().value();
-        {
-            continue;
-        }
         auto cgiPath = exts.back();
         exts.pop_back(); // Last element is the CGI path
         auto it = std::ranges::find(exts, extension);

@@ -14,8 +14,10 @@ class ServerConfig;
 class Router
 {
   public:
-    [[nodiscard]] static std::unique_ptr<HttpResponse> handleRequest(const HttpRequest &request);
+    Router(Client *client);
+    void handleRequest();
 
   private:
-    [[nodiscard]] static bool isMethodSupported(const std::string &method, const AConfig &config);
+    Client *client_;
+    [[nodiscard]] bool isMethodSupported(const std::string &method, const AConfig &config);
 };

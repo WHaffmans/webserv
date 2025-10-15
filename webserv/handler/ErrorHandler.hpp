@@ -14,7 +14,7 @@ class AConfig;
 class ErrorHandler
 {
   public:
-    static std::unique_ptr<HttpResponse> getErrorResponse(uint16_t statusCode, const AConfig *config = nullptr);
+    static void createErrorResponse(uint16_t statusCode, HttpResponse &response, const AConfig *config = nullptr);
 
   private:
     static std::string generateErrorPage(uint16_t statusCode, const AConfig *config = nullptr);

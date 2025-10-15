@@ -1,8 +1,7 @@
-#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
-
 #include <webserv/config/AConfig.hpp>       // for AConfig
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/GlobalConfig.hpp>  // for GlobalConfig
+#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
 #include <webserv/http/HttpConstants.hpp>   // for getStatusCodeReason, INTERNAL_SERVER_ERROR
 #include <webserv/http/HttpResponse.hpp>    // for HttpResponse
 #include <webserv/log/Log.hpp>              // for Log, LOCATION
@@ -12,18 +11,15 @@
 #include <sstream> // for basic_stringstream
 #include <string>  // for basic_string, char_traits, operator+, string, to_string
 
-std::unique_ptr<HttpResponse> ErrorHandler::getErrorResponse(uint16_t statusCode, const AConfig *config)
+void ErrorHandler::createErrorResponse(uint16_t statusCode, HttpResponse &response, const AConfig *config)
 {
     std::string statusMessage = Http::getStatusCodeReason(statusCode);
     Log::warning("Generating error response: " + std::to_string(statusCode) + " " + statusMessage);
 
-    auto response = std::make_unique<HttpResponse>();
-    std::string body = generateErrorPage(statusCode, config);
-    response->appendBody(body);
-    response->setStatus(statusCode);
-    response->addHeader("Content-Type", "text/html");
-    response->addHeader("Connection", "close");
-    return response;
+    response.setStatus(statusCode);
+    response.addHeader("Content-Type", "text/html");
+    response.addHeader("Connection", "close");
+    response.appendBody(generateErrorPage(statusCode, config));
 }
 
 std::string ErrorHandler::generateErrorPage(uint16_t statusCode, const AConfig *config)

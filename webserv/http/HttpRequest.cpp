@@ -1,17 +1,20 @@
-#include <webserv/http/HttpRequest.hpp>
+#include "webserv/config/ConfigManager.hpp"
+#include "webserv/handler/URI.hpp"
 
 #include <webserv/client/Client.hpp>      // for Client
 #include <webserv/http/HttpConstants.hpp> // for CRLF, DOUBLE_CRLF, BAD_REQUEST
+#include <webserv/http/HttpRequest.hpp>
 #include <webserv/log/Log.hpp>     // for Log, LOCATION
 #include <webserv/utils/utils.hpp> // for stoul
 
-#include <map>      // for map
+#include <map> // for map
+#include <memory>
 #include <optional> // for optional
 #include <sstream>  // for basic_stringstream, basic_istream, stringstream
 #include <utility>  // for pair
 #include <vector>   // for vector
 
-HttpRequest::HttpRequest(Client *client) : client_(client)
+HttpRequest::HttpRequest(Client *client) : client_(client), uri_(nullptr)
 {
     Log::trace(LOCATION);
 }
@@ -23,12 +26,16 @@ HttpRequest::~HttpRequest()
 
 HttpRequest::State HttpRequest::getState() const
 {
-    Log::trace(LOCATION);
     return state_;
 }
 
 void HttpRequest::setState(State state)
 {
+    if (state == State::Complete)
+    {
+        uri_ = std::make_unique<URI>(
+            *this, *ConfigManager::getInstance().getMatchingServerConfig(getHeaders().getHost().value_or("")));
+    }
     state_ = state;
 }
 
@@ -51,6 +58,7 @@ void HttpRequest::receiveData(const char *data, size_t length)
 
 void HttpRequest::parseBuffer()
 {
+    Log::trace(LOCATION);
     while (true)
     {
         try
@@ -156,7 +164,8 @@ bool HttpRequest::parseBufferforHeaders()
         state_ = State::Chunked;
         return true;
     }
-    state_ = State::Complete;
+    Log::debug("No body to read, marking request as complete");
+    setState(State::Complete);
     return false; // No body to read
 }
 
@@ -177,7 +186,7 @@ bool HttpRequest::parseBufferforChunkedBody()
         Log::warning("Invalid chunk size: " + chunkSizeStr);
         if (chunkSize == 0)
         {
-            state_ = State::Complete; // Last chunk
+            setState(State::Complete); // Last chunk
             buffer_.erase(0, pos + Http::Protocol::CRLF.size());
             return true;
         }
@@ -197,7 +206,7 @@ bool HttpRequest::parseBufferforBody()
     if (!headers_.getContentLength().has_value())
     {
         Log::warning("HttpRequest::parseBuffer() in state Body but no Content-Length header found");
-        state_ = State::Complete;
+        setState(State::Complete);
         return true;
     }
     Log::trace(LOCATION, {{"Content-Length", std::to_string(*headers_.getContentLength())}});
@@ -208,7 +217,7 @@ bool HttpRequest::parseBufferforBody()
     }
     body_ = buffer_.substr(0, *headers_.getContentLength());
     buffer_.erase(0, *headers_.getContentLength());
-    state_ = State::Complete;
+    setState(State::Complete);
 
     return true;
 }
@@ -222,6 +231,11 @@ void HttpRequest::reset()
     // headers_.clear();
     body_.clear();
     // contentLength_ = 0;
+}
+
+const URI &HttpRequest::getUri() const
+{
+    return *uri_;
 }
 
 const std::string &HttpRequest::getMethod() const
@@ -239,3 +253,7 @@ const std::string &HttpRequest::getHttpVersion() const
     return httpVersion_;
 }
 
+Client &HttpRequest::getClient() const
+{
+    return *client_;
+}

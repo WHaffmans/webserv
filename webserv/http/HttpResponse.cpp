@@ -22,7 +22,7 @@ void HttpResponse::appendBody(const std::string &body)
     body_.insert(body_.end(), body.begin(), body.end());
 }
 
-void HttpResponse::setBody(const std::vector<uint8_t> &data)
+void HttpResponse::setBody(const std::vector<uint8_t> &data) // TODO: validate headers
 {
     body_ = data;
     setComplete();

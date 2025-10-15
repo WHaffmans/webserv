@@ -1,9 +1,8 @@
-#include <webserv/server/Server.hpp>
-
 #include <webserv/client/Client.hpp>        // for Client
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/ServerConfig.hpp>  // for ServerConfig
 #include <webserv/log/Log.hpp>              // for Log, LOCATION
+#include <webserv/server/Server.hpp>
 #include <webserv/socket/ASocket.hpp>
 #include <webserv/socket/ClientSocket.hpp> // for ClientSocket
 #include <webserv/socket/ServerSocket.hpp> // for ServerSocket
@@ -26,8 +25,7 @@
 
 class Router;
 
-Server::Server(const ConfigManager &configManager)
-    : epoll_fd_(epoll_create1(0)), configManager_(configManager)
+Server::Server(const ConfigManager &configManager) : epoll_fd_(epoll_create1(0)), configManager_(configManager)
 {
     Log::trace(LOCATION);
     const auto &serverConfigs = configManager.getServerConfigs();
@@ -152,7 +150,6 @@ ServerSocket &Server::getListener(int fd) const
 
 Client &Server::getClient(int fd) const
 {
-    Log::trace(LOCATION);
     if (socketToClient_.contains(fd))
     {
         return *(socketToClient_.at(fd));
@@ -224,6 +221,28 @@ void Server::handleEvent(struct epoll_event *event)
     }
 }
 
+void Server::handleEpoll(struct epoll_event *events, int max_events)
+{
+    int nfds = epoll_wait(epoll_fd_, events, max_events, 0); // NOLINT
+    if (nfds == -1)
+    {
+        Log::error("epoll_wait failed");
+        throw std::runtime_error("epoll_wait failed");
+    }
+    for (int i = 0; i < nfds; ++i)
+    {
+        handleEvent(&events[i]); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    }
+}
+
+void Server::pollClients() const
+{
+    for (const auto &client : clients_)
+    {
+        client->poll();
+    }
+}
+
 void Server::run()
 {
     Log::trace(LOCATION);
@@ -232,15 +251,8 @@ void Server::run()
     struct epoll_event events[MAX_EVENTS]; // NOLINT
     while (true)
     {
-        int nfds = epoll_wait(epoll_fd_, events, MAX_EVENTS, -1); // NOLINT
-        if (nfds == -1)
-        {
-            Log::error("epoll_wait failed");
-            throw std::runtime_error("epoll_wait failed");
-        }
-        for (int i = 0; i < nfds; ++i)
-        {
-            handleEvent(&events[i]); // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        }
+        pollClients();
+        handleEpoll(events, MAX_EVENTS);
+        usleep(1000);
     }
 }

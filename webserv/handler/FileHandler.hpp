@@ -1,5 +1,7 @@
 #pragma once
 
+#include "webserv/http/HttpRequest.hpp"
+
 #include <webserv/config/AConfig.hpp>
 #include <webserv/config/LocationConfig.hpp>
 #include <webserv/handler/URI.hpp>
@@ -15,7 +17,7 @@ class URI;
 class FileHandler
 {
   public:
-    FileHandler(const AConfig *config, const URI &uri);
+    FileHandler(const HttpRequest &request, HttpResponse &response);
 
     FileHandler(const FileHandler &other) = delete;
     FileHandler(FileHandler &&other) noexcept = delete;
@@ -24,11 +26,13 @@ class FileHandler
 
     ~FileHandler() = default;
 
-    [[nodiscard]] std::unique_ptr<HttpResponse> getResponse() const;
+    void handle() const;
 
   private:
     const AConfig *config_;
     const URI &uri_;
+
+    HttpResponse &response_;
 
     enum ResourceType : uint8_t
     {
@@ -39,6 +43,6 @@ class FileHandler
     };
 
     [[nodiscard]] ResourceType getResourceType(const std::string &path) const;
-    [[nodiscard]] std::unique_ptr<HttpResponse> handleFile(const std::string &filepath) const;
-    [[nodiscard]] std::unique_ptr<HttpResponse> handleDirectory(const std::string &dirpath, ResourceType type) const;
+    void handleFile(const std::string &filepath) const;
+    void handleDirectory(const std::string &dirpath, ResourceType type) const;
 };

@@ -13,7 +13,6 @@ AValidationRule::AValidationRule(std::string ruleName, std::string description, 
 
 ValidationResult AValidationRule::validate(const AConfig *config, const std::string &directiveName) const
 {
-    Log::trace(LOCATION);
     if (config == nullptr || directiveName.empty())
     {
         return ValidationResult::error("Invalid config or directive name");

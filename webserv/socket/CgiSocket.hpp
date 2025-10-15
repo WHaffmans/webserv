@@ -6,10 +6,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-class CGISocket : public ASocket
+class CgiSocket : public ASocket
 {
   public:
-    explicit CGISocket(int fd);
+    explicit CgiSocket(int fd);
 
     [[nodiscard]] ASocket::Type getType() const override;
 };

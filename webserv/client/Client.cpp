@@ -12,11 +12,12 @@
 #include <string>     // for basic_string, to_string, operator+, operator<=>
 #include <utility>    // for pair, move
 
+#include <sys/epoll.h>
 #include <sys/types.h> // for ssize_t
 
 Client::Client(std::unique_ptr<ClientSocket> socket, Server &server)
     : httpRequest_(std::make_unique<HttpRequest>(this)), httpResponse_(std::make_unique<HttpResponse>()),
-      client_socket_(std::move(socket)), server_(std::ref(server))
+      router_(std::make_unique<Router>(this)), client_socket_(std::move(socket)), server_(std::ref(server))
 {
     Log::trace(LOCATION);
     Log::info("New client connected, fd: " + std::to_string(client_socket_->getFd()));
@@ -31,13 +32,11 @@ Client::~Client()
 
 int Client::getStatusCode() const
 {
-    Log::trace(LOCATION);
     return statusCode_;
 }
 
 void Client::setStatusCode(int code)
 {
-    Log::trace(LOCATION);
     statusCode_ = code;
 }
 
@@ -74,7 +73,8 @@ void Client::request()
                       {"body", httpRequest_->getBody()},
                       {"state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
                   });
-        server_.responseReady(client_socket_->getFd());
+        // server_.responseReady(client_socket_->getFd());
+        router_->handleRequest();
     }
     else
     {
@@ -86,17 +86,33 @@ void Client::request()
     }
 }
 
-bool Client::isResponseReady() const
+void Client::setCgiSocket(CgiSocket &cgiSocket)
 {
-    Log::trace(LOCATION);
-    // todo: poll the httpResponse_ object
-    return httpResponse_->isComplete();
+    server_.add(cgiSocket, EPOLLIN | EPOLLOUT);
+    // TODO add to handler
+}
+
+void Client::poll() const
+{
+    if (httpResponse_->isComplete())
+    {
+        Log::info("Response is ready to be sent to client, fd: " + std::to_string(client_socket_->getFd()));
+        server_.responseReady(client_socket_->getFd());
+    }
 }
 
 std::vector<uint8_t> Client::getResponse() const
 {
-    Log::trace(LOCATION);
 
-    auto response = Router::handleRequest(*httpRequest_);
-    return response->toBytes();
+    return httpResponse_->toBytes();
+}
+
+HttpRequest &Client::getHttpRequest() const
+{
+    return *httpRequest_;
+}
+
+HttpResponse &Client::getHttpResponse() const
+{
+    return *httpResponse_;
 }
