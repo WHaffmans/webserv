@@ -247,6 +247,6 @@ void Server::run()
     {
         pollClients();
         handleEpoll(events, MAX_EVENTS);
-        usleep(1000);
+        // usleep(1000);
     }
 }
