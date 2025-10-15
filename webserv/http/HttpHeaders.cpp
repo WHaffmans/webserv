@@ -37,7 +37,8 @@ std::optional<std::string> HttpHeaders::getHost() const noexcept
     return value;
 }
 
-void HttpHeaders::add(const std::string &name, const std::string &value) noexcept// NOLINT(bugprone-easily-swappable-parameters)
+void HttpHeaders::add(const std::string &name,
+                      const std::string &value) noexcept // NOLINT(bugprone-easily-swappable-parameters)
 {
     std::string lower = name;
     std::ranges::transform(lower, lower.begin(), ::tolower);
