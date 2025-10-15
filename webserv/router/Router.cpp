@@ -40,21 +40,12 @@ void Router::handleRequest()
     HttpRequest &request = client_->getHttpRequest();
     HttpResponse &response = client_->getHttpResponse();
 
-    // ServerConfig *serverConfig
-    //     = ConfigManager::getInstance().getMatchingServerConfig(request.getHeaders().getHost().value_or(""));
-
-    // if (serverConfig == nullptr)
-    // {
-        // response = ErrorHandler::getErrorResponse(400);
-    // }
-    // URI uri{request, *serverConfig};
-
     const std::string &target = request.getTarget();
     static_cast<void>(target); // Suppress unused variable warning
     const std::string &method = request.getMethod();
 
     const AConfig *config = request.getUri().getConfig();
-    
+
     if (!isMethodSupported(method, *config))
     {
         // return ErrorHandler::getErrorResponse(405, config);
@@ -63,6 +54,7 @@ void Router::handleRequest()
     {
         try
         {
+            Log::debug("Starting CGI process");
             CgiProcess cgiProcess(request);
             // return nullptr; // Response will be handled asynchronously
         }
@@ -72,6 +64,9 @@ void Router::handleRequest()
             // return ErrorHandler::getErrorResponse(500, config);
         }
     }
-    FileHandler fileHandler(request, response);
-    fileHandler.handle();
+    else
+    {
+        FileHandler fileHandler(request, response);
+        fileHandler.handle();
+    }
 }

@@ -43,7 +43,7 @@ class Client
     [[nodiscard]] ClientSocket &getSocket() const { return *client_socket_; }
 
     void setStatusCode(int code);
-    void setCgiSocket(CgiSocket &cgiSocket);
+    void setCgiSocket(std::unique_ptr<CgiSocket> cgiSocket);
 
     [[nodiscard]] HttpRequest &getHttpRequest() const;
     [[nodiscard]] HttpResponse &getHttpResponse() const;
@@ -55,5 +55,6 @@ class Client
     std::unique_ptr<HttpResponse> httpResponse_;
     std::unique_ptr<Router> router_;
     std::unique_ptr<ClientSocket> client_socket_;
+    std::unique_ptr<CgiSocket> cgi_socket_ = nullptr;
     Server &server_;
 };

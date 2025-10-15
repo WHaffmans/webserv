@@ -5,6 +5,9 @@
 
 #include <webserv/handler/URI.hpp>
 
+#include <memory>
+#include <string>
+
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -47,17 +50,18 @@ void CgiProcess::spawn()
         close(sv[1]);
 
         // Prepare arguments
-        char *args[] = {const_cast<char *>(cgiPath.c_str()), nullptr};
+        std::string fullPath = uri.getFullPath();
+        char *args[] = {const_cast<char *>(cgiPath.c_str()), const_cast<char *>(fullPath.c_str())};
         execve(const_cast<char *>(cgiPath.c_str()), args, nullptr);
     }
     else
     {
         // Parent process
-        CgiSocket cgiSocket(sv[0]);
-        close(sv[0]);
+        auto cgiSocket = std::make_unique<CgiSocket>(sv[0]); // CgiSocket wraps sv[0]
+        close(sv[1]);
 
-        request_.getClient().setCgiSocket(cgiSocket); // move the socket to the client
-        cgiSocket.write(request_.getBody().data(), request_.getBody().size());
+        // cgiSocket->write(request_.getBody().data(), request_.getBody().size());
+        request_.getClient().setCgiSocket(std::move(cgiSocket)); // move the socket to the client
         // _cgiFd can be used to communicate with the CGI process
     }
 }

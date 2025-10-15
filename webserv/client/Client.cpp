@@ -1,3 +1,5 @@
+#include "webserv/socket/CgiSocket.hpp"
+
 #include <webserv/client/Client.hpp>
 #include <webserv/http/HttpHeaders.hpp>    // for HttpHeaders
 #include <webserv/log/Log.hpp>             // for Log, LOCATION
@@ -9,8 +11,9 @@
 #include <exception>
 #include <functional> // for ref, reference_wrapper
 #include <map>        // for map
-#include <string>     // for basic_string, to_string, operator+, operator<=>
-#include <utility>    // for pair, move
+#include <memory>
+#include <string>  // for basic_string, to_string, operator+, operator<=>
+#include <utility> // for pair, move
 
 #include <sys/epoll.h>
 #include <sys/types.h> // for ssize_t
@@ -86,9 +89,10 @@ void Client::request()
     }
 }
 
-void Client::setCgiSocket(CgiSocket &cgiSocket)
+void Client::setCgiSocket(std::unique_ptr<CgiSocket> cgiSocket)
 {
-    server_.add(cgiSocket, EPOLLIN | EPOLLOUT);
+    server_.add(*cgiSocket, EPOLLIN, this);
+    cgi_socket_ = std::move(cgiSocket);
     // TODO add to handler
 }
 

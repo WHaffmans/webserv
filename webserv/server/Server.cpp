@@ -73,7 +73,7 @@ void Server::add(const ASocket &socket, uint32_t events, Client *client)
     event.data.fd = fd;
     if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, fd, &event) == -1)
     {
-        Log::error("epoll_ctl ADD failed for fd: " + std::to_string(fd));
+        Log::error("epoll_ctl ADD failed for fd: " + std::to_string(fd) + " with error: " + std::strerror(errno));
         throw std::runtime_error("epoll_ctl ADD failed");
     }
     socketToClient_[fd] = client;
@@ -185,8 +185,8 @@ void Server::handleResponse(struct epoll_event *event)
 {
     Log::debug("Attempting to send data to fd: " + std::to_string(event->data.fd));
     Client &client = getClient(event->data.fd);
-    auto httpResponse = client.getResponse();
-    ssize_t bytesSent = send(event->data.fd, httpResponse.data(), httpResponse.size(), 0);
+    auto payload = client.getResponse();
+    ssize_t bytesSent = send(event->data.fd, payload.data(), payload.size(), 0);
     if (bytesSent < 0)
     {
         Log::error("Send failed for fd: " + std::to_string(event->data.fd) + " with error: " + std::strerror(errno));

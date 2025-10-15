@@ -130,7 +130,7 @@ std::string AConfig::getCGIPath(const std::string &extension) const
         auto exts = directive->getValue().try_get<std::vector<std::string>>().value();
         auto cgiPath = exts.back();
         exts.pop_back(); // Last element is the CGI path
-        auto it = std::ranges::find(exts, extension);
+        auto it = std::ranges::find(exts, "." + extension);
         if (it != exts.end())
         {
             return cgiPath;

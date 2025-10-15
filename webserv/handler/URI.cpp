@@ -1,4 +1,5 @@
 #include "webserv/log/Log.hpp"
+
 #include <webserv/config/AConfig.hpp>        // for AConfig
 #include <webserv/config/LocationConfig.hpp> // for LocationConfig
 #include <webserv/config/ServerConfig.hpp>   // for ServerConfig
@@ -155,9 +156,16 @@ bool URI::isCgi() const
 
 std::string URI::getCgiPath() const
 {
-    if (isFile() || getExtension().empty() || !config_->get<std::string>("cgi_enabled").has_value()
-        || config_->get<std::string>("cgi_enabled").value() != "on")
+    Log::debug("BaseName: " + baseName_ + ", FullPath: " + fullPath_ + ", Dir: " + dir_ + ", PathInfo: " + pathInfo_ +
+               ", Extension: " + getExtension());
+    if (!isFile() || getExtension().empty() || !config_->get<bool>("cgi_enabled").has_value()
+        || !config_->get<bool>("cgi_enabled").value())
     {
+        Log::debug("CGI not enabled or not a file or no extension",
+                   {{"isFile", isFile() ? "true" : "false"},
+                    {"extension", getExtension()},
+                    {"cgi_enabled", config_->get<bool>("cgi_enabled").has_value() ? "true" : "false"},
+                    {"cgi_enabled_value", config_->get<bool>("cgi_enabled").value() ? "true" : "false"}});
         return "";
     }
     auto cgiPath = config_->getCGIPath(getExtension());
