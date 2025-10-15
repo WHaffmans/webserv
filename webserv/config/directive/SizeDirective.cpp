@@ -25,7 +25,14 @@ void SizeDirective::parse(const std::string &value)
     {
         throw std::invalid_argument("Invalid size directive: " + value);
     }
-    value_ = std::stoul(number, &idx);
+    try
+    {
+        value_ = std::stoul(number, &idx);
+    }
+    catch (const std::exception &e)
+    {
+        throw std::invalid_argument("Invalid size directive: " + value + " - " + e.what());
+    }
     if (idx == number.size())
     {
         return;
@@ -33,15 +40,15 @@ void SizeDirective::parse(const std::string &value)
     std::string suffix = number.substr(idx);
     if (suffix == "k")
     {
-        multiplier = 1024;
+        multiplier = 1024UL;
     }
     else if (suffix == "m")
     {
-        multiplier = 1024 * 1024;
+        multiplier = 1024UL * 1024UL;
     }
     else if (suffix == "g")
     {
-        multiplier = 1024 * 1024 * 1024;
+        multiplier = 1024UL * 1024UL * 1024UL;
     }
     else
     {

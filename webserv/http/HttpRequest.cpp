@@ -182,8 +182,17 @@ bool HttpRequest::parseBufferforChunkedBody()
         }
         std::string chunkSizeStr = buffer_.substr(0, pos);
         Log::debug("Chunk size string: " + chunkSizeStr);
-        size_t chunkSize = utils::stoul(chunkSizeStr, 16);
-        Log::warning("Invalid chunk size: " + chunkSizeStr);
+        size_t chunkSize = 0;
+        try
+        {
+            chunkSize = utils::stoul(chunkSizeStr, 16);
+        }
+        catch (const std::exception &e)
+        {
+            Log::warning("Invalid chunk size: " + chunkSizeStr + " - " + e.what());
+            setState(State::ParseError);
+            return false;
+        }
         if (chunkSize == 0)
         {
             setState(State::Complete); // Last chunk

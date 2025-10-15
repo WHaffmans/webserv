@@ -7,7 +7,7 @@
 #include <cctype>    // for tolower
 #include <utility>   // for pair
 
-std::optional<size_t> HttpHeaders::getContentLength() const noexcept
+std::optional<size_t> HttpHeaders::getContentLength() const
 {
     const auto &value = this->get("Content-Length");
     if (value.empty())

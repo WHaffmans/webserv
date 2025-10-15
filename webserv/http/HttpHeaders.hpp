@@ -26,7 +26,7 @@ class HttpHeaders
     void remove(const std::string &name) noexcept;
 
     [[nodiscard]] std::string toString() const noexcept;
-    [[nodiscard]] std::optional<size_t> getContentLength() const noexcept;
+    [[nodiscard]] std::optional<size_t> getContentLength() const;
     [[nodiscard]] std::optional<std::string> getContentType() const noexcept;
     [[nodiscard]] std::optional<std::string> getHost() const noexcept;
 
