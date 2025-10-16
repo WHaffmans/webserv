@@ -33,7 +33,7 @@ bool Router::isMethodSupported(const std::string &method, const AConfig &config)
     return std::ranges::find(methods, method) != methods.end();
 }
 
-void Router::handleRequest()
+std::unique_ptr<AHandler> Router::handleRequest()
 {
     Log::trace(LOCATION);
 
@@ -48,6 +48,7 @@ void Router::handleRequest()
 
     if (!isMethodSupported(method, *config))
     {
+        return nullptr;
         // return ErrorHandler::getErrorResponse(405, config);
     }
     if (request.getUri().isCgi())
@@ -55,8 +56,7 @@ void Router::handleRequest()
         try
         {
             Log::debug("Starting CGI process");
-            CgiProcess cgiProcess(request);
-            // return nullptr; // Response will be handled asynchronously
+            return std::make_unique<CgiHandler>(request, response);
         }
         catch (const std::exception &e)
         {
@@ -66,7 +66,7 @@ void Router::handleRequest()
     }
     else
     {
-        FileHandler fileHandler(request, response);
-        fileHandler.handle();
+        return std::make_unique<FileHandler>(request, response);
     }
+    return nullptr;
 }

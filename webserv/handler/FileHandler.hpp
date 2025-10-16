@@ -3,6 +3,7 @@
 #include "webserv/http/HttpRequest.hpp"
 
 #include <webserv/config/AConfig.hpp>
+#include <webserv/handler/AHandler.hpp>
 #include <webserv/config/LocationConfig.hpp>
 #include <webserv/handler/URI.hpp>
 #include <webserv/http/HttpResponse.hpp> // for HttpResponse
@@ -14,26 +15,23 @@
 class AConfig;
 class URI;
 
-class FileHandler
+class FileHandler : public AHandler
 {
   public:
     FileHandler(const HttpRequest &request, HttpResponse &response);
 
     FileHandler(const FileHandler &other) = delete;
-    FileHandler(FileHandler &&other) noexcept = delete;
     FileHandler &operator=(const FileHandler &other) = delete;
+    FileHandler(FileHandler &&other) noexcept = delete;
     FileHandler &operator=(FileHandler &&other) noexcept = delete;
 
     ~FileHandler() = default;
 
-    void handle() const;
+    void handle() override;
 
   private:
+  const URI &uri_;
     const AConfig *config_;
-    const URI &uri_;
-
-    HttpResponse &response_;
-
     enum ResourceType : uint8_t
     {
         FILE,

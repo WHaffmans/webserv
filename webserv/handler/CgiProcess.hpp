@@ -1,11 +1,12 @@
 #pragma once
 
+#include "webserv/handler/CgiHandler.hpp"
 #include "webserv/http/HttpRequest.hpp"
 
 class CgiProcess
 {
   public:
-    CgiProcess(const HttpRequest &request);
+    CgiProcess(const HttpRequest &request, CgiHandler &handler);
 
     CgiProcess(const CgiProcess &other) = delete;
     CgiProcess(CgiProcess &&other) noexcept = delete;
@@ -17,6 +18,7 @@ class CgiProcess
 
   private:
     const HttpRequest &request_;
+    CgiHandler &handler_;
 
     int _pid;
     // int _cgiFd;

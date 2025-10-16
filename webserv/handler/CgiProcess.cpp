@@ -12,7 +12,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-CgiProcess::CgiProcess(const HttpRequest &request) : request_(request), _pid(-1)
+CgiProcess::CgiProcess(const HttpRequest &request, CgiHandler &handler) : request_(request), handler_(handler), _pid(-1)
 {
     if (!request_.getUri().isCgi())
     {
@@ -78,6 +78,8 @@ void CgiProcess::spawn()
 
         Log::debug("CGI process forked with PID: " + std::to_string(_pid));
 
-        request_.getClient().setCgiSockets(std::move(cgiStdIn), std::move(cgiStdOut)); // move the sockets to the client
+        // request_.getClient().setCgiSockets(std::move(cgiStdIn), std::move(cgiStdOut)); // move the sockets to the
+        // client
+        handler_.setCgiSockets(std::move(cgiStdIn), std::move(cgiStdOut));
     }
 }

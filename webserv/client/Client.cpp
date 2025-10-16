@@ -26,6 +26,7 @@ Client::Client(std::unique_ptr<ClientSocket> socket, Server &server)
     Log::trace(LOCATION);
     Log::info("New client connected, fd: " + std::to_string(clientSocket_->getFd()));
     clientSocket_->setCallback([this]() { request(); });
+    sockets_[clientSocket_->getFd()] = clientSocket_.get();
 }
 
 Client::~Client()
@@ -35,20 +36,15 @@ Client::~Client()
     server_.remove(*clientSocket_);
 };
 
-
 ASocket &Client::getSocket(int fd) const
 {
-    if (fd == -1 || clientSocket_->getFd() == fd)
+    if (fd == -1)
     {
         return *clientSocket_;
     }
-    if (cgiStdIn_ && cgiStdIn_->getFd() == fd)
+    if (sockets_.contains(fd))
     {
-        return *cgiStdIn_;
-    }
-    if (cgiStdOut_ && cgiStdOut_->getFd() == fd)
-    {
-        return *cgiStdOut_;
+        return *sockets_.at(fd);
     }
     Log::error("Socket not found for fd: " + std::to_string(fd));
     throw std::runtime_error("Socket not found for fd: " + std::to_string(fd));
@@ -88,7 +84,8 @@ void Client::request()
                       {"state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
                   });
         // server_.responseReady(client_socket_->getFd());
-        router_->handleRequest();
+        handler_ = router_->handleRequest();
+        handler_->handle();
     }
     else
     {
@@ -100,80 +97,23 @@ void Client::request()
     }
 }
 
-void Client::writeToCgi()
+//
+void Client::setCgiSockets(CgiSocket *cgiStdIn, CgiSocket *cgiStdOut)
 {
-    Log::trace(LOCATION);
-    if (cgiStdIn_ == nullptr)
-    {
-        Log::error("CGI stdin socket is null");
-        return;
-    }
-    if (httpRequest_->getBody().empty())
-    {
-        Log::debug("No body to write to CGI stdin, fd: " + std::to_string(cgiStdIn_->getFd()));
-        server_.remove(*cgiStdIn_);
-        cgiStdIn_ = nullptr;
-        return;
-    }
-    ssize_t bytesWritten = cgiStdIn_->write(httpRequest_->getBody().data(), httpRequest_->getBody().size());
-    if (bytesWritten < 0)
-    {
-        Log::error("Failed to write to CGI stdin, fd: " + std::to_string(cgiStdIn_->getFd()));
-    }
-    else
-    {
-        Log::debug("Wrote " + std::to_string(bytesWritten)
-                   + " bytes to CGI stdin, fd: " + std::to_string(cgiStdIn_->getFd()));
-    }
-    server_.remove(*cgiStdIn_);
-    cgiStdIn_ = nullptr;
+    server_.add(*cgiStdIn, EPOLLOUT, this); // write
+    server_.add(*cgiStdOut, EPOLLIN, this); // read
+
+    sockets_[cgiStdIn->getFd()] = cgiStdIn;
+    sockets_[cgiStdOut->getFd()] = cgiStdOut;
 }
 
-void Client::readFromCgi()
+void Client::removeCgiSocket(CgiSocket *cgiSocket)
 {
-    Log::trace(LOCATION);
-    if (cgiStdOut_ == nullptr)
-    {
-        Log::error("CGI stdout socket is null");
-        return;
-    }
-    char buffer[bufferSize_] = {}; // NOLINT(cppcoreguidelines-avoid-c-arrays)
-    ssize_t bytesRead
-        = cgiStdOut_->read(buffer, sizeof(buffer) - 1); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
-    if (bytesRead < 0)
-    {
-        Log::error("Failed to read from CGI stdout, fd: " + std::to_string(cgiStdOut_->getFd()));
-    }
-    else if (bytesRead == 0)
-    {
-        Log::info("CGI process closed stdout, fd: " + std::to_string(cgiStdOut_->getFd()));
-        server_.remove(*cgiStdOut_);
-        cgiStdOut_ = nullptr;
-        httpResponse_->addHeader("Content-Type", "text/html");
-        httpResponse_->setComplete();
-        return;
-    }
-    else
-    {
-        buffer[bytesRead] = '\0'; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        httpResponse_->appendBody(std::string(buffer, static_cast<size_t>(bytesRead)));
-        Log::debug("Read " + std::to_string(bytesRead)
-                   + " bytes from CGI stdout, fd: " + std::to_string(cgiStdOut_->getFd()));
-    }
-}
+    server_.remove(*cgiSocket);  // write
 
-void Client::setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_ptr<CgiSocket> cgiStdOut)
-{
-    cgiStdIn->setCallback([this]() { writeToCgi(); });
-    cgiStdOut->setCallback([this]() { readFromCgi(); });
-
-    cgiStdOut_ = std::move(cgiStdOut);
-    cgiStdIn_ = std::move(cgiStdIn);
-
-    server_.add(*cgiStdOut_, EPOLLIN, this); // read
-    server_.add(*cgiStdIn_, EPOLLOUT, this); // write
-
-    // TODO add to handler
+    sockets_.erase(cgiSocket->getFd());
+    // sockets_[cgiStdIn->getFd()] = cgiStdIn;
+    // sockets_[cgiStdOut->getFd()] = cgiStdOut;
 }
 
 void Client::poll() const

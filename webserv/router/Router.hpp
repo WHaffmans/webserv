@@ -1,5 +1,6 @@
 #pragma once
 
+#include "webserv/handler/AHandler.hpp"
 #include <webserv/config/AConfig.hpp> // for AConfig
 #include <webserv/config/LocationConfig.hpp>
 #include <webserv/http/HttpRequest.hpp>  // for HttpRequest
@@ -15,7 +16,7 @@ class Router
 {
   public:
     Router(Client *client);
-    void handleRequest();
+    [[nodiscard]] std::unique_ptr<AHandler> handleRequest();
 
   private:
     Client *client_;

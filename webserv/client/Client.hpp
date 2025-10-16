@@ -2,7 +2,9 @@
 
 // #include <webserv/http/HttpResponse.hpp>
 
+#include "webserv/handler/AHandler.hpp"
 #include "webserv/router/Router.hpp"
+#include "webserv/socket/ASocket.hpp"
 #include "webserv/socket/CgiSocket.hpp"
 
 #include <webserv/config/ServerConfig.hpp> // for ServerConfig
@@ -36,16 +38,13 @@ class Client
     void respond() const;
     void poll() const;
 
-    void writeToCgi();
-    void readFromCgi();
-
-
     // [[nodiscard]] int getStatusCode() const noexcept;
 
     [[nodiscard]] ASocket &getSocket(int fd = -1) const;
 
     // void setStatusCode(int code);
-    void setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_ptr<CgiSocket> cgiStdOut);
+    void setCgiSockets(CgiSocket *cgiStdIn, CgiSocket *cgiStdOut);
+    void removeCgiSocket(CgiSocket *cgiSocket);
 
     [[nodiscard]] HttpRequest &getHttpRequest() const noexcept;
     [[nodiscard]] HttpResponse &getHttpResponse() const noexcept;
@@ -56,8 +55,14 @@ class Client
     std::unique_ptr<HttpRequest> httpRequest_;
     std::unique_ptr<HttpResponse> httpResponse_;
     std::unique_ptr<Router> router_;
+    std::unique_ptr<AHandler> handler_ = nullptr;
     std::unique_ptr<ClientSocket> clientSocket_;
     std::unique_ptr<CgiSocket> cgiStdIn_ = nullptr;
     std::unique_ptr<CgiSocket> cgiStdOut_ = nullptr;
+
+    std::unordered_map<int, ASocket *> sockets_;
+
     Server &server_;
+    void writeToCgi();
+    void readFromCgi();
 };

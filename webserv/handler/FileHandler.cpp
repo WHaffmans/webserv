@@ -15,7 +15,7 @@
 #include <vector>   // for vector
 
 FileHandler::FileHandler(const HttpRequest &request, HttpResponse &response)
-    : config_(request.getUri().getConfig()), uri_(request.getUri()), response_(response)
+    : AHandler(request, response), uri_(request.getUri()), config_(uri_.getConfig())
 {
     Log::trace(LOCATION);
 }
@@ -71,7 +71,7 @@ void FileHandler::handleDirectory(const std::string &dirpath, ResourceType type)
     ErrorHandler::createErrorResponse(Http::StatusCode::NOT_FOUND, response_, config_);
 }
 
-void FileHandler::handle() const
+void FileHandler::handle()
 {
     Log::trace(LOCATION);
     if (!uri_.isValid())
@@ -85,10 +85,16 @@ void FileHandler::handle() const
 
     switch (resourceType)
     {
-    case FILE: handleFile(filepath); return;
+    case FILE:
+        handleFile(filepath);
+        return;
     case DIRECTORY_AUTOINDEX:
-    case DIRECTORY_INDEX: handleDirectory(filepath, resourceType); return;
-    case NOT_FOUND: ErrorHandler::createErrorResponse(Http::StatusCode::NOT_FOUND, response_, config_); return;
+    case DIRECTORY_INDEX:
+        handleDirectory(filepath, resourceType);
+        return;
+    case NOT_FOUND:
+        ErrorHandler::createErrorResponse(Http::StatusCode::NOT_FOUND, response_, config_);
+        return;
     }
     ErrorHandler::createErrorResponse(Http::StatusCode::NOT_FOUND, response_, config_);
 }
