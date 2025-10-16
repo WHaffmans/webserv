@@ -34,24 +34,24 @@ class Client
 
     void request();
     void respond() const;
+    void poll() const;
 
     void writeToCgi();
     void readFromCgi();
 
-    void poll() const;
 
-    [[nodiscard]] int getStatusCode() const noexcept;
+    // [[nodiscard]] int getStatusCode() const noexcept;
 
     [[nodiscard]] ASocket &getSocket(int fd = -1) const;
 
-    void setStatusCode(int code);
+    // void setStatusCode(int code);
     void setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_ptr<CgiSocket> cgiStdOut);
 
     [[nodiscard]] HttpRequest &getHttpRequest() const noexcept;
     [[nodiscard]] HttpResponse &getHttpResponse() const noexcept;
 
   private:
-    int statusCode_ = Http::StatusCode::OK;
+    // int statusCode_ = Http::StatusCode::OK;
     constexpr static size_t bufferSize_ = 8192; // 8KB buffer for reading CGI output
     std::unique_ptr<HttpRequest> httpRequest_;
     std::unique_ptr<HttpResponse> httpResponse_;

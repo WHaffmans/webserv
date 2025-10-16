@@ -17,6 +17,7 @@ URI::URI(const HttpRequest &request, const ServerConfig &serverConfig)
 {
     Log::trace(LOCATION);
     parseUri(request.getTarget());
+    Log::debug("Parsed URI: " + uriTrimmed_, {{"ConfigType", config_->getType()}});
     parseFullpath();
 
     authority_ = request.getHeaders().getHost().value();
@@ -84,23 +85,29 @@ void URI::parseFullpath()
 
     for (const auto &segment : uriSegments)
     {
-        std::string curDir = FileUtils::joinPath(dir_, segment);
+        std::string currentPath = FileUtils::joinPath(dir_, segment);
         if (segment.empty())
         {
             continue;
         }
 
-        if (FileUtils::isFile(curDir) && baseName_.empty())
+        if (FileUtils::isFile(currentPath) && baseName_.empty())
         {
             baseName_ = segment;
         }
-        else if (FileUtils::isDirectory(curDir))
+        else if (FileUtils::isDirectory(currentPath))
         {
             dir_ = FileUtils::joinPath(dir_, segment);
         }
         else if (!baseName_.empty()) // not file or dir, but we have a baseName already
         {
             pathInfo_ = FileUtils::joinPath(pathInfo_, baseName_);
+        }
+        else // not file or dir, and no baseName yet
+        {
+            valid_ = false;
+            Log::warning("Invalid path segment encountered: " + currentPath);
+            return;
         }
     }
     fullPath_ = FileUtils::joinPath(dir_, baseName_);
@@ -146,7 +153,7 @@ bool URI::isDirectory() const noexcept
 
 bool URI::isValid() const noexcept
 {
-    return FileUtils::isValidPath(fullPath_);
+    return valid_ && FileUtils::isValidPath(fullPath_);
 }
 
 bool URI::isCgi() const noexcept

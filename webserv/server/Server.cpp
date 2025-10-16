@@ -168,7 +168,7 @@ void Server::handleRequest(struct epoll_event *event) const
     client.getSocket(client_fd).callback();
 }
 
-void Server::responseReady(int client_fd) const
+void Server::writable(int client_fd) const
 {
     Log::trace(LOCATION);
     Log::debug("Response ready for client fd: " + std::to_string(client_fd));

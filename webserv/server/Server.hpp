@@ -36,7 +36,7 @@ class Server
     void add(const ASocket &socket, uint32_t events, Client *client = nullptr);
     void remove(const ASocket &socket);
     void disconnect(const Client &client);
-    void responseReady(int client_fd) const;
+    void writable(int client_fd) const;
 
     ServerSocket &getListener(int fd) const;
     Client &getClient(int fd) const;

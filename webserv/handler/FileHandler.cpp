@@ -23,6 +23,7 @@ FileHandler::FileHandler(const HttpRequest &request, HttpResponse &response)
 void FileHandler::handleFile(const std::string &filepath) const
 {
     Log::trace(LOCATION);
+    Log::debug("Requested path is a file: " + filepath);
     // auto response = std::make_unique<HttpResponse>();
 
     std::string extension = FileUtils::getExtension(filepath);
@@ -45,6 +46,7 @@ void FileHandler::handleFile(const std::string &filepath) const
 void FileHandler::handleDirectory(const std::string &dirpath, ResourceType type) const
 {
     Log::trace(LOCATION);
+    Log::debug("Requested path is a directory: " + dirpath);
 
     if (type == DIRECTORY_INDEX)
     {
@@ -72,7 +74,13 @@ void FileHandler::handleDirectory(const std::string &dirpath, ResourceType type)
 void FileHandler::handle() const
 {
     Log::trace(LOCATION);
+    if (!uri_.isValid())
+    {
+        ErrorHandler::createErrorResponse(Http::StatusCode::NOT_FOUND, response_, config_);
+        return;
+    }
     std::string filepath = uri_.getFullPath();
+    Log::debug("Handling file request for path: " + filepath);
     ResourceType resourceType = getResourceType(filepath);
 
     switch (resourceType)

@@ -94,7 +94,6 @@ void HttpRequest::parseBuffer()
                 return; // Request is complete
             case State::ParseError:
                 Log::warning("Parse error occurred, stopping further processing");
-                client_->setStatusCode(Http::StatusCode::BAD_REQUEST);
                 return;
             }
         }

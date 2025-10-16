@@ -20,6 +20,7 @@ void ErrorHandler::createErrorResponse(uint16_t statusCode, HttpResponse &respon
     response.addHeader("Content-Type", "text/html");
     response.addHeader("Connection", "close");
     response.appendBody(generateErrorPage(statusCode, config));
+    response.setComplete();
 }
 
 std::string ErrorHandler::generateErrorPage(uint16_t statusCode, const AConfig *config)

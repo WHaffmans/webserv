@@ -35,15 +35,6 @@ Client::~Client()
     server_.remove(*clientSocket_);
 };
 
-int Client::getStatusCode() const noexcept
-{
-    return statusCode_;
-}
-
-void Client::setStatusCode(int code)
-{
-    statusCode_ = code;
-}
 
 ASocket &Client::getSocket(int fd) const
 {
@@ -191,7 +182,7 @@ void Client::poll() const
     {
         Log::info("Response is ready to be sent to client, fd: " + std::to_string(clientSocket_->getFd()));
         clientSocket_->setCallback([this]() { respond(); });
-        server_.responseReady(clientSocket_->getFd());
+        server_.writable(clientSocket_->getFd());
     }
 }
 

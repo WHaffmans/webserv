@@ -49,6 +49,7 @@ class URI
     std::string query_;
     std::string fragment_;
     std::string authority_;
+    bool valid_ = true;
 
     static const AConfig *matchConfig(const std::string &uri, const ServerConfig &serverConfig);
 };
