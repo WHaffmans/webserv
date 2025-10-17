@@ -1,3 +1,4 @@
+#include "webserv/handler/CgiHandler.hpp"
 #include "webserv/socket/ASocket.hpp"
 #include "webserv/socket/CgiSocket.hpp"
 
@@ -118,12 +119,20 @@ void Client::removeCgiSocket(CgiSocket *cgiSocket)
 
 void Client::poll() const
 {
+    auto * cgiHandler = dynamic_cast<CgiHandler *>(handler_.get());
+    if (cgiHandler != nullptr)
+    {
+        Log::debug("Polling CGI handler for client, fd: " + std::to_string(clientSocket_->getFd()));
+        // CGI handler polling logic if needed
+        cgiHandler->wait();
+    }
     if (httpResponse_->isComplete())
     {
         Log::info("Response is ready to be sent to client, fd: " + std::to_string(clientSocket_->getFd()));
         clientSocket_->setCallback([this]() { respond(); });
         server_.writable(clientSocket_->getFd());
     }
+
 }
 
 void Client::respond() const

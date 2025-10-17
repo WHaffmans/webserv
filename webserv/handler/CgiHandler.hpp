@@ -20,13 +20,17 @@ class CgiHandler : public AHandler
     ~CgiHandler() = default;
 
     void handle() override;
+    void wait() noexcept;
     void setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_ptr<CgiSocket> cgiStdOut);
+    void setPid(int pid);
 
   private:
     constexpr static size_t bufferSize_ = 8192; // TODO: remove duplicate definition and move to configmanager
     std::unique_ptr<CgiProcess> cgiProcess_;
     std::unique_ptr<CgiSocket> cgiStdIn_;
     std::unique_ptr<CgiSocket> cgiStdOut_;
+    int pid_ = -1;
+
 
     void write();
     void read();

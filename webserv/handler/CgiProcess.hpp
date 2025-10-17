@@ -15,6 +15,8 @@ class CgiProcess
     CgiProcess &operator=(CgiProcess &&other) noexcept = delete;
 
     ~CgiProcess() = default;
+    void kill() const noexcept;
+    void wait() noexcept;
 
   private:
     const HttpRequest &request_;

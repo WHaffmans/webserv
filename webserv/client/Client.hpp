@@ -57,9 +57,6 @@ class Client
     std::unique_ptr<Router> router_;
     std::unique_ptr<AHandler> handler_ = nullptr;
     std::unique_ptr<ClientSocket> clientSocket_;
-    std::unique_ptr<CgiSocket> cgiStdIn_ = nullptr;
-    std::unique_ptr<CgiSocket> cgiStdOut_ = nullptr;
-
     std::unordered_map<int, ASocket *> sockets_;
 
     Server &server_;

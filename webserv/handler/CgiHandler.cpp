@@ -19,6 +19,7 @@ void CgiHandler::handle()
     // Initialize CGI process
     cgiProcess_ = std::make_unique<CgiProcess>(request_, *this);
 
+
     Log::info("CGI process started and sockets registered");
 }
 
@@ -95,4 +96,18 @@ void CgiHandler::setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_
     request_.getClient().setCgiSockets(cgiStdIn_.get(), cgiStdOut_.get()); // write
 
     // TODO add to handler
+}
+
+void CgiHandler::wait() noexcept
+{
+    if (cgiProcess_)
+    {
+        cgiProcess_->wait();
+    }
+}
+
+void CgiHandler::setPid(int pid)
+{
+    pid_ = pid;
+
 }

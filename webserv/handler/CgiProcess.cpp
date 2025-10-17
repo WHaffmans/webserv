@@ -11,6 +11,8 @@
 
 #include <sys/socket.h>
 #include <unistd.h>
+#include <sys/wait.h>
+#include <csignal>
 
 CgiProcess::CgiProcess(const HttpRequest &request, CgiHandler &handler) : request_(request), handler_(handler), _pid(-1)
 {
@@ -81,5 +83,37 @@ void CgiProcess::spawn()
         // request_.getClient().setCgiSockets(std::move(cgiStdIn), std::move(cgiStdOut)); // move the sockets to the
         // client
         handler_.setCgiSockets(std::move(cgiStdIn), std::move(cgiStdOut));
+        handler_.setPid(_pid);
+    }
+}
+
+void CgiProcess::kill() const noexcept
+{
+    if (_pid > 0)
+    {
+        ::kill(_pid, SIGKILL);
+        Log::debug("Killed CGI process with PID: " + std::to_string(_pid));
+    }
+}
+
+void CgiProcess::wait() noexcept
+{
+    if (_pid > 0)
+    {
+        int status;
+        int waitResult =::waitpid(_pid, &status, WNOHANG);
+        if (waitResult == -1)
+        {
+            Log::error("Error while waiting for CGI process with PID: " + std::to_string(_pid));
+            return;
+        }
+        if (waitResult == 0)
+        {
+            // Still running
+            return;
+        }
+
+        Log::debug("CGI process with PID " + std::to_string(_pid) + " has terminated");
+        _pid = -1;
     }
 }
