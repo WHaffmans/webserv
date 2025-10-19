@@ -37,7 +37,8 @@ ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make
 
     /*Location Directive Rules*/
     engine_->addLocationRule("allowed_methods",
-                             std::make_unique<AllowedValuesRule>(std::vector<std::string>{"GET", "POST", "DELETE"}));
+                             std::make_unique<AllowedValuesRule>(std::vector<std::string>{"GET", "POST", "DELETE", "PUT"},
+                                                                 true));
     engine_->addLocationRule("root", std::make_unique<FolderExistsRule>(true));
     engine_->addLocationRule("cgi_ext", std::make_unique<CgiExtValidationRule>(false));
 
