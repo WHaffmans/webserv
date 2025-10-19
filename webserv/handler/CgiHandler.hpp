@@ -26,9 +26,16 @@ class CgiHandler : public AHandler
 
   private:
     constexpr static size_t bufferSize_ = 8192; // TODO: remove duplicate definition and move to configmanager
+    std::vector<uint8_t> buffer_;
+
     std::unique_ptr<CgiProcess> cgiProcess_;
     std::unique_ptr<CgiSocket> cgiStdIn_;
     std::unique_ptr<CgiSocket> cgiStdOut_;
+    void parseCgiOutput();
+    void parseCgiHeaders(std::string &headers);
+    void parseCgiBody();
+    void appendToBuffer(const char *data, size_t length);
+
     int pid_ = -1;
 
 
