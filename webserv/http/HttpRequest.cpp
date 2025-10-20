@@ -33,8 +33,9 @@ void HttpRequest::setState(State state)
 {
     if (state == State::Complete)
     {
+        //TODO: segfault if server does not exist
         uri_ = std::make_unique<URI>(
-            *this, *ConfigManager::getInstance().getMatchingServerConfig(getHeaders().getHost().value_or("")));
+            *this, *ConfigManager::getInstance().getMatchingServerConfig(getHeaders().getHost().value_or("")));   
     }
     state_ = state;
 }
