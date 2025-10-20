@@ -6,7 +6,7 @@
 #include <webserv/http/HttpRequest.hpp> // for HttpRequest
 #include <webserv/server/Server.hpp>
 
-#include <map>    // for map
+
 #include <string> // for string, basic_string
 
 class LocationConfig;
@@ -17,8 +17,6 @@ class URI
 {
   public:
     URI(const HttpRequest &request, const ServerConfig &serverConfig);
-
-    [[nodiscard]] std::map<std::string, std::string> getCGIEnvironment() const;
 
     [[nodiscard]] bool isFile() const noexcept;
     [[nodiscard]] bool isDirectory() const noexcept;

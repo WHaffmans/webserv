@@ -1,5 +1,6 @@
 #include "webserv/handler/CgiProcess.hpp"
 
+#include "webserv/handler/CgiEnvironment.hpp"
 #include "webserv/http/HttpRequest.hpp"
 #include "webserv/socket/CgiSocket.hpp"
 
@@ -28,7 +29,6 @@ void CgiProcess::spawn()
 {
     const URI &uri = request_.getUri();
     auto cgiPath = uri.getCgiPath();
-    auto environment = uri.getCGIEnvironment();
 
     // pipes
 
@@ -63,11 +63,12 @@ void CgiProcess::spawn()
 
         // Prepare arguments
         std::string fullPath = uri.getFullPath();
+        CgiEnvironment cgiEnv(uri, request_);
         char *args[] = {const_cast<char *>(cgiPath.c_str()), const_cast<char *>(fullPath.c_str()), nullptr};
         // Log::debug("With args:", {args[0], args[1]});
 
         // TODO: Close all FDs
-        execve(const_cast<char *>(cgiPath.c_str()), args, nullptr);
+        execve(const_cast<char *>(cgiPath.c_str()), args, cgiEnv.toEnvp());
         exit(1);
     }
     else
@@ -114,6 +115,7 @@ void CgiProcess::wait() noexcept
         }
 
         Log::debug("CGI process with PID " + std::to_string(_pid) + " has terminated");
+        ;
         _pid = -1;
     }
 }

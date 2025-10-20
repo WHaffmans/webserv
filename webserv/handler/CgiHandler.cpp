@@ -121,6 +121,7 @@ void CgiHandler::parseCgiOutput()
         Log::debug("CGI output headers not complete yet");
         return;
     }
+
     // Parse the headers
     std::string headers(buffer_.begin(), buffer_.begin() + static_cast<long>(headerEnd));
     Log::debug("CGI output headers: " + headers);
@@ -133,24 +134,51 @@ void CgiHandler::parseCgiOutput()
 void CgiHandler::parseCgiHeaders(std::string &headers)
 {
     Log::trace(LOCATION);
+
+    // Debug: log the raw headers to see what we're getting
+    Log::debug("Raw CGI headers (length=" + std::to_string(headers.length()) + "): [" + headers + "]");
+
     size_t start = 0;
     size_t end = headers.find("\r\n");
     while (end != std::string::npos)
     {
         std::string header = headers.substr(start, end - start);
-        Log::debug("CGI header: " + header);
-        size_t colonPos = header.find(':');
-        if (colonPos != std::string::npos)
+        if (!header.empty())
         {
-            std::string name = header.substr(0, colonPos);
-            std::string value = header.substr(colonPos + 1);
-            name = utils::trim(name);
-            value = utils::trim(value);
-            response_.addHeader(name, value);
+            Log::debug("CGI header: [" + header + "]");
+            size_t colonPos = header.find(':');
+            if (colonPos != std::string::npos)
+            {
+                std::string name = header.substr(0, colonPos);
+                std::string value = header.substr(colonPos + 1);
+                name = utils::trim(name);
+                value = utils::trim(value);
+                response_.addHeader(name, value);
+            }
+            else
+            {
+                Log::warning("CGI header has no colon: [" + header + "]");
+            }
         }
         start = end + 2;
         end = headers.find("\r\n", start);
     }
+
+    // // Handle the last header (might not have trailing \r\n)
+    // std::string lastHeader = headers.substr(start);
+    // if (!lastHeader.empty())
+    // {
+    //     Log::debug("Last CGI header: [" + lastHeader + "]");
+    //     size_t colonPos = lastHeader.find(':');
+    //     if (colonPos != std::string::npos)
+    //     {
+    //         std::string name = lastHeader.substr(0, colonPos);
+    //         std::string value = lastHeader.substr(colonPos + 1);
+    //         name = utils::trim(name);
+    //         value = utils::trim(value);
+    //         response_.addHeader(name, value);
+    //     }
+    // }
 }
 
 void CgiHandler::parseCgiBody()
