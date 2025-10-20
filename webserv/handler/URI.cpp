@@ -110,6 +110,20 @@ void URI::parseFullpath()
             return;
         }
     }
+    if (baseName_.empty() && FileUtils::isDirectory(fullPath_))
+    {
+        for (const auto &index : config_->get<std::vector<std::string>>("index").value_or(std::vector<std::string>()))
+        {
+            std::string indexPath = FileUtils::joinPath(fullPath_, index);
+            if (FileUtils::isFile(indexPath))
+            {
+                baseName_ = index;
+                break;
+            }
+        }
+    }
+    Log::debug("URI parseFullpath results",
+               {{"dir", dir_}, {"baseName", baseName_}, {"pathInfo", pathInfo_}});
     fullPath_ = FileUtils::joinPath(dir_, baseName_);
 }
 
