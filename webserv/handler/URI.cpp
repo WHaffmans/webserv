@@ -60,7 +60,9 @@ void URI::parseUri(const std::string &uri)
     {
         auto const *locConfig = dynamic_cast<LocationConfig const *>(config_);
         std::string locTrimmed = utils::trim(locConfig->getPath(), "/");
-        std::string uriSub = uri.substr(locTrimmed.length());
+        std::string uriTrimmed = utils::trim(uri, "/");
+
+        std::string uriSub = uriTrimmed.substr(locTrimmed.length());
         fullPath_ = FileUtils::joinPath(locConfig->get<std::string>("root").value_or(""), uriSub);
     }
 
