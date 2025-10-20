@@ -164,21 +164,21 @@ void CgiHandler::parseCgiHeaders(std::string &headers)
         end = headers.find("\r\n", start);
     }
 
-    // // Handle the last header (might not have trailing \r\n)
-    // std::string lastHeader = headers.substr(start);
-    // if (!lastHeader.empty())
-    // {
-    //     Log::debug("Last CGI header: [" + lastHeader + "]");
-    //     size_t colonPos = lastHeader.find(':');
-    //     if (colonPos != std::string::npos)
-    //     {
-    //         std::string name = lastHeader.substr(0, colonPos);
-    //         std::string value = lastHeader.substr(colonPos + 1);
-    //         name = utils::trim(name);
-    //         value = utils::trim(value);
-    //         response_.addHeader(name, value);
-    //     }
-    // }
+    // Handle the last header (might not have trailing \r\n)
+    std::string lastHeader = headers.substr(start);
+    if (!lastHeader.empty())
+    {
+        Log::debug("Last CGI header: [" + lastHeader + "]");
+        size_t colonPos = lastHeader.find(':');
+        if (colonPos != std::string::npos)
+        {
+            std::string name = lastHeader.substr(0, colonPos);
+            std::string value = lastHeader.substr(colonPos + 1);
+            name = utils::trim(name);
+            value = utils::trim(value);
+            response_.addHeader(name, value);
+        }
+    }
 }
 
 void CgiHandler::parseCgiBody()

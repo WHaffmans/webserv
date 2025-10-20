@@ -4,6 +4,15 @@ header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
 header("X-Content-Type-Options: nosniff");
+session_start();
+// Initialize counter if not set
+if (!isset($_SESSION['request_count'])) {
+    $_SESSION['request_count'] = 0;
+}
+
+// Increment on each request
+$_SESSION['request_count']++;
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -43,7 +52,8 @@ header("X-Content-Type-Options: nosniff");
     <div class="info">
         <strong>CGI Status:</strong> <span class="success">✅ PHP CGI is working!</span><br>
         <strong>Execution Time:</strong> <?php echo date('Y-m-d H:i:s'); ?><br>
-        <strong>PHP Version:</strong> <?php echo phpversion(); ?>
+        <strong>PHP Version:</strong> <?php echo phpversion(); ?><br>
+        <strong>Session Request Count:</strong> <?php echo $_SESSION['request_count']; ?>
     </div>
 
     <div class="container">

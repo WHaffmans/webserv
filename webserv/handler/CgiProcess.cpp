@@ -6,14 +6,14 @@
 
 #include <webserv/handler/URI.hpp>
 
+#include <csignal>
 #include <cstdlib>
 #include <memory>
 #include <string>
 
 #include <sys/socket.h>
-#include <unistd.h>
 #include <sys/wait.h>
-#include <csignal>
+#include <unistd.h>
 
 CgiProcess::CgiProcess(const HttpRequest &request, CgiHandler &handler) : request_(request), handler_(handler), _pid(-1)
 {
@@ -39,7 +39,7 @@ void CgiProcess::spawn()
     {
         throw std::runtime_error("Failed to create pipes");
     }
-
+    CgiEnvironment cgiEnv(uri, request_);
     _pid = fork();
     if (_pid < 0)
     {
@@ -63,7 +63,7 @@ void CgiProcess::spawn()
 
         // Prepare arguments
         std::string fullPath = uri.getFullPath();
-        CgiEnvironment cgiEnv(uri, request_);
+
         char *args[] = {const_cast<char *>(cgiPath.c_str()), const_cast<char *>(fullPath.c_str()), nullptr};
         // Log::debug("With args:", {args[0], args[1]});
 
@@ -102,7 +102,7 @@ void CgiProcess::wait() noexcept
     if (_pid > 0)
     {
         int status;
-        int waitResult =::waitpid(_pid, &status, WNOHANG);
+        int waitResult = ::waitpid(_pid, &status, WNOHANG);
         if (waitResult == -1)
         {
             Log::error("Error while waiting for CGI process with PID: " + std::to_string(_pid));
