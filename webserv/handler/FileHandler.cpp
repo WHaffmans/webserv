@@ -20,6 +20,12 @@ FileHandler::FileHandler(const HttpRequest &request, HttpResponse &response)
     Log::trace(LOCATION);
 }
 
+void FileHandler::handleTimeout()
+{
+    Log::warning("File handler timeout occurred for path: " + uri_.getFullPath());
+    ErrorHandler::createErrorResponse(504, response_, config_);
+}
+
 void FileHandler::handleFile(const std::string &filepath) const
 {
     Log::trace(LOCATION);

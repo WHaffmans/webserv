@@ -93,7 +93,7 @@ void Client::request()
         }
         else
         {
-          ErrorHandler::createErrorResponse(500, *httpResponse_);  
+            ErrorHandler::createErrorResponse(500, *httpResponse_);
         }
     }
     else
@@ -149,7 +149,7 @@ void Client::poll() const
         Log::info("Response is ready to be sent to client, fd: " + std::to_string(clientSocket_->getFd()));
         clientSocket_->setCallback([this]() { respond(); });
         // server_.writable(clientSocket_->getFd());
-        clientSocket_->setIOState(ASocket::IOState::WRITE);
+        clientSocket_->setIOState(ASocket::IoState::WRITE);
     }
 }
 

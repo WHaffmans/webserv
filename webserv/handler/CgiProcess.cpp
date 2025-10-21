@@ -82,9 +82,9 @@ void CgiProcess::spawn()
     else
     {
         // Parent process
-        auto cgiStdIn = std::make_unique<CgiSocket>(pipeStdin[1], ASocket::IOState::WRITE);
-        auto cgiStdOut = std::make_unique<CgiSocket>(pipeStdout[0], ASocket::IOState::READ);
-        auto cgiStdErr = std::make_unique<CgiSocket>(pipeStderr[0], ASocket::IOState::READ);
+        auto cgiStdIn = std::make_unique<CgiSocket>(pipeStdin[1], ASocket::IoState::WRITE);
+        auto cgiStdOut = std::make_unique<CgiSocket>(pipeStdout[0], ASocket::IoState::READ);
+        auto cgiStdErr = std::make_unique<CgiSocket>(pipeStderr[0], ASocket::IoState::READ);
 
         close(pipeStdin[0]);
         close(pipeStdout[1]);
@@ -95,7 +95,7 @@ void CgiProcess::spawn()
         // request_.getClient().setCgiSockets(std::move(cgiStdIn), std::move(cgiStdOut)); // move the sockets to the
         // client
         handler_.setCgiSockets(std::move(cgiStdIn), std::move(cgiStdOut), std::move(cgiStdErr));
-        
+
         handler_.setPid(_pid);
     }
 }

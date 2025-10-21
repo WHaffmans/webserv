@@ -13,10 +13,11 @@ class ASocket
     {
         CLIENT_SOCKET,
         SERVER_SOCKET,
-        CGI_SOCKET
+        CGI_SOCKET,
+        TIMER_SOCKET
     };
 
-    enum class IOState : uint32_t
+    enum class IoState : uint32_t
     {
         NONE = 0,
         READ = 1 << 0,
@@ -24,7 +25,7 @@ class ASocket
     };
 
     ASocket() = delete;
-    explicit ASocket(int fd, IOState state = IOState::READ);
+    explicit ASocket(int fd, IoState state = IoState::NONE);
 
     ASocket(const ASocket &other) = delete;
     ASocket &operator=(const ASocket &other) = delete;
@@ -35,7 +36,7 @@ class ASocket
 
     [[nodiscard]] virtual Type getType() const noexcept = 0;
     [[nodiscard]] int getFd() const noexcept;
-    [[nodiscard]] IOState getEvent() const noexcept;
+    [[nodiscard]] IoState getEvent() const noexcept;
     [[nodiscard]] bool isDirty() const noexcept;
 
     void callback() const;
@@ -44,7 +45,7 @@ class ASocket
     virtual ssize_t read(void *buf, size_t len) const;
     virtual ssize_t write(const void *buf, size_t len) const;
 
-    void setIOState(IOState event);
+    void setIOState(IoState event);
     void processed();
 
   protected:
@@ -54,6 +55,6 @@ class ASocket
   private:
     int fd_;
     bool dirty_ = false;
-    IOState ioState_;
+    IoState ioState_;
     std::function<void()> callback_ = nullptr;
 };

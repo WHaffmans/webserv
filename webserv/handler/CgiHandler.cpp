@@ -1,3 +1,4 @@
+#include "webserv/handler/ErrorHandler.hpp"
 #include <webserv/client/Client.hpp> // for Client
 #include <webserv/handler/CgiHandler.hpp>
 #include <webserv/handler/CgiProcess.hpp> // for CgiProcess
@@ -19,6 +20,8 @@ void CgiHandler::handle()
 
     // Initialize CGI process
     cgiProcess_ = std::make_unique<CgiProcess>(request_, *this);
+
+    startTimer();
 
     Log::info("CGI process started and sockets registered");
 }
@@ -71,6 +74,7 @@ void CgiHandler::read()
     {
         Log::info("CGI process closed stdout, fd: " + std::to_string(cgiStdOut_->getFd()));
         request_.getClient().removeSocket(cgiStdOut_.get());
+        request_.getClient().removeSocket(timerSocket_.get());
         cgiStdOut_ = nullptr;
         parseCgiOutput();
         return;
@@ -103,6 +107,7 @@ void CgiHandler::error()
     {
         Log::info("CGI process closed stderr, fd: " + std::to_string(cgiStdErr_->getFd()));
         request_.getClient().removeSocket(cgiStdErr_.get());
+        request_.getClient().removeSocket(timerSocket_.get()); // todo maybe this dangerous
         cgiStdErr_ = nullptr;
         return;
     }
@@ -211,6 +216,21 @@ void CgiHandler::parseCgiHeaders(std::string &headers)
             response_.addHeader(name, value);
         }
     }
+}
+
+void CgiHandler::handleTimeout()
+{
+    Log::warning("CGI handler timeout occurred for PID: " + std::to_string(pid_));
+
+    // Terminate the CGI process if it's still running
+    if (cgiProcess_)
+    {
+        cgiProcess_->kill();
+        Log::info("Terminated CGI process with PID: " + std::to_string(pid_));
+    }
+
+    ErrorHandler::createErrorResponse(504, response_);
+    // cancelTimer();
 }
 
 void CgiHandler::parseCgiBody()

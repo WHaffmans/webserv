@@ -9,7 +9,7 @@
 class CgiSocket : public ASocket
 {
   public:
-    explicit CgiSocket(int fd, ASocket::IOState event);
+    explicit CgiSocket(int fd, ASocket::IoState event);
 
     [[nodiscard]] ASocket::Type getType() const noexcept override;
 

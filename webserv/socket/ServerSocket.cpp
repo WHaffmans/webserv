@@ -11,7 +11,7 @@
 #include <sys/socket.h> // for AF_INET, accept, bind, listen, setsockopt, socket, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 #include <unistd.h>     // for close
 
-ServerSocket::ServerSocket() : ASocket(socket(AF_INET, SOCK_STREAM, 0))
+ServerSocket::ServerSocket() : ASocket(socket(AF_INET, SOCK_STREAM, 0), ASocket::IoState::READ)
 {
     Log::trace(LOCATION);
     if (getFd() == -1)

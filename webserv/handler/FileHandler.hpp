@@ -29,6 +29,9 @@ class FileHandler : public AHandler
 
     void handle() override;
 
+  protected:
+    void handleTimeout() override;
+
   private:
   const URI &uri_;
     const AConfig *config_;

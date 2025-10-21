@@ -18,5 +18,5 @@ void removeComments(std::string &str);
 std::vector<std::string> split(const std::string &str, char delimiter);
 std::string implode(const std::vector<std::string> &elements, const std::string &delimiter);
 
-uint32_t stateToEpoll(const ASocket::IOState &event);
+uint32_t stateToEpoll(const ASocket::IoState &event);
 } // namespace utils

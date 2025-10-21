@@ -89,7 +89,12 @@ void Server::remove(ASocket &socket)
     int fd = socket.getFd();
     if (epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, fd, nullptr) == -1)
     {
-        Log::error("epoll_ctl DEL failed for fd: " + std::to_string(fd));
+        if (errno == EBADF || errno == ENOENT)
+        {
+            Log::debug("Socket fd " + std::to_string(fd) + " was already closed or removed from epoll");
+            return;
+        }
+        Log::error("epoll_ctl DEL failed for fd: " + std::to_string(fd) + " with error: " + std::strerror(errno));
         throw std::runtime_error("epoll_ctl DEL failed");
     }
     socketToClient_.erase(fd);
@@ -133,7 +138,7 @@ void Server::handleConnection(struct epoll_event *event)
     Log::trace(LOCATION);
     ServerSocket &listener = getListener(event->data.fd);
     std::unique_ptr<ClientSocket> clientSocket = listener.accept();
-
+    clientSocket->setIOState(ASocket::IoState::READ);
     auto client = std::make_unique<Client>(std::move(clientSocket), *this);
     add(client->getSocket(), client.get());
     clients_.emplace_back(std::move(client));
@@ -198,7 +203,12 @@ void Server::update(const ASocket &socket) const
     evt.data.fd = socketFd;
     if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, socketFd, &evt) == -1)
     {
-        Log::error("epoll_ctl MOD failed for fd: " + std::to_string(socketFd));
+        if (errno == EBADF || errno == ENOENT)
+        {
+            Log::debug("Socket fd " + std::to_string(socketFd) + " was already closed or removed from epoll");
+            return;
+        }
+        Log::error("epoll_ctl MOD failed for fd: " + std::to_string(socketFd) + " with error: " + std::strerror(errno));
         throw std::runtime_error("epoll_ctl MOD failed");
     }
 }

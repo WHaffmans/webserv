@@ -10,7 +10,7 @@
 #include <sys/socket.h> // for recv, send
 #include <unistd.h>     // for close
 
-ASocket::ASocket(int fd, IOState event) : fd_(fd), ioState_(event)
+ASocket::ASocket(int fd, IoState event) : fd_(fd), ioState_(event)
 {
     Log::trace(LOCATION);
     if (fd_ == -1)
@@ -65,7 +65,7 @@ int ASocket::getFd() const noexcept
     return fd_;
 }
 
-ASocket::IOState ASocket::getEvent() const noexcept
+ASocket::IoState ASocket::getEvent() const noexcept
 {
     return ioState_;
 }
@@ -75,7 +75,7 @@ bool ASocket::isDirty() const noexcept
     return dirty_;
 }
 
-void ASocket::setIOState(IOState event)
+void ASocket::setIOState(IoState event)
 {
     if (event == ioState_)
     {

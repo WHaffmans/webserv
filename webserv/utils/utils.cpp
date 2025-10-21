@@ -139,15 +139,15 @@ std::string implode(const std::vector<std::string> &elements, const std::string 
     return stream.str();
 }
 
-uint32_t stateToEpoll(const ASocket::IOState &event)
+uint32_t stateToEpoll(const ASocket::IoState &event)
 {
     uint32_t epollEvents = 0;
-    using EventType = std::underlying_type_t<ASocket::IOState>;
-    if ((static_cast<EventType>(event) & static_cast<EventType>(ASocket::IOState::READ)) != 0U)
+    using EventType = std::underlying_type_t<ASocket::IoState>;
+    if ((static_cast<EventType>(event) & static_cast<EventType>(ASocket::IoState::READ)) != 0U)
     {
         epollEvents |= EPOLLIN;
     }
-    if ((static_cast<EventType>(event) & static_cast<EventType>(ASocket::IOState::WRITE)) != 0U)
+    if ((static_cast<EventType>(event) & static_cast<EventType>(ASocket::IoState::WRITE)) != 0U)
     {
         epollEvents |= EPOLLOUT;
     }

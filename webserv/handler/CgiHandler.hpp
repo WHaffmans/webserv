@@ -24,6 +24,9 @@ class CgiHandler : public AHandler
     void setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_ptr<CgiSocket> cgiStdOut, std::unique_ptr<CgiSocket> cgiStdErr);
     void setPid(int pid);
 
+  protected:
+    void handleTimeout() override;
+
   private:
     constexpr static size_t bufferSize_ = 8192; // TODO: remove duplicate definition and move to configmanager
     std::vector<uint8_t> buffer_;

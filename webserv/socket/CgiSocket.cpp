@@ -4,7 +4,7 @@
 
 #include <unistd.h>
 
-CgiSocket::CgiSocket(int fd, ASocket::IOState event) : ASocket(fd, event)
+CgiSocket::CgiSocket(int fd, ASocket::IoState event) : ASocket(fd, event)
 {
     Log::trace(LOCATION);
 }
