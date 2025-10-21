@@ -106,26 +106,33 @@ void Client::request()
     }
 }
 
-//
-void Client::setCgiSockets(CgiSocket *cgiStdIn, CgiSocket *cgiStdOut, CgiSocket *cgiStdErr)
+// //
+// void Client::setCgiSockets(CgiSocket *cgiStdIn, CgiSocket *cgiStdOut)
+// {
+//     // server_.add(*cgiStdIn, EPOLLOUT, this); // write
+//     // server_.add(*cgiStdOut, EPOLLIN, this); // read
+
+//     sockets_[cgiStdIn->getFd()] = cgiStdIn;
+//     sockets_[cgiStdOut->getFd()] = cgiStdOut;
+// }
+
+// void Client::removeCgiSocket(CgiSocket *cgiSocket)
+// {
+//     server_.remove(*cgiSocket);  // write
+
+//     sockets_.erase(cgiSocket->getFd());
+// }
+
+void Client::addSocket(ASocket *socket)
 {
-    server_.add(*cgiStdIn, EPOLLOUT, this); // write
-    server_.add(*cgiStdOut, EPOLLIN, this); // read
-    server_.add(*cgiStdErr, EPOLLIN, this); // error
-
-
-    sockets_[cgiStdIn->getFd()] = cgiStdIn;
-    sockets_[cgiStdOut->getFd()] = cgiStdOut;
-    sockets_[cgiStdErr->getFd()] = cgiStdErr;
+    server_.add(*socket, this);
+    sockets_[socket->getFd()] = socket;
 }
 
-void Client::removeCgiSocket(CgiSocket *cgiSocket)
+void Client::removeSocket(ASocket *socket)
 {
-    server_.remove(*cgiSocket); // write
-
-    sockets_.erase(cgiSocket->getFd());
-    // sockets_[cgiStdIn->getFd()] = cgiStdIn;
-    // sockets_[cgiStdOut->getFd()] = cgiStdOut;
+    server_.remove(*socket);
+    sockets_.erase(socket->getFd());
 }
 
 void Client::poll() const
@@ -141,7 +148,8 @@ void Client::poll() const
     {
         Log::info("Response is ready to be sent to client, fd: " + std::to_string(clientSocket_->getFd()));
         clientSocket_->setCallback([this]() { respond(); });
-        server_.writable(clientSocket_->getFd());
+        // server_.writable(clientSocket_->getFd());
+        clientSocket_->setIOState(ASocket::IOState::WRITE);
     }
 }
 

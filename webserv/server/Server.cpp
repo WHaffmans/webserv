@@ -1,3 +1,5 @@
+#include "webserv/utils/utils.hpp"
+
 #include <webserv/client/Client.hpp>        // for Client
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/ServerConfig.hpp>  // for ServerConfig
@@ -59,7 +61,7 @@ Server::~Server()
     }
 }
 
-void Server::add(const ASocket &socket, uint32_t events, Client *client)
+void Server::add(ASocket &socket, Client *client)
 {
     if (socket.getType() != ASocket::Type::SERVER_SOCKET && client == nullptr)
     {
@@ -69,7 +71,7 @@ void Server::add(const ASocket &socket, uint32_t events, Client *client)
     Log::trace(LOCATION);
     int fd = socket.getFd();
     struct epoll_event event{};
-    event.events = events;
+    event.events = utils::stateToEpoll(socket.getEvent());
     event.data.fd = fd;
     if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, fd, &event) == -1)
     {
@@ -78,9 +80,10 @@ void Server::add(const ASocket &socket, uint32_t events, Client *client)
     }
     Log::debug("Socket added to epoll, fd: " + std::to_string(fd));
     socketToClient_[fd] = client;
+    sockets_.insert(&socket);
 }
 
-void Server::remove(const ASocket &socket)
+void Server::remove(ASocket &socket)
 {
     Log::trace(LOCATION);
     int fd = socket.getFd();
@@ -90,6 +93,7 @@ void Server::remove(const ASocket &socket)
         throw std::runtime_error("epoll_ctl DEL failed");
     }
     socketToClient_.erase(fd);
+    sockets_.erase(&socket);
 }
 
 void Server::disconnect(const Client &client)
@@ -112,7 +116,7 @@ void Server::setupServerSocket(const ServerConfig &config)
         serverSocket->listen(SOMAXCONN);
         int server_fd = serverSocket->getFd();
 
-        add(*serverSocket, EPOLLIN);
+        add(*serverSocket);
 
         listeners_.push_back(std::move(serverSocket));
         listener_fds_.insert(server_fd);
@@ -131,7 +135,7 @@ void Server::handleConnection(struct epoll_event *event)
     std::unique_ptr<ClientSocket> clientSocket = listener.accept();
 
     auto client = std::make_unique<Client>(std::move(clientSocket), *this);
-    add(client->getSocket(), EPOLLIN, client.get());
+    add(client->getSocket(), client.get());
     clients_.emplace_back(std::move(client));
 }
 
@@ -178,6 +182,23 @@ void Server::writable(int client_fd) const
     if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, client_fd, &ev) == -1)
     {
         Log::error("epoll_ctl MOD failed for fd: " + std::to_string(client_fd));
+        throw std::runtime_error("epoll_ctl MOD failed");
+    }
+}
+
+void Server::update(const ASocket &socket) const
+{
+    Log::trace(LOCATION);
+
+    int socketFd = socket.getFd();
+    uint32_t events = utils::stateToEpoll(socket.getEvent());
+    Log::debug("Socket (" + std::to_string(socket.getFd()) + ") is being updated");
+    struct epoll_event evt{};
+    evt.events = events;
+    evt.data.fd = socketFd;
+    if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, socketFd, &evt) == -1)
+    {
+        Log::error("epoll_ctl MOD failed for fd: " + std::to_string(socketFd));
         throw std::runtime_error("epoll_ctl MOD failed");
     }
 }
@@ -254,6 +275,18 @@ void Server::pollClients() const
     }
 }
 
+void Server::pollSockets()
+{
+    for (auto *socket : sockets_)
+    {
+        if (socket->isDirty())
+        {
+            update(*socket);
+            socket->processed();
+        }
+    }
+}
+
 void Server::run()
 {
     Log::trace(LOCATION);
@@ -262,6 +295,7 @@ void Server::run()
     struct epoll_event events[MAX_EVENTS]; // NOLINT
     while (true)
     {
+        pollSockets();
         pollClients();
         handleEpoll(events, MAX_EVENTS);
     }

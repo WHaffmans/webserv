@@ -51,7 +51,7 @@ void ServerSocket::bind(const std::string &host, const int port) const
     struct sockaddr_in address{};
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = inet_addr(host.c_str());
-    address.sin_port = htons(port);
+    address.sin_port = htons(static_cast<uint16_t>(port));
 
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     if (::bind(getFd(), reinterpret_cast<struct sockaddr *>(&address), sizeof(address)) < 0)
