@@ -1,4 +1,5 @@
 #include "webserv/handler/CgiHandler.hpp"
+#include "webserv/handler/ErrorHandler.hpp"
 #include "webserv/socket/ASocket.hpp"
 #include "webserv/socket/CgiSocket.hpp"
 
@@ -86,7 +87,14 @@ void Client::request()
                   });
         // server_.responseReady(client_socket_->getFd());
         handler_ = router_->handleRequest();
-        handler_->handle();
+        if (handler_ != nullptr)
+        {
+            handler_->handle();
+        }
+        else
+        {
+          ErrorHandler::createErrorResponse(500, *httpResponse_);  
+        }
     }
     else
     {
@@ -110,7 +118,7 @@ void Client::setCgiSockets(CgiSocket *cgiStdIn, CgiSocket *cgiStdOut)
 
 void Client::removeCgiSocket(CgiSocket *cgiSocket)
 {
-    server_.remove(*cgiSocket);  // write
+    server_.remove(*cgiSocket); // write
 
     sockets_.erase(cgiSocket->getFd());
     // sockets_[cgiStdIn->getFd()] = cgiStdIn;
@@ -119,7 +127,7 @@ void Client::removeCgiSocket(CgiSocket *cgiSocket)
 
 void Client::poll() const
 {
-    auto * cgiHandler = dynamic_cast<CgiHandler *>(handler_.get());
+    auto *cgiHandler = dynamic_cast<CgiHandler *>(handler_.get());
     if (cgiHandler != nullptr)
     {
         Log::debug("Polling CGI handler for client, fd: " + std::to_string(clientSocket_->getFd()));
@@ -132,7 +140,6 @@ void Client::poll() const
         clientSocket_->setCallback([this]() { respond(); });
         server_.writable(clientSocket_->getFd());
     }
-
 }
 
 void Client::respond() const

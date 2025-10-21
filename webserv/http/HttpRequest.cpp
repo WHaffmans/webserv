@@ -1,4 +1,5 @@
 #include "webserv/config/ConfigManager.hpp"
+#include "webserv/config/ServerConfig.hpp"
 #include "webserv/handler/URI.hpp"
 
 #include <webserv/client/Client.hpp>      // for Client
@@ -33,9 +34,17 @@ void HttpRequest::setState(State state)
 {
     if (state == State::Complete)
     {
-        //TODO: segfault if server does not exist
+        // TODO: segfault if server does not exist
+        std::string hostHeader = getHeaders().getHost().value_or("");
+        ServerConfig *serverConfig = ConfigManager::getInstance().getMatchingServerConfig(hostHeader);
+        if (hostHeader.empty() || serverConfig == nullptr)
+        {
+            Log::error("No matching server config found for host: " + hostHeader);
+            state_ = State::ParseError;
+            return;
+        }
         uri_ = std::make_unique<URI>(
-            *this, *ConfigManager::getInstance().getMatchingServerConfig(getHeaders().getHost().value_or("")));   
+            *this, *serverConfig);
     }
     state_ = state;
 }
@@ -93,9 +102,7 @@ void HttpRequest::parseBuffer()
             case State::Complete:
                 Log::debug("HttpRequest::parseBuffer() request is complete");
                 return; // Request is complete
-            case State::ParseError:
-                Log::warning("Parse error occurred, stopping further processing");
-                return;
+            case State::ParseError: Log::warning("Parse error occurred, stopping further processing"); return;
             }
         }
         catch (...)
