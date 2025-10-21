@@ -107,13 +107,16 @@ void Client::request()
 }
 
 //
-void Client::setCgiSockets(CgiSocket *cgiStdIn, CgiSocket *cgiStdOut)
+void Client::setCgiSockets(CgiSocket *cgiStdIn, CgiSocket *cgiStdOut, CgiSocket *cgiStdErr)
 {
     server_.add(*cgiStdIn, EPOLLOUT, this); // write
     server_.add(*cgiStdOut, EPOLLIN, this); // read
+    server_.add(*cgiStdErr, EPOLLIN, this); // error
+
 
     sockets_[cgiStdIn->getFd()] = cgiStdIn;
     sockets_[cgiStdOut->getFd()] = cgiStdOut;
+    sockets_[cgiStdErr->getFd()] = cgiStdErr;
 }
 
 void Client::removeCgiSocket(CgiSocket *cgiSocket)

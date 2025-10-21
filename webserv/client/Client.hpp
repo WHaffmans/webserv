@@ -43,7 +43,7 @@ class Client
     [[nodiscard]] ASocket &getSocket(int fd = -1) const;
 
     // void setStatusCode(int code);
-    void setCgiSockets(CgiSocket *cgiStdIn, CgiSocket *cgiStdOut);
+    void setCgiSockets(CgiSocket *cgiStdIn, CgiSocket *cgiStdOut, CgiSocket *cgiStdErr);
     void removeCgiSocket(CgiSocket *cgiSocket);
 
     [[nodiscard]] HttpRequest &getHttpRequest() const noexcept;

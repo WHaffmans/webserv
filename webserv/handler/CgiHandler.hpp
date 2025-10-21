@@ -21,7 +21,7 @@ class CgiHandler : public AHandler
 
     void handle() override;
     void wait() noexcept;
-    void setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_ptr<CgiSocket> cgiStdOut);
+    void setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_ptr<CgiSocket> cgiStdOut, std::unique_ptr<CgiSocket> cgiStdErr);
     void setPid(int pid);
 
   private:
@@ -31,6 +31,7 @@ class CgiHandler : public AHandler
     std::unique_ptr<CgiProcess> cgiProcess_;
     std::unique_ptr<CgiSocket> cgiStdIn_;
     std::unique_ptr<CgiSocket> cgiStdOut_;
+    std::unique_ptr<CgiSocket> cgiStdErr_;
     void parseCgiOutput();
     void parseCgiHeaders(std::string &headers);
     void parseCgiBody();
@@ -41,4 +42,5 @@ class CgiHandler : public AHandler
 
     void write();
     void read();
+    void error();
 };

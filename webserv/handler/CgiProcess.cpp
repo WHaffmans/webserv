@@ -8,6 +8,7 @@
 
 #include <csignal>
 #include <cstdlib>
+#include <iostream>
 #include <memory>
 #include <string>
 
@@ -34,8 +35,9 @@ void CgiProcess::spawn()
 
     int pipeStdin[2];
     int pipeStdout[2];
+    int pipeStderr[2];
 
-    if (pipe(pipeStdin) == -1 || pipe(pipeStdout) == -1)
+    if (pipe(pipeStdin) == -1 || pipe(pipeStdout) == -1 || pipe(pipeStderr) == -1)
     {
         throw std::runtime_error("Failed to create pipes");
     }
@@ -47,19 +49,25 @@ void CgiProcess::spawn()
         close(pipeStdin[1]);
         close(pipeStdout[0]);
         close(pipeStdout[1]);
+        close(pipeStderr[0]);
+        close(pipeStderr[1]);
         throw std::runtime_error("Failed to fork");
     }
     if (_pid == 0)
     {
         dup2(pipeStdin[0], STDIN_FILENO);
         dup2(pipeStdout[1], STDOUT_FILENO);
+        dup2(pipeStderr[1], STDERR_FILENO);
 
         close(pipeStdin[0]);
         close(pipeStdin[1]);
         close(pipeStdout[0]);
         close(pipeStdout[1]);
+        close(pipeStderr[0]);
+        close(pipeStderr[1]);
 
         // Log::debug("Executing CGI: " + cgiPath);
+        std::cerr << "Executing CGI: " << cgiPath << std::endl;
 
         // Prepare arguments
         std::string fullPath = uri.getFullPath();
@@ -76,14 +84,17 @@ void CgiProcess::spawn()
         // Parent process
         auto cgiStdIn = std::make_unique<CgiSocket>(pipeStdin[1]);
         auto cgiStdOut = std::make_unique<CgiSocket>(pipeStdout[0]);
+        auto cgiStdErr = std::make_unique<CgiSocket>(pipeStderr[0]);
+
         close(pipeStdin[0]);
         close(pipeStdout[1]);
+        close(pipeStderr[1]);
 
         Log::debug("CGI process forked with PID: " + std::to_string(_pid));
 
         // request_.getClient().setCgiSockets(std::move(cgiStdIn), std::move(cgiStdOut)); // move the sockets to the
         // client
-        handler_.setCgiSockets(std::move(cgiStdIn), std::move(cgiStdOut));
+        handler_.setCgiSockets(std::move(cgiStdIn), std::move(cgiStdOut), std::move(cgiStdErr));
         handler_.setPid(_pid);
     }
 }

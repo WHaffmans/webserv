@@ -23,7 +23,7 @@ ASocket::ASocket(int fd) : fd_(fd)
 
 ASocket::~ASocket()
 {
-    Log::trace(LOCATION);
+    Log::trace(LOCATION + "Closing socket fd: " + std::to_string(fd_));
     if (fd_ != -1)
     {
         close(fd_);

@@ -84,15 +84,47 @@ void CgiHandler::read()
     }
 }
 
-void CgiHandler::setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_ptr<CgiSocket> cgiStdOut)
+void CgiHandler::error()
+{
+    Log::trace(LOCATION);
+    if (cgiStdErr_ == nullptr)
+    {
+        Log::error("CGI stderr socket is null");
+        return;
+    }
+    char buffer[bufferSize_] = {}; // NOLINT(cppcoreguidelines-avoid-c-arrays)
+    ssize_t bytesRead
+        = cgiStdErr_->read(buffer, sizeof(buffer) - 1); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
+    if (bytesRead < 0)
+    {
+        Log::error("Failed to read from CGI stderr, fd: " + std::to_string(cgiStdErr_->getFd()));
+    }
+    else if (bytesRead == 0)
+    {
+        Log::info("CGI process closed stderr, fd: " + std::to_string(cgiStdErr_->getFd()));
+        request_.getClient().removeCgiSocket(cgiStdErr_.get());
+        cgiStdErr_ = nullptr;
+        return;
+    }
+    else
+    {
+        buffer[bytesRead] = '\0'; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        Log::error("CGI stderr output (fd: " + std::to_string(cgiStdErr_->getFd()) + "): "
+                   + std::string(buffer, static_cast<size_t>(bytesRead)));
+    }
+}
+
+void CgiHandler::setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_ptr<CgiSocket> cgiStdOut, std::unique_ptr<CgiSocket> cgiStdErr)
 {
     cgiStdIn->setCallback([this]() { write(); });
     cgiStdOut->setCallback([this]() { read(); });
+    cgiStdErr->setCallback([this]() { error(); });
 
     cgiStdOut_ = std::move(cgiStdOut);
     cgiStdIn_ = std::move(cgiStdIn);
+    cgiStdErr_ = std::move(cgiStdErr);
 
-    request_.getClient().setCgiSockets(cgiStdIn_.get(), cgiStdOut_.get()); // write
+    request_.getClient().setCgiSockets(cgiStdIn_.get(), cgiStdOut_.get(), cgiStdErr_.get()); // write
 
     // TODO add to handler
 }

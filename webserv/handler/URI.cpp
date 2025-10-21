@@ -103,6 +103,11 @@ void URI::parseFullpath()
         }
         else if (!baseName_.empty()) // not file or dir, but we have a baseName already
         {
+            if (pathInfo_.empty())
+            {
+                pathInfo_ = "/";
+            }
+
             pathInfo_ = FileUtils::joinPath(pathInfo_, segment);
         }
         else // not file or dir, and no baseName yet
@@ -124,8 +129,7 @@ void URI::parseFullpath()
             }
         }
     }
-    Log::debug("URI parseFullpath results",
-               {{"dir", dir_}, {"baseName", baseName_}, {"pathInfo", pathInfo_}});
+    Log::debug("URI parseFullpath results", {{"dir", dir_}, {"baseName", baseName_}, {"pathInfo", pathInfo_}});
     fullPath_ = FileUtils::joinPath(dir_, baseName_);
 }
 
