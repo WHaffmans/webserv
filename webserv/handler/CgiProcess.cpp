@@ -32,7 +32,8 @@ void CgiProcess::spawn()
     auto cgiPath = uri.getCgiPath();
 
     // pipes
-
+    // TODO pipe can handle flags O_CLOEXEC | O_NONBLOCK as open we should use this everywhere, then we dont need to set
+    // non blocking and the fd will be closed when exec is run
     int pipeStdin[2];
     int pipeStdout[2];
     int pipeStderr[2];
