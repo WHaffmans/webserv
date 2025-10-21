@@ -74,8 +74,8 @@ void CgiProcess::spawn()
     else
     {
         // Parent process
-        auto cgiStdIn = std::make_unique<CgiSocket>(pipeStdin[1]);
-        auto cgiStdOut = std::make_unique<CgiSocket>(pipeStdout[0]);
+        auto cgiStdIn = std::make_unique<CgiSocket>(pipeStdin[1], ASocket::IOState::WRITE);
+        auto cgiStdOut = std::make_unique<CgiSocket>(pipeStdout[0], ASocket::IOState::READ);
         close(pipeStdin[0]);
         close(pipeStdout[1]);
 

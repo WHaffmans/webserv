@@ -1,10 +1,16 @@
 
+#include "webserv/socket/ASocket.hpp"
+
 #include <webserv/utils/utils.hpp>
 
+#include <cstdint>
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <vector>
+
+#include <sys/epoll.h>
 
 namespace utils
 {
@@ -131,5 +137,20 @@ std::string implode(const std::vector<std::string> &elements, const std::string 
         }
     }
     return stream.str();
+}
+
+uint32_t stateToEpoll(const ASocket::IOState &event)
+{
+    uint32_t epollEvents = 0;
+    using EventType = std::underlying_type_t<ASocket::IOState>;
+    if ((static_cast<EventType>(event) & static_cast<EventType>(ASocket::IOState::READ)) != 0U)
+    {
+        epollEvents |= EPOLLIN;
+    }
+    if ((static_cast<EventType>(event) & static_cast<EventType>(ASocket::IOState::WRITE)) != 0U)
+    {
+        epollEvents |= EPOLLOUT;
+    }
+    return epollEvents;
 }
 } // namespace utils

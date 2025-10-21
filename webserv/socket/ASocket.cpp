@@ -10,7 +10,7 @@
 #include <sys/socket.h> // for recv, send
 #include <unistd.h>     // for close
 
-ASocket::ASocket(int fd) : fd_(fd)
+ASocket::ASocket(int fd, IOState event) : fd_(fd), ioState_(event)
 {
     Log::trace(LOCATION);
     if (fd_ == -1)
@@ -63,6 +63,34 @@ void ASocket::setNonBlocking() const
 int ASocket::getFd() const noexcept
 {
     return fd_;
+}
+
+ASocket::IOState ASocket::getEvent() const noexcept
+{
+    return ioState_;
+}
+
+bool ASocket::isDirty() const noexcept
+{
+    return dirty_;
+}
+
+void ASocket::setIOState(IOState event)
+{
+    if (event == ioState_)
+    {
+        return;
+    }
+
+    Log::debug("Processing state change for socket " + std::to_string(fd_));
+    dirty_ = true;
+    ioState_ = event;
+}
+
+void ASocket::processed()
+{
+    Log::debug("Socket " + std::to_string(fd_) + " processed");
+    dirty_ = false;
 }
 
 void ASocket::setFd(int fd)

@@ -34,7 +34,7 @@ void CgiHandler::write()
     if (request_.getBody().empty())
     {
         Log::debug("No body to write to CGI stdin, fd: " + std::to_string(cgiStdIn_->getFd()));
-        request_.getClient().removeCgiSocket(cgiStdIn_.get());
+        request_.getClient().removeSocket(cgiStdIn_.get());
         cgiStdIn_ = nullptr;
         return;
     }
@@ -48,7 +48,7 @@ void CgiHandler::write()
         Log::debug("Wrote " + std::to_string(bytesWritten)
                    + " bytes to CGI stdin, fd: " + std::to_string(cgiStdIn_->getFd()));
     }
-    request_.getClient().removeCgiSocket(cgiStdIn_.get());
+    request_.getClient().removeSocket(cgiStdIn_.get());
     cgiStdIn_ = nullptr;
 }
 
@@ -70,7 +70,7 @@ void CgiHandler::read()
     else if (bytesRead == 0)
     {
         Log::info("CGI process closed stdout, fd: " + std::to_string(cgiStdOut_->getFd()));
-        request_.getClient().removeCgiSocket(cgiStdOut_.get());
+        request_.getClient().removeSocket(cgiStdOut_.get());
         cgiStdOut_ = nullptr;
         parseCgiOutput();
         return;
@@ -92,9 +92,8 @@ void CgiHandler::setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_
     cgiStdOut_ = std::move(cgiStdOut);
     cgiStdIn_ = std::move(cgiStdIn);
 
-    request_.getClient().setCgiSockets(cgiStdIn_.get(), cgiStdOut_.get()); // write
-
-    // TODO add to handler
+    request_.getClient().addSocket(cgiStdIn_.get());
+    request_.getClient().addSocket(cgiStdOut_.get());
 }
 
 void CgiHandler::wait() noexcept

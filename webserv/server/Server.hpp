@@ -33,8 +33,9 @@ class Server
     ~Server();
 
     void run();
-    void add(const ASocket &socket, uint32_t events, Client *client = nullptr);
-    void remove(const ASocket &socket);
+    void add(ASocket &socket, Client *client = nullptr);
+    void remove(ASocket &socket);
+    void update(const ASocket &socket) const;
     void disconnect(const Client &client);
     void writable(int client_fd) const;
 
@@ -48,8 +49,10 @@ class Server
     std::set<int> listener_fds_;
     std::vector<std::unique_ptr<Client>> clients_;
     std::unordered_map<int, Client *> socketToClient_;
+    std::set<ASocket *> sockets_;
 
     void pollClients() const;
+    void pollSockets();
     void handleEpoll(struct epoll_event *events, int max_events);
 
     void handleEpollHangUp(struct epoll_event *event) const;
