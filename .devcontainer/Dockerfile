@@ -35,6 +35,7 @@ RUN apt-get update && apt-get install -y \
     nano \
     # Include What You Use
     iwyu \
+    php-cgi \
     # Clean up
     && rm -rf /var/lib/apt/lists/*
 
