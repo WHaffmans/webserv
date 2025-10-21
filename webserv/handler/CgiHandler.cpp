@@ -102,7 +102,7 @@ void CgiHandler::error()
     else if (bytesRead == 0)
     {
         Log::info("CGI process closed stderr, fd: " + std::to_string(cgiStdErr_->getFd()));
-        request_.getClient().removeCgiSocket(cgiStdErr_.get());
+        request_.getClient().removeSocket(cgiStdErr_.get());
         cgiStdErr_ = nullptr;
         return;
     }
@@ -126,6 +126,7 @@ void CgiHandler::setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_
 
     request_.getClient().addSocket(cgiStdIn_.get());
     request_.getClient().addSocket(cgiStdOut_.get());
+    request_.getClient().addSocket(cgiStdErr_.get());
 }
 
 void CgiHandler::wait() noexcept
