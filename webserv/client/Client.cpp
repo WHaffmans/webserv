@@ -35,7 +35,11 @@ Client::~Client()
 {
     Log::trace(LOCATION);
     Log::info("Client disconnected, fd: " + std::to_string(clientSocket_->getFd()));
-    server_.remove(*clientSocket_);
+    for (auto it : sockets_)
+    {
+        server_.remove(*(it.second));
+    }
+    // server_.remove(*clientSocket_);
 };
 
 ASocket &Client::getSocket(int fd) const

@@ -59,8 +59,8 @@ class Client
     std::unique_ptr<HttpResponse> httpResponse_;
     std::unique_ptr<Router> router_;
     std::unique_ptr<ClientSocket> clientSocket_;
-    std::unordered_map<int, ASocket *> sockets_;
     std::unique_ptr<AHandler> handler_ = nullptr;
+    std::unordered_map<int, ASocket *> sockets_;
 
     Server &server_;
     void writeToCgi();
