@@ -20,6 +20,7 @@
 #include <utility>       // for move, pair
 #include <vector>        // for vector
 
+#include <fcntl.h>
 #include <sys/epoll.h> // for epoll_event, epoll_ctl, EPOLLIN, EPOLLOUT, epoll_create1, epoll_wait, EPOLLERR, EPOLLHUP, EPOLL_CTL_ADD, EPOLL_CTL_DEL, EPOLL_CTL_MOD
 #include <sys/socket.h> // for send, SOMAXCONN
 #include <sys/types.h>  // for ssize_t
@@ -27,7 +28,7 @@
 
 class Router;
 
-Server::Server(const ConfigManager &configManager) : epoll_fd_(epoll_create1(0)), configManager_(configManager)
+Server::Server(const ConfigManager &configManager) : epoll_fd_(epoll_create1(O_CLOEXEC)), configManager_(configManager)
 {
     Log::trace(LOCATION);
     const auto &serverConfigs = configManager.getServerConfigs();
@@ -307,6 +308,6 @@ void Server::run()
     {
         pollSockets();
         pollClients();
-        handleEpoll(events, MAX_EVENTS);
+        handleEpoll(events, MAX_EVENTS); // NOLINT (cppcoreguidelines-pro-bounds-pointer-arithmetic)
     }
 }

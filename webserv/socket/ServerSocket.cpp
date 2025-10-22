@@ -27,7 +27,7 @@ ServerSocket::ServerSocket() : ASocket(socket(AF_INET, SOCK_STREAM, 0), ASocket:
         Log::error("setsockopt failed");
         throw std::runtime_error("setsockopt failed");
     }
-    setNonBlocking();
+    // setNonBlocking();
 }
 
 ServerSocket::ServerSocket(int fd) : ASocket(fd)

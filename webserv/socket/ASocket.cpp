@@ -54,10 +54,52 @@ ssize_t ASocket::write(const void *buf, size_t len) const
 
 void ASocket::setNonBlocking() const
 {
-    if (fcntl(fd_, F_SETFL, O_NONBLOCK) == -1)
+    // Set file status flags (O_NONBLOCK)
+    int flags = fcntl(fd_, F_GETFL, 0);
+    if (flags == -1)
+    {
+        throw std::system_error(errno, std::generic_category(), "ASocket: Failed to get FD flags");
+    }
+    if (fcntl(fd_, F_SETFL, flags | O_NONBLOCK) == -1)
     {
         throw std::system_error(errno, std::generic_category(), "ASocket: Failed to set FD non-blocking");
     }
+
+    // Set file descriptor flags (O_CLOEXEC)
+    int fdFlags = fcntl(fd_, F_GETFD, 0);
+    if (fdFlags == -1)
+    {
+        throw std::system_error(errno, std::generic_category(), "ASocket: Failed to get FD descriptor flags");
+    }
+    if (fcntl(fd_, F_SETFD, fdFlags | FD_CLOEXEC) == -1)
+    {
+        throw std::system_error(errno, std::generic_category(), "ASocket: Failed to set FD close-on-exec");
+    }
+
+    // Debug output
+    flags = fcntl(fd_, F_GETFL, 0);
+    fdFlags = fcntl(fd_, F_GETFD, 0);
+
+    std::string flagStr = "0x" + std::to_string(flags) + " (";
+    int mode = flags & 3;
+    switch (mode)
+    {
+    case 0: flagStr += "O_RDONLY "; break;
+    case 1: flagStr += "O_WRONLY "; break;
+    case 2: flagStr += "O_RDWR "; break;
+    default: flagStr += "UNKNOWN_MODE "; break;
+    }
+    if ((flags & O_NONBLOCK) != 0)
+    {
+        flagStr += "O_NONBLOCK ";
+    }
+    if ((fdFlags & FD_CLOEXEC) != 0)
+    {
+        flagStr += "FD_CLOEXEC ";
+    }
+    flagStr += ")";
+
+    Log::debug("ASocket: FD " + std::to_string(fd_) + " configured. Flags: " + flagStr);
 }
 
 int ASocket::getFd() const noexcept

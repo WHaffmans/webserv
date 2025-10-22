@@ -2,6 +2,7 @@
 
 #include "webserv/handler/CgiEnvironment.hpp"
 #include "webserv/http/HttpRequest.hpp"
+#include "webserv/log/Log.hpp"
 #include "webserv/socket/CgiSocket.hpp"
 
 #include <webserv/handler/URI.hpp>
@@ -12,6 +13,7 @@
 #include <memory>
 #include <string>
 
+#include <fcntl.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -34,14 +36,16 @@ void CgiProcess::spawn()
     // pipes
     // TODO pipe can handle flags O_CLOEXEC | O_NONBLOCK as open we should use this everywhere, then we dont need to set
     // non blocking and the fd will be closed when exec is run
+    // NOLINTBEGIN
     int pipeStdin[2];
     int pipeStdout[2];
     int pipeStderr[2];
 
-    if (pipe(pipeStdin) == -1 || pipe(pipeStdout) == -1 || pipe(pipeStderr) == -1)
+    if (pipe2(pipeStdin, O_CLOEXEC | O_NONBLOCK) == -1 || pipe2(pipeStdout, O_CLOEXEC | O_NONBLOCK) == -1 || pipe2(pipeStderr, O_CLOEXEC | O_NONBLOCK) == -1)
     {
         throw std::runtime_error("Failed to create pipes");
     }
+    // NOLINTEND
     CgiEnvironment cgiEnv(uri, request_);
     _pid = fork();
     if (_pid < 0)
@@ -60,15 +64,16 @@ void CgiProcess::spawn()
         dup2(pipeStdout[1], STDOUT_FILENO);
         dup2(pipeStderr[1], STDERR_FILENO);
 
-        close(pipeStdin[0]);
-        close(pipeStdin[1]);
-        close(pipeStdout[0]);
-        close(pipeStdout[1]);
-        close(pipeStderr[0]);
-        close(pipeStderr[1]);
+        // close(pipeStdin[0]);
+        // close(pipeStdin[1]);
+        // close(pipeStdout[0]);
+        // close(pipeStdout[1]);
+        // close(pipeStderr[0]);
+        // close(pipeStderr[1]);
 
         // Log::debug("Executing CGI: " + cgiPath);
-        std::cerr << "Executing CGI: " << cgiPath << std::endl;
+        // std::cerr << "Executing CGI: " << cgiPath << std::endl;
+        Log::clearChannels();
 
         // Prepare arguments
         std::string fullPath = uri.getFullPath();
