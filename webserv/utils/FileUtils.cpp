@@ -54,6 +54,10 @@ std::string joinPath(const std::string &base, const std::string &addition) // NO
     {
         result = addition;
     }
+    else if (addition.empty())
+    {
+        return result;
+    }
     else if (result.back() == '/' && addition.front() == '/')
     {
         result += addition.substr(1);
