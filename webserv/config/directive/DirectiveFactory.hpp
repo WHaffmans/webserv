@@ -20,7 +20,7 @@ class DirectiveFactory
         std::string_view context;
     };
 
-    constexpr static std::array<DirectiveInfo, 15> supportedDirectives = {{
+    constexpr static std::array<DirectiveInfo, 16> supportedDirectives = {{
         {.name = "listen", .type = "IntDirective", .context = "S"},
         {.name = "host", .type = "StringDirective", .context = "S"},
         {.name = "server_name", .type = "StringDirective", .context = "S"},
@@ -36,6 +36,7 @@ class DirectiveFactory
         {.name = "upload_enabled", .type = "BoolDirective", .context = "gsl"},
         {.name = "upload_store", .type = "StringDirective", .context = "gsl"},
         {.name = "redirect", .type = "VectorDirective", .context = "l"},
+        {.name = "timeout", .type = "IntDirective", .context = "gsl"},
     }};
 
   private:
