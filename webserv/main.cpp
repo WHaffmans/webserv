@@ -16,7 +16,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    Log::setFileChannel("logs/webserv.log", std::ios_base::trunc);
+    Log::setFileChannel("logs/webserv.log");
     Log::setStdoutChannel();
 
     Log::info("\n======================\nStarting webserv...\n======================\n");

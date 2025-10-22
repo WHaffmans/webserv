@@ -51,7 +51,7 @@ class Log
 
     static constexpr Log::Level COMPILE_TIME_LOG_LEVEL = Log::Level::Debug;
 
-    static void setFileChannel(const std::string &filename, std::ios_base::openmode mode = std::ios_base::app);
+    static void setFileChannel(const std::string &filename);
     static void setStdoutChannel();
 
     static int getElapsedTime();
@@ -67,6 +67,8 @@ class Log
     static const char *logLevelToColor(Level level);
     static std::string logLevelToColoredString(Level level);
     static Level stringToLogLevel(const std::string &level);
+
+    static void clearChannels();
 
   private:
     Log();

@@ -33,7 +33,7 @@ void Log::setStdoutChannel()
     }
 }
 
-void Log::setFileChannel(const std::string &filename, std::ios_base::openmode mode)
+void Log::setFileChannel(const std::string &filename)
 {
     Log &log = getInstance();
     if (log.channels_.contains("file"))
@@ -42,12 +42,18 @@ void Log::setFileChannel(const std::string &filename, std::ios_base::openmode mo
     }
     try
     {
-        log.channels_["file"] = std::make_unique<FileChannel>(filename, mode);
+        log.channels_["file"] = std::make_unique<FileChannel>(filename);
     }
     catch (const std::exception &e)
     {
         std::cerr << "Failed to set log file: " << e.what() << '\n';
     }
+}
+
+void Log::clearChannels()
+{
+    Log &log = getInstance();
+    log.channels_.clear();
 }
 
 Log &Log::getInstance()

@@ -1,16 +1,17 @@
 #include <webserv/log/FileChannel.hpp>
-
 #include <webserv/log/Log.hpp> // for Log
 
-#include <chrono>   // for system_clock
+#include <chrono> // for system_clock
+#include <cstdio>
 #include <ctime>    // for localtime, tm
 #include <iomanip>  // for operator<<, put_time
 #include <iostream> // for cerr
 
+#include <fcntl.h>
+
 struct tm;
 
-FileChannel::FileChannel(const std::string &filename, std::ios_base::openmode mode)
-    : filename_(filename), fileStream_(filename, mode)
+FileChannel::FileChannel(const std::string &filename) : filename_(filename), fileStream_(filename, std::ios_base::trunc)
 {
     if (!fileStream_.is_open())
     {
