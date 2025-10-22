@@ -10,7 +10,7 @@ class AHandler
 {
   public:
     AHandler(const HttpRequest &request, HttpResponse &response);
-    virtual ~AHandler() = default;
+    virtual ~AHandler();
 
     AHandler(const AHandler &other) = delete;
     AHandler &operator=(const AHandler &other) = delete;

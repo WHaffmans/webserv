@@ -140,7 +140,7 @@ void Client::poll() const
     auto *cgiHandler = dynamic_cast<CgiHandler *>(handler_.get());
     if (cgiHandler != nullptr)
     {
-        Log::debug("Polling CGI handler for client, fd: " + std::to_string(clientSocket_->getFd()));
+        // Log::debug("Polling CGI handler for client, fd: " + std::to_string(clientSocket_->getFd()));
         // CGI handler polling logic if needed
         cgiHandler->wait();
     }

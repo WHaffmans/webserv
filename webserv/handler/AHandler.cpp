@@ -10,6 +10,10 @@
 
 AHandler::AHandler(const HttpRequest &request, HttpResponse &response) : request_(request), response_(response) {}
 
+AHandler::~AHandler()
+{
+    cancelTimer();
+}
 void AHandler::startTimer()
 {
     timerSocket_ = std::make_unique<TimerSocket>(std::chrono::milliseconds(5000));

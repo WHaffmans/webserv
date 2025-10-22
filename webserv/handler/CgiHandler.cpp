@@ -1,4 +1,5 @@
 #include "webserv/handler/ErrorHandler.hpp"
+
 #include <webserv/client/Client.hpp> // for Client
 #include <webserv/handler/CgiHandler.hpp>
 #include <webserv/handler/CgiProcess.hpp> // for CgiProcess
@@ -7,6 +8,8 @@
 #include <webserv/log/Log.hpp>            // for Log
 #include <webserv/socket/CgiSocket.hpp>   // for CgiSocket
 #include <webserv/utils/utils.hpp>        // for stoul
+
+#include <sys/types.h>
 
 CgiHandler::CgiHandler(const HttpRequest &request, HttpResponse &response)
     : AHandler(request, response), cgiProcess_(nullptr), cgiStdIn_(nullptr), cgiStdOut_(nullptr)
@@ -74,7 +77,7 @@ void CgiHandler::read()
     {
         Log::info("CGI process closed stdout, fd: " + std::to_string(cgiStdOut_->getFd()));
         request_.getClient().removeSocket(cgiStdOut_.get());
-        request_.getClient().removeSocket(timerSocket_.get());
+        // request_.getClient().removeSocket(timerSocket_.get());
         cgiStdOut_ = nullptr;
         parseCgiOutput();
         return;
@@ -107,19 +110,20 @@ void CgiHandler::error()
     {
         Log::info("CGI process closed stderr, fd: " + std::to_string(cgiStdErr_->getFd()));
         request_.getClient().removeSocket(cgiStdErr_.get());
-        request_.getClient().removeSocket(timerSocket_.get()); // todo maybe this dangerous
+        // request_.getClient().removeSocket(timerSocket_.get()); // todo maybe this dangerous
         cgiStdErr_ = nullptr;
         return;
     }
     else
     {
         buffer[bytesRead] = '\0'; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        Log::error("CGI stderr output (fd: " + std::to_string(cgiStdErr_->getFd()) + "): "
-                   + std::string(buffer, static_cast<size_t>(bytesRead)));
+        Log::error("CGI stderr output (fd: " + std::to_string(cgiStdErr_->getFd())
+                   + "): " + std::string(buffer, static_cast<size_t>(bytesRead)));
     }
 }
 
-void CgiHandler::setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_ptr<CgiSocket> cgiStdOut, std::unique_ptr<CgiSocket> cgiStdErr)
+void CgiHandler::setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_ptr<CgiSocket> cgiStdOut,
+                               std::unique_ptr<CgiSocket> cgiStdErr)
 {
     cgiStdIn->setCallback([this]() { write(); });
     cgiStdOut->setCallback([this]() { read(); });
@@ -221,7 +225,14 @@ void CgiHandler::parseCgiHeaders(std::string &headers)
 void CgiHandler::handleTimeout()
 {
     Log::warning("CGI handler timeout occurred for PID: " + std::to_string(pid_));
-
+    char buffer[9] = {}; // NOLINT(cppcoreguidelines-avoid-c-arrays)
+    ssize_t bytesRead = timerSocket_->read(buffer, sizeof(buffer) - 1);
+    buffer[bytesRead] = '\0';
+    if (bytesRead <= 0)
+    {
+        // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        return;
+    }
     // Terminate the CGI process if it's still running
     if (cgiProcess_)
     {
