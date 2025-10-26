@@ -310,17 +310,13 @@ void Server::run()
     Log::info("Listening...");
     const int MAX_EVENTS = 10;
     struct epoll_event events[MAX_EVENTS]; // NOLINT
-    while (true)
+    while (stop_ == 0)
     {
-        if (stop_ != 0)
-        {
-            Log::info("Server stopping...");
-            break;
-        }
         pollSockets();
         pollClients();
         handleEpoll(events, MAX_EVENTS); // NOLINT (cppcoreguidelines-pro-bounds-pointer-arithmetic)
     }
+    Log::info("Server stopping...");
 }
 
 void Server::signalHandler(int signum)
