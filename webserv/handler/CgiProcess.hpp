@@ -1,7 +1,9 @@
 #pragma once
 
-#include "webserv/handler/CgiHandler.hpp"
-#include "webserv/http/HttpRequest.hpp"
+#include <webserv/handler/CgiHandler.hpp>
+#include <webserv/http/HttpRequest.hpp> // for HttpRequest
+
+class CgiHandler;
 
 class CgiProcess
 {

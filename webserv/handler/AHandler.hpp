@@ -1,10 +1,12 @@
 #pragma once
 
-#include "webserv/socket/TimerSocket.hpp"
+#include <webserv/socket/TimerSocket.hpp>
 
-#include <memory>
+#include <memory> // for unique_ptr
+
 class HttpRequest;
 class HttpResponse;
+class TimerSocket;
 
 class AHandler
 {

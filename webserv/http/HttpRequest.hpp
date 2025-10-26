@@ -5,8 +5,8 @@
 
 #include <cstddef> // for size_t
 #include <cstdint> // for uint8_t
-#include <memory>
-#include <string> // for string, basic_string
+#include <memory>  // for unique_ptr
+#include <string>  // for string, basic_string
 
 class Client;
 class ServerConfig;

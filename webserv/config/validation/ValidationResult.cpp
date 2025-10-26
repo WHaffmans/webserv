@@ -1,4 +1,5 @@
 #include <webserv/config/validation/ValidationResult.hpp>
+
 #include <webserv/log/Log.hpp> // for Log
 
 #include <utility> // for move

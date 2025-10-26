@@ -4,6 +4,7 @@
 #include <webserv/log/Log.hpp>          // for LOCATION, Log
 
 #include <cstdint> // for uint8_t, uint16_t
+#include <format>  // for vector
 #include <memory>  // for unique_ptr
 #include <string>  // for string
 #include <vector>  // for vector

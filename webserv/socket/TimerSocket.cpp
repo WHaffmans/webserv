@@ -1,12 +1,16 @@
-#include "webserv/log/Log.hpp"
-#include "webserv/socket/ASocket.hpp"
-
 #include <webserv/socket/TimerSocket.hpp>
 
-#include <stdexcept>
+#include <webserv/log/Log.hpp>        // for LOCATION, Log
+#include <webserv/socket/ASocket.hpp> // for ASocket
 
-#include <sys/time.h>
-#include <sys/timerfd.h>
+#include <stdexcept>    // for runtime_error
+#include <system_error> // for generic_category, system_error
+
+#include <errno.h>       // for errno
+#include <sys/time.h>    // for CLOCK_MONOTONIC
+#include <sys/timerfd.h> // for timerfd_create, timerfd_settime
+#include <time.h>        // for itimerspec, timespec
+#include <unistd.h>      // for read, write
 
 TimerSocket::TimerSocket(std::chrono::milliseconds timeout)
     : ASocket(timerfd_create(CLOCK_MONOTONIC, 0), ASocket::IoState::NONE), timeout_(timeout)

@@ -1,4 +1,5 @@
 #include <webserv/config/ConfigManager.hpp>
+
 #include <webserv/config/GlobalConfig.hpp> // for GlobalConfig
 #include <webserv/log/Log.hpp>             // for Log
 #include <webserv/utils/utils.hpp>         // for removeComments

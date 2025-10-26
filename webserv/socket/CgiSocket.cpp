@@ -1,8 +1,12 @@
-#include <webserv/log/Log.hpp>        // for LOCATION, Log
-#include <webserv/socket/ASocket.hpp> // for ASocket
 #include <webserv/socket/CgiSocket.hpp>
 
-#include <unistd.h>
+#include <webserv/log/Log.hpp>        // for LOCATION, Log
+#include <webserv/socket/ASocket.hpp> // for ASocket
+
+#include <system_error> // for generic_category, system_error
+
+#include <errno.h>  // for errno
+#include <unistd.h> // for read, write
 
 CgiSocket::CgiSocket(int fd, ASocket::IoState event) : ASocket(fd, event)
 {

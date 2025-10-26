@@ -4,10 +4,10 @@
 #include <webserv/log/Log.hpp>                            // for Log
 #include <webserv/server/Server.hpp>                      // for Server
 
+#include <csignal>
 #include <iostream> // for ios_base
 #include <string>   // for allocator, basic_string, char_traits, operator+, string
 #include <vector>   // for vector
-#include <csignal>
 
 int main(int argc, char **argv)
 {

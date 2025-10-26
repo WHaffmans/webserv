@@ -1,21 +1,25 @@
-#include "webserv/handler/CgiProcess.hpp"
+#include <webserv/router/Router.hpp>                   // for Router
 
+#include <webserv/client/Client.hpp>                   // for Client
 #include <webserv/config/AConfig.hpp>                  // for AConfig
-#include <webserv/config/ConfigManager.hpp>            // for ConfigManager
 #include <webserv/config/directive/ADirective.hpp>     // for ADirective
 #include <webserv/config/directive/DirectiveValue.hpp> // for DirectiveValue
-#include <webserv/handler/ErrorHandler.hpp>            // for ErrorHandler
+#include <webserv/handler/CgiHandler.hpp>              // for CgiHandler
+#include <webserv/handler/CgiProcess.hpp>              // for CgiProcess
 #include <webserv/handler/FileHandler.hpp>             // for FileHandler
 #include <webserv/handler/URI.hpp>                     // for URI
-#include <webserv/http/HttpHeaders.hpp>                // for HttpHeaders
-#include <webserv/log/Log.hpp>                         // for LOCATION, Log
-#include <webserv/router/Router.hpp>
+#include <webserv/http/HttpRequest.hpp>                // for HttpRequest
+#include <webserv/log/Log.hpp>                         // for Log, LOCATION
 
-#include <memory>   // for unique_ptr
-#include <optional> // for optional
-#include <ranges>   // for __find_fn, find
-#include <string>   // for basic_string, string
-#include <vector>   // for vector
+#include <exception> // for exception
+#include <format>    // for vector
+#include <memory>    // for unique_ptr, make_unique
+#include <optional>  // for optional
+#include <ranges>    // for __find_fn, find
+#include <string>    // for basic_string, string, operator+
+#include <vector>    // for vector
+
+class HttpResponse;
 
 Router::Router(Client *client) : client_(client)
 {
@@ -41,7 +45,7 @@ std::unique_ptr<AHandler> Router::handleRequest()
     if (request.getState() == HttpRequest::State::ParseError)
     {
         Log::error("Router::handleRequest() called with incomplete request");
-        
+
         return nullptr;
     }
     HttpResponse &response = client_->getHttpResponse();

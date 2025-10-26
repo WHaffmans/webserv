@@ -6,7 +6,6 @@
 #include <webserv/http/HttpRequest.hpp> // for HttpRequest
 #include <webserv/server/Server.hpp>
 
-
 #include <string> // for string, basic_string
 
 class LocationConfig;

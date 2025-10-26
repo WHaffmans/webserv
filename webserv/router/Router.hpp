@@ -1,8 +1,8 @@
 #pragma once
 
-#include "webserv/handler/AHandler.hpp"
 #include <webserv/config/AConfig.hpp> // for AConfig
 #include <webserv/config/LocationConfig.hpp>
+#include <webserv/handler/AHandler.hpp>  // for AHandler
 #include <webserv/http/HttpRequest.hpp>  // for HttpRequest
 #include <webserv/http/HttpResponse.hpp> // for HttpResponse
 
@@ -11,6 +11,7 @@
 
 class LocationConfig;
 class ServerConfig;
+class Client;
 
 class Router
 {

@@ -1,11 +1,10 @@
 #pragma once
 
-#include "webserv/http/HttpRequest.hpp"
-
 #include <webserv/config/AConfig.hpp>
-#include <webserv/handler/AHandler.hpp>
 #include <webserv/config/LocationConfig.hpp>
+#include <webserv/handler/AHandler.hpp> // for AHandler
 #include <webserv/handler/URI.hpp>
+#include <webserv/http/HttpRequest.hpp>  // for HttpRequest
 #include <webserv/http/HttpResponse.hpp> // for HttpResponse
 
 #include <cstdint> // for uint8_t
@@ -14,6 +13,7 @@
 
 class AConfig;
 class URI;
+class HttpResponse;
 
 class FileHandler : public AHandler
 {
@@ -33,8 +33,9 @@ class FileHandler : public AHandler
     void handleTimeout() override;
 
   private:
-  const URI &uri_;
+    const URI &uri_;
     const AConfig *config_;
+
     enum ResourceType : uint8_t
     {
         FILE,

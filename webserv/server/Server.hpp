@@ -7,7 +7,7 @@
 #include <webserv/socket/ASocket.hpp>
 #include <webserv/socket/ServerSocket.hpp> // for ServerSocket
 
-#include <csignal>
+#include <csignal>       // for sig_atomic_t
 #include <cstdint>       // for uint32_t
 #include <memory>        // for unique_ptr
 #include <set>           // for set

@@ -1,8 +1,11 @@
-#include "webserv/handler/CgiEnvironment.hpp"
+#include <webserv/handler/CgiEnvironment.hpp>
 
-#include "webserv/log/Log.hpp"
+#include <webserv/handler/URI.hpp>      // for URI
+#include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
 
-#include <cstring> // for strcpy
+#include <cstring>  // for strcpy, size_t
+#include <optional> // for optional
+#include <utility>  // for pair
 
 CgiEnvironment::CgiEnvironment(const URI &uri, const HttpRequest &request)
 {
@@ -46,8 +49,6 @@ CgiEnvironment::CgiEnvironment(const URI &uri, const HttpRequest &request)
     env_["HTTP_ACCEPT"] = headers.get("Accept");
     env_["HTTP_ACCEPT_LANGUAGE"] = headers.get("Accept-Language");
     env_["HTTP_ACCEPT_ENCODING"] = headers.get("Accept-Encoding");
-        
-
 }
 
 char **CgiEnvironment::toEnvp() const

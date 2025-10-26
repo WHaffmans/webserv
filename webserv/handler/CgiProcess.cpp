@@ -1,22 +1,23 @@
-#include "webserv/handler/CgiProcess.hpp"
+#include <webserv/handler/CgiProcess.hpp>
 
-#include "webserv/handler/CgiEnvironment.hpp"
-#include "webserv/http/HttpRequest.hpp"
-#include "webserv/log/Log.hpp"
-#include "webserv/socket/CgiSocket.hpp"
+#include <webserv/handler/CgiEnvironment.hpp> // for CgiEnvironment
+#include <webserv/handler/CgiHandler.hpp>     // for CgiHandler
+#include <webserv/handler/URI.hpp>      // for URI
+#include <webserv/http/HttpRequest.hpp> // for HttpRequest
+#include <webserv/log/Log.hpp>          // for Log
+#include <webserv/socket/ASocket.hpp>   // for ASocket
+#include <webserv/socket/CgiSocket.hpp> // for CgiSocket
 
-#include <webserv/handler/URI.hpp>
+#include <csignal>   // for kill, SIGKILL
+#include <cstdlib>   // for exit
+#include <memory>    // for allocator, make_unique, unique_ptr
+#include <stdexcept> // for runtime_error
+#include <string>    // for basic_string, operator+, to_string, char_traits, string
+#include <utility>   // for move
 
-#include <csignal>
-#include <cstdlib>
-#include <iostream>
-#include <memory>
-#include <string>
-
-#include <fcntl.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <unistd.h>
+#include <fcntl.h>    // for O_CLOEXEC, O_NONBLOCK
+#include <sys/wait.h> // for waitpid, WNOHANG
+#include <unistd.h>   // for close, dup2, pipe2, execve, fork, STDERR_FILENO, STDIN_FILENO, STDOUT_FILENO
 
 CgiProcess::CgiProcess(const HttpRequest &request, CgiHandler &handler) : request_(request), handler_(handler), _pid(-1)
 {
@@ -41,7 +42,8 @@ void CgiProcess::spawn()
     int pipeStdout[2];
     int pipeStderr[2];
 
-    if (pipe2(pipeStdin, O_CLOEXEC | O_NONBLOCK) == -1 || pipe2(pipeStdout, O_CLOEXEC | O_NONBLOCK) == -1 || pipe2(pipeStderr, O_CLOEXEC | O_NONBLOCK) == -1)
+    if (pipe2(pipeStdin, O_CLOEXEC | O_NONBLOCK) == -1 || pipe2(pipeStdout, O_CLOEXEC | O_NONBLOCK) == -1
+        || pipe2(pipeStderr, O_CLOEXEC | O_NONBLOCK) == -1)
     {
         throw std::runtime_error("Failed to create pipes");
     }

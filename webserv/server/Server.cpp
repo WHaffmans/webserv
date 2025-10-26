@@ -1,33 +1,31 @@
-#include "webserv/utils/utils.hpp"
+#include <webserv/server/Server.hpp>
 
 #include <webserv/client/Client.hpp>        // for Client
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/ServerConfig.hpp>  // for ServerConfig
 #include <webserv/log/Log.hpp>              // for Log, LOCATION
-#include <webserv/server/Server.hpp>
-#include <webserv/socket/ASocket.hpp>
+#include <webserv/socket/ASocket.hpp>      // for ASocket
 #include <webserv/socket/ClientSocket.hpp> // for ClientSocket
 #include <webserv/socket/ServerSocket.hpp> // for ServerSocket
+#include <webserv/utils/utils.hpp>         // for stateToEpoll
 
-#include <cerrno>        // for errno
+#include <cerrno>        // for errno, EBADF, ENOENT, EINTR
+#include <csignal>       // for SIGINT, sig_atomic_t
 #include <cstring>       // for strerror
 #include <exception>     // for exception
 #include <memory>        // for unique_ptr, allocator, make_unique
 #include <optional>      // for optional
-#include <stdexcept>     // for runtime_error
+#include <stdexcept>     // for runtime_error, invalid_argument
 #include <string>        // for basic_string, operator+, to_string, char_traits, string
-#include <unordered_map> // for unordered_map, operator==
-#include <utility>       // for move, pair
-#include <vector>        // for vector
+#include <unordered_map> // for unordered_map
+#include <utility>       // for move
+#include <vector>        // for vector, erase_if
 
-#include <fcntl.h>
-#include <sys/epoll.h> // for epoll_event, epoll_ctl, EPOLLIN, EPOLLOUT, epoll_create1, epoll_wait, EPOLLERR, EPOLLHUP, EPOLL_CTL_ADD, EPOLL_CTL_DEL, EPOLL_CTL_MOD
-#include <sys/socket.h> // for send, SOMAXCONN
-#include <sys/types.h>  // for ssize_t
+#include <fcntl.h>     // for O_CLOEXEC
+#include <stdint.h>    // for uint32_t
+#include <sys/epoll.h> // for epoll_event, epoll_ctl, EPOLLOUT, EPOLL_CTL_MOD, epoll_create1, epoll_wait, EPOLLERR, EPOLLHUP, EPOLLIN, EPOLL_CTL_ADD, EPOLL_CTL_DEL
+#include <sys/socket.h> // for SOMAXCONN
 #include <unistd.h>     // for close
-#include <csignal>
-
-class Router;
 
 volatile sig_atomic_t Server::stop_ = 0;
 

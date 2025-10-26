@@ -2,8 +2,9 @@
 
 #include <webserv/socket/ASocket.hpp> // for ASocket
 
+#include <stddef.h> // for size_t
 #include <sys/socket.h>
-#include <sys/types.h>
+#include <sys/types.h> // for ssize_t
 #include <unistd.h>
 
 class CgiSocket : public ASocket

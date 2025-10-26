@@ -1,25 +1,27 @@
-#include "webserv/handler/CgiHandler.hpp"
-#include "webserv/handler/ErrorHandler.hpp"
-#include "webserv/socket/ASocket.hpp"
-#include "webserv/socket/CgiSocket.hpp"
-
 #include <webserv/client/Client.hpp>
-#include <webserv/http/HttpHeaders.hpp>    // for HttpHeaders
-#include <webserv/log/Log.hpp>             // for Log, LOCATION
-#include <webserv/router/Router.hpp>       // for Router
-#include <webserv/server/Server.hpp>       // for Server
-#include <webserv/socket/ClientSocket.hpp> // for Socket
 
-#include <cstdint> // for uint8_t
-#include <exception>
-#include <functional> // for ref, reference_wrapper
+#include <webserv/handler/CgiHandler.hpp>   // for CgiHandler
+#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
+#include <webserv/http/HttpHeaders.hpp>     // for HttpHeaders
+#include <webserv/http/HttpRequest.hpp>     // for HttpRequest
+#include <webserv/http/HttpResponse.hpp>    // for HttpResponse
+#include <webserv/log/Log.hpp>              // for Log, LOCATION
+#include <webserv/router/Router.hpp>        // for Router
+#include <webserv/server/Server.hpp>        // for Server
+#include <webserv/socket/ASocket.hpp>       // for ASocket
+#include <webserv/socket/ClientSocket.hpp>  // for ClientSocket
+
+#include <cstdint>    // for uint8_t
+#include <functional> // for function, ref, reference_wrapper
 #include <map>        // for map
-#include <memory>
-#include <string>  // for basic_string, to_string, operator+, operator<=>
-#include <utility> // for pair, move
+#include <memory>     // for unique_ptr, make_unique, allocator, operator==, default_delete
+#include <stdexcept>  // for runtime_error
+#include <string>     // for basic_string, to_string, operator+, char_traits, operator<=>
+#include <utility>    // for move, pair
+#include <vector>     // for vector
 
-#include <sys/epoll.h>
-#include <sys/types.h> // for ssize_t
+#include <sys/socket.h> // for send
+#include <sys/types.h>  // for ssize_t
 
 Client::Client(std::unique_ptr<ClientSocket> socket, Server &server)
     : httpRequest_(std::make_unique<HttpRequest>(this)), httpResponse_(std::make_unique<HttpResponse>()),

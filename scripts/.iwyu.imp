@@ -1,11 +1,7 @@
 [
   # ============================================================================
-  # WEBSERV PROJECT IWYU MAPPINGS
-  # Based on preferences: Forward declarations in headers, central common header,
-  # umbrella headers for modules, strict standard library includes, stdexcept
+  # STANDARD LIBRARY PRIVATE IMPLEMENTATION MAPPINGS
   # ============================================================================
-
-  # Standard C++ library private implementation mappings
   { include: ["<bits/std_abs.h>", "private", "<cstdlib>", "public"] },
   { include: ["<bits/stdint-intn.h>", "private", "<cstdint>", "public"] },
   { include: ["<bits/stdint-uintn.h>", "private", "<cstdint>", "public"] },
@@ -14,23 +10,17 @@
   { include: ["<bits/exception.h>", "private", "<exception>", "public"] },
   { include: ["<bits/std_function.h>", "private", "<functional>", "public"] },
   { include: ["<bits/stringfwd.h>", "private", "<string>", "public"] },
+  { include: ["<bits/basic_string.h>", "private", "<string>", "public"] },
+  { include: ["<bits/move.h>", "private", "<utility>", "public"] },
+  { include: ["<bits/stl_pair.h>", "private", "<utility>", "public"] },
+  { include: ["<bits/stl_vector.h>", "private", "<vector>", "public"] },
+  { include: ["<bits/stl_map.h>", "private", "<map>", "public"] },
+  { include: ["<bits/unique_ptr.h>", "private", "<memory>", "public"] },
+  { include: ["<bits/shared_ptr.h>", "private", "<memory>", "public"] },
 
-  # Standard library strict mappings (preference 5C - very strict)
-  { include: ["<iostream>", "public", "<iostream>", "public"] },
-  { symbol: ["std::cout", "private", "<iostream>", "public"] },
-  { symbol: ["std::cerr", "private", "<iostream>", "public"] },
-  { symbol: ["std::cin", "private", "<iostream>", "public"] },
-  { symbol: ["std::endl", "private", "<iostream>", "public"] },
-  { symbol: ["std::vector", "private", "<vector>", "public"] },
-  { symbol: ["std::string", "private", "<string>", "public"] },
-  { symbol: ["std::map", "private", "<map>", "public"] },
-  { symbol: ["std::unordered_map", "private", "<unordered_map>", "public"] },
-  { symbol: ["std::unique_ptr", "private", "<memory>", "public"] },
-  { symbol: ["std::shared_ptr", "private", "<memory>", "public"] },
-  { symbol: ["std::make_unique", "private", "<memory>", "public"] },
-  { symbol: ["std::make_shared", "private", "<memory>", "public"] },
-
-  # System headers for socket programming
+  # ============================================================================
+  # SYSTEM HEADERS
+  # ============================================================================
   { include: ["<sys/socket.h>", "public", "<sys/socket.h>", "public"] },
   { include: ["<netinet/in.h>", "public", "<netinet/in.h>", "public"] },
   { include: ["<arpa/inet.h>", "public", "<arpa/inet.h>", "public"] },
@@ -38,17 +28,9 @@
   { include: ["<fcntl.h>", "public", "<fcntl.h>", "public"] },
   { include: ["<unistd.h>", "public", "<unistd.h>", "public"] },
 
-  # Error handling (preference 6A - stdexcept)
-  { symbol: ["std::runtime_error", "private", "<stdexcept>", "public"] },
-  { symbol: ["std::logic_error", "private", "<stdexcept>", "public"] },
-  { symbol: ["std::invalid_argument", "private", "<stdexcept>", "public"] },
-  { symbol: ["std::out_of_range", "private", "<stdexcept>", "public"] },
-
   # ============================================================================
-  # PROJECT HEADER MAPPINGS - Standardized on <> angle brackets
+  # PROJECT HEADERS - Normalize to angle brackets
   # ============================================================================
-
-  # Convert quoted includes to angle brackets for consistency
   { include: ["\"webserv/log/Log.hpp\"", "public", "<webserv/log/Log.hpp>", "public"] },
   { include: ["\"webserv/log/Channel.hpp\"", "public", "<webserv/log/Channel.hpp>", "public"] },
   { include: ["\"webserv/log/StdoutChannel.hpp\"", "public", "<webserv/log/StdoutChannel.hpp>", "public"] },
@@ -62,31 +44,27 @@
   { include: ["\"webserv/config/ConfigManager.hpp\"", "public", "<webserv/config/ConfigManager.hpp>", "public"] },
   { include: ["\"webserv/config/ServerConfig.hpp\"", "public", "<webserv/config/ServerConfig.hpp>", "public"] },
   { include: ["\"webserv/config/LocationConfig.hpp\"", "public", "<webserv/config/LocationConfig.hpp>", "public"] },
-  { include: ["\i"webserv/utils/utls.hpp\"", "public", "<webserv/utils/utils.hpp>", "public"] },
+  { include: ["\"webserv/config/AConfig.hpp\"", "public", "<webserv/config/AConfig.hpp>", "public"] },
+  { include: ["\"webserv/config/GlobalConfig.hpp\"", "public", "<webserv/config/GlobalConfig.hpp>", "public"] },
+
+  { include: ["\"webserv/utils/utils.hpp\"", "public", "<webserv/utils/utils.hpp>", "public"] },
+  { include: ["\"webserv/utils/FileUtils.hpp\"", "public", "<webserv/utils/FileUtils.hpp>", "public"] },
 
   { include: ["\"webserv/server/Server.hpp\"", "public", "<webserv/server/Server.hpp>", "public"] },
   { include: ["\"webserv/client/Client.hpp\"", "public", "<webserv/client/Client.hpp>", "public"] },
-  { include: ["\"webserv/socket/Socket.hpp\"", "public", "<webserv/socket/Socket.hpp>", "public"] },
+  { include: ["\"webserv/socket/ASocket.hpp\"", "public", "<webserv/socket/ASocket.hpp>", "public"] },
+  { include: ["\"webserv/socket/ClientSocket.hpp\"", "public", "<webserv/socket/ClientSocket.hpp>", "public"] },
+  { include: ["\"webserv/socket/ServerSocket.hpp\"", "public", "<webserv/socket/ServerSocket.hpp>", "public"] },
+  { include: ["\"webserv/socket/CgiSocket.hpp\"", "public", "<webserv/socket/CgiSocket.hpp>", "public"] },
   { include: ["\"webserv/router/Router.hpp\"", "public", "<webserv/router/Router.hpp>", "public"] },
 
+  { include: ["\"webserv/handler/AHandler.hpp\"", "public", "<webserv/handler/AHandler.hpp>", "public"] },
   { include: ["\"webserv/handler/CgiHandler.hpp\"", "public", "<webserv/handler/CgiHandler.hpp>", "public"] },
   { include: ["\"webserv/handler/FileHandler.hpp\"", "public", "<webserv/handler/FileHandler.hpp>", "public"] },
   { include: ["\"webserv/handler/ErrorHandler.hpp\"", "public", "<webserv/handler/ErrorHandler.hpp>", "public"] },
-
-  # ============================================================================
-  # FORWARD DECLARATION PREFERENCES
-  # ============================================================================
-
-  # Suggest forward declarations instead of full includes in headers where possible
-  { symbol: ["Client", "private", "<webserv/client/Client.hpp>", "public"] },
-  { symbol: ["Server", "private", "<webserv/server/Server.hpp>", "public"] },
-  { symbol: ["HttpRequest", "private", "<webserv/http/HttpRequest.hpp>", "public"] },
-  { symbol: ["HttpResponse", "private", "<webserv/http/HttpResponse.hpp>", "public"] },
-  { symbol: ["HttpHeaders", "private", "<webserv/http/HttpHeaders.hpp>", "public"] },
-  { symbol: ["ServerConfig", "private", "<webserv/config/ServerConfig.hpp>", "public"] },
-  { symbol: ["ConfigManager", "private", "<webserv/config/ConfigManager.hpp>", "public"] },
-  { symbol: ["LocationConfig", "private", "<webserv/config/LocationConfig.hpp>", "public"] },
-  { symbol: ["Socket", "private", "<webserv/socket/Socket.hpp>", "public"] },
-  { symbol: ["Router", "private", "<webserv/router/Router.hpp>", "public"] },
-  { symbol: ["Channel", "private", "<webserv/log/Channel.hpp>", "public"] }
+  { include: ["\"webserv/handler/URI.hpp\"", "public", "<webserv/handler/URI.hpp>", "public"] },
+  { include: ["\"webserv/handler/CgiProcess.hpp\"", "public", "<webserv/handler/CgiProcess.hpp>", "public"] },
+  { include: ["\"webserv/handler/CgiEnvironment.hpp\"", "public", "<webserv/handler/CgiEnvironment.hpp>", "public"] },
+  # CgiHandler needs CgiProcess for unique_ptr deletion
+  { include: ["<webserv/handler/CgiHandler.hpp>", "public", "<webserv/handler/CgiProcess.hpp>", "public"] }
 ]

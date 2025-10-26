@@ -1,4 +1,5 @@
 #include <webserv/config/validation/ConfigValidator.hpp>
+
 #include <webserv/config/validation/ValidationEngine.hpp>                            // for ValidationEngine
 #include <webserv/config/validation/directive_rules/AValidationRule.hpp>             // for AValidationRule
 #include <webserv/config/validation/directive_rules/AllowedValuesRule.hpp>           // for AllowedValuesRule
@@ -36,9 +37,8 @@ ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make
     engine_->addServerRule("root", std::make_unique<FolderExistsRule>(false));
 
     /*Location Directive Rules*/
-    engine_->addLocationRule("allowed_methods",
-                             std::make_unique<AllowedValuesRule>(std::vector<std::string>{"GET", "POST", "DELETE", "PUT"},
-                                                                 true));
+    engine_->addLocationRule("allowed_methods", std::make_unique<AllowedValuesRule>(
+                                                    std::vector<std::string>{"GET", "POST", "DELETE", "PUT"}, true));
     engine_->addLocationRule("root", std::make_unique<FolderExistsRule>(true));
     engine_->addLocationRule("cgi_ext", std::make_unique<CgiExtValidationRule>(false));
 

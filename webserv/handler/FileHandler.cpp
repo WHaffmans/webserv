@@ -1,6 +1,7 @@
+#include <webserv/handler/FileHandler.hpp>
+
 #include <webserv/config/AConfig.hpp>       // for AConfig
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
-#include <webserv/handler/FileHandler.hpp>
 #include <webserv/handler/MIMETypes.hpp>  // for MIMETypes
 #include <webserv/handler/URI.hpp>        // for URI
 #include <webserv/http/HttpConstants.hpp> // for NOT_FOUND, FORBIDDEN, OK
@@ -8,10 +9,9 @@
 #include <webserv/log/Log.hpp>            // for Log, LOCATION
 #include <webserv/utils/FileUtils.hpp>    // for joinPath, getExtension, isFile, readBinaryFile
 
-#include <memory>   // for unique_ptr, allocator, make_unique
 #include <optional> // for optional
 #include <ranges>   // for __find_if_fn, find_if
-#include <string>   // for basic_string, string, operator+, char_traits
+#include <string>   // for basic_string, allocator, operator+, string, char_traits
 #include <vector>   // for vector
 
 FileHandler::FileHandler(const HttpRequest &request, HttpResponse &response)
@@ -91,16 +91,10 @@ void FileHandler::handle()
 
     switch (resourceType)
     {
-    case FILE:
-        handleFile(filepath);
-        return;
+    case FILE: handleFile(filepath); return;
     case DIRECTORY_AUTOINDEX:
-    case DIRECTORY_INDEX:
-        handleDirectory(filepath, resourceType);
-        return;
-    case NOT_FOUND:
-        ErrorHandler::createErrorResponse(Http::StatusCode::NOT_FOUND, response_, config_);
-        return;
+    case DIRECTORY_INDEX: handleDirectory(filepath, resourceType); return;
+    case NOT_FOUND: ErrorHandler::createErrorResponse(Http::StatusCode::NOT_FOUND, response_, config_); return;
     }
     ErrorHandler::createErrorResponse(Http::StatusCode::NOT_FOUND, response_, config_);
 }

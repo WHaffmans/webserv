@@ -1,8 +1,11 @@
 #pragma once
 
-#include "webserv/socket/ASocket.hpp"
+#include <webserv/socket/ASocket.hpp> // for ASocket
 
-#include <chrono>
+#include <chrono> // for milliseconds
+
+#include <stddef.h>    // for size_t
+#include <sys/types.h> // for ssize_t
 
 class TimerSocket : public ASocket
 {

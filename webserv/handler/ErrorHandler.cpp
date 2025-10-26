@@ -1,15 +1,15 @@
+#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
+
 #include <webserv/config/AConfig.hpp>       // for AConfig
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/GlobalConfig.hpp>  // for GlobalConfig
-#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
 #include <webserv/http/HttpConstants.hpp>   // for getStatusCodeReason, INTERNAL_SERVER_ERROR
 #include <webserv/http/HttpResponse.hpp>    // for HttpResponse
 #include <webserv/log/Log.hpp>              // for Log, LOCATION
 
 #include <fstream> // for basic_ifstream, basic_filebuf, basic_ostream::operator<<, ifstream, stringstream
-#include <memory>  // for allocator, make_unique, unique_ptr
 #include <sstream> // for basic_stringstream
-#include <string>  // for basic_string, char_traits, operator+, string, to_string
+#include <string>  // for allocator, basic_string, char_traits, operator+, string, to_string
 
 void ErrorHandler::createErrorResponse(uint16_t statusCode, HttpResponse &response, const AConfig *config)
 {

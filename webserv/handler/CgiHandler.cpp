@@ -1,15 +1,19 @@
-#include "webserv/handler/ErrorHandler.hpp"
+#include <webserv/handler/CgiHandler.hpp>
 
 #include <webserv/client/Client.hpp> // for Client
-#include <webserv/handler/CgiHandler.hpp>
-#include <webserv/handler/CgiProcess.hpp> // for CgiProcess
-#include <webserv/http/HttpRequest.hpp>   // for HttpRequest
-#include <webserv/http/HttpResponse.hpp>  // for HttpResponse
-#include <webserv/log/Log.hpp>            // for Log
-#include <webserv/socket/CgiSocket.hpp>   // for CgiSocket
-#include <webserv/utils/utils.hpp>        // for stoul
+#include <webserv/handler/CgiProcess.hpp>   // for CgiProcess
+#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
+#include <webserv/http/HttpRequest.hpp>     // for HttpRequest
+#include <webserv/http/HttpResponse.hpp>    // for HttpResponse
+#include <webserv/log/Log.hpp>              // for Log, LOCATION
+#include <webserv/socket/CgiSocket.hpp>     // for CgiSocket
+#include <webserv/socket/TimerSocket.hpp>   // for TimerSocket
+#include <webserv/utils/utils.hpp>          // for trim
 
-#include <sys/types.h>
+#include <functional> // for function
+#include <utility>    // for move
+
+#include <sys/types.h> // for ssize_t
 
 CgiHandler::CgiHandler(const HttpRequest &request, HttpResponse &response)
     : AHandler(request, response), cgiProcess_(nullptr), cgiStdIn_(nullptr), cgiStdOut_(nullptr)

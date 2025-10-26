@@ -1,19 +1,17 @@
-#include "webserv/config/ConfigManager.hpp"
-#include "webserv/config/ServerConfig.hpp"
-#include "webserv/handler/URI.hpp"
-
-#include <webserv/client/Client.hpp>      // for Client
-#include <webserv/http/HttpConstants.hpp> // for CRLF, DOUBLE_CRLF, BAD_REQUEST
 #include <webserv/http/HttpRequest.hpp>
+
+#include <webserv/config/ConfigManager.hpp> // for ConfigManager
+#include <webserv/handler/URI.hpp>          // for URI
+#include <webserv/http/HttpConstants.hpp>   // for CRLF, DOUBLE_CRLF
 #include <webserv/log/Log.hpp>     // for Log, LOCATION
 #include <webserv/utils/utils.hpp> // for stoul
 
-#include <map> // for map
-#include <memory>
-#include <optional> // for optional
-#include <sstream>  // for basic_stringstream, basic_istream, stringstream
-#include <utility>  // for pair
-#include <vector>   // for vector
+#include <exception> // for exception
+#include <map>       // for map
+#include <memory>    // for allocator, make_unique, unique_ptr
+#include <optional>  // for optional
+#include <sstream>   // for basic_stringstream, basic_istream, stringstream
+#include <vector>    // for vector
 
 HttpRequest::HttpRequest(Client *client) : client_(client), uri_(nullptr)
 {
@@ -43,8 +41,7 @@ void HttpRequest::setState(State state)
             state_ = State::ParseError;
             return;
         }
-        uri_ = std::make_unique<URI>(
-            *this, *serverConfig);
+        uri_ = std::make_unique<URI>(*this, *serverConfig);
     }
     state_ = state;
 }

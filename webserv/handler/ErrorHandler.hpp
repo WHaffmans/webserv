@@ -10,6 +10,7 @@
 #include <sys/types.h>
 
 class AConfig;
+class HttpResponse;
 
 class ErrorHandler
 {

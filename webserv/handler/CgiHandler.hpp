@@ -1,11 +1,18 @@
 #pragma once
 
-#include "webserv/handler/AHandler.hpp"
-#include "webserv/socket/CgiSocket.hpp"
+#include <webserv/handler/AHandler.hpp> // for AHandler
+#include <webserv/http/HttpRequest.hpp> // for HttpRequest
+#include <webserv/socket/CgiSocket.hpp> // for CgiSocket
 
-#include <memory>
+#include <memory> // for unique_ptr
+#include <string> // for string
+#include <vector> // for vector
+
+#include <stddef.h> // for size_t
+#include <stdint.h> // for uint8_t
 
 class CgiProcess;
+class HttpResponse;
 
 class CgiHandler : public AHandler
 {
@@ -21,7 +28,8 @@ class CgiHandler : public AHandler
 
     void handle() override;
     void wait() noexcept;
-    void setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_ptr<CgiSocket> cgiStdOut, std::unique_ptr<CgiSocket> cgiStdErr);
+    void setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_ptr<CgiSocket> cgiStdOut,
+                       std::unique_ptr<CgiSocket> cgiStdErr);
     void setPid(int pid);
 
   protected:
@@ -41,7 +49,6 @@ class CgiHandler : public AHandler
     void appendToBuffer(const char *data, size_t length);
 
     int pid_ = -1;
-
 
     void write();
     void read();
