@@ -56,6 +56,8 @@ class HttpRequest
     void parseBuffer();
     void parseContentLength();
 
+    ServerConfig * getServerConfig() const;
+
     Client *client_;
 
     State state_ = State::RequestLine;

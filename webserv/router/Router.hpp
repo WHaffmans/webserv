@@ -1,5 +1,6 @@
 #pragma once
 
+#include "webserv/http/RequestValidator.hpp"
 #include <webserv/config/AConfig.hpp> // for AConfig
 #include <webserv/config/LocationConfig.hpp>
 #include <webserv/handler/AHandler.hpp>  // for AHandler
@@ -7,7 +8,6 @@
 #include <webserv/http/HttpResponse.hpp> // for HttpResponse
 
 #include <memory> // for unique_ptr
-#include <string> // for string
 
 class LocationConfig;
 class ServerConfig;
@@ -21,5 +21,6 @@ class Router
 
   private:
     Client *client_;
-    [[nodiscard]] bool isMethodSupported(const std::string &method, const AConfig &config) noexcept;
+    std::unique_ptr<RequestValidator> requestValidator_;
+    // [[nodiscard]] bool isMethodSupported(const std::string &method, const AConfig &config) noexcept;
 };

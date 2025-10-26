@@ -1,4 +1,4 @@
-#include <webserv/router/Router.hpp>                   // for Router
+#include "webserv/handler/ErrorHandler.hpp"
 
 #include <webserv/client/Client.hpp>                   // for Client
 #include <webserv/config/AConfig.hpp>                  // for AConfig
@@ -10,6 +10,7 @@
 #include <webserv/handler/URI.hpp>                     // for URI
 #include <webserv/http/HttpRequest.hpp>                // for HttpRequest
 #include <webserv/log/Log.hpp>                         // for Log, LOCATION
+#include <webserv/router/Router.hpp>                   // for Router
 
 #include <exception> // for exception
 #include <format>    // for vector
@@ -26,16 +27,16 @@ Router::Router(Client *client) : client_(client)
     Log::trace(LOCATION);
 }
 
-bool Router::isMethodSupported(const std::string &method, const AConfig &config) noexcept
-{
-    const ADirective *allowedMethods = config.getDirective("allowed_methods");
-    if (allowedMethods == nullptr || !allowedMethods->getValue().try_get<std::vector<std::string>>().has_value())
-    {
-        return true;
-    }
-    auto methods = allowedMethods->getValue().get<std::vector<std::string>>();
-    return std::ranges::find(methods, method) != methods.end();
-}
+// bool Router::isMethodSupported(const std::string &method, const AConfig &config) noexcept
+// {
+//     const ADirective *allowedMethods = config.getDirective("allowed_methods");
+//     if (allowedMethods == nullptr || !allowedMethods->getValue().try_get<std::vector<std::string>>().has_value())
+//     {
+//         return true;
+//     }
+//     auto methods = allowedMethods->getValue().get<std::vector<std::string>>();
+//     return std::ranges::find(methods, method) != methods.end();
+// }
 
 std::unique_ptr<AHandler> Router::handleRequest()
 {
@@ -50,17 +51,25 @@ std::unique_ptr<AHandler> Router::handleRequest()
     }
     HttpResponse &response = client_->getHttpResponse();
 
-    const std::string &target = request.getTarget();
-    static_cast<void>(target); // Suppress unused variable warning
-    const std::string &method = request.getMethod();
+    // const std::string &target = request.getTarget();
+    // static_cast<void>(target); // Suppress unused variable warning
+    // const std::string &method = request.getMethod();
 
     const AConfig *config = request.getUri().getConfig();
-
-    if (!isMethodSupported(method, *config))
+    auto validator = std::make_unique<RequestValidator>(config, &request);
+    auto error = validator->validate();
+    if (error.has_value())
     {
+        Log::warning("Request validation failed: " + error->message);
+        ErrorHandler::createErrorResponse(error->statusCode, response, config);
         return nullptr;
-        // return ErrorHandler::getErrorResponse(405, config);
     }
+
+    // if (!isMethodSupported(method, *config))
+    // {
+    //     return nullptr;
+    //     // return ErrorHandler::getErrorResponse(405, config);
+    // }
     if (request.getUri().isCgi())
     {
         try

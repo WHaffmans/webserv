@@ -1,5 +1,4 @@
 #include <webserv/client/Client.hpp>
-
 #include <webserv/handler/CgiHandler.hpp>   // for CgiHandler
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
 #include <webserv/http/HttpHeaders.hpp>     // for HttpHeaders
@@ -91,15 +90,23 @@ void Client::request()
                       {"body", httpRequest_->getBody()},
                       {"state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
                   });
-        // server_.responseReady(client_socket_->getFd());
-        handler_ = router_->handleRequest();
-        if (handler_ != nullptr)
+
+        try
         {
-            handler_->handle();
+            // Thoughts: if a handler isn't returned, this could because of the error handler already setting up the response
+            // so, maybe we don't need to throw a 500 when no handler. Because that would override the actual error response.
+            // How about the router, or a handler, throws an exception if something goes wrong, and we catch it here to make a 500 response?
+            handler_ = router_->handleRequest();
+            if (handler_ != nullptr)
+            {
+                handler_->handle();
+            }
         }
-        else
+        catch (const std::exception &e)
         {
+            Log::error("Exception during request handling: " + std::string(e.what()));
             ErrorHandler::createErrorResponse(500, *httpResponse_);
+            return;
         }
     }
     else
@@ -111,23 +118,6 @@ void Client::request()
                    });
     }
 }
-
-// //
-// void Client::setCgiSockets(CgiSocket *cgiStdIn, CgiSocket *cgiStdOut)
-// {
-//     // server_.add(*cgiStdIn, EPOLLOUT, this); // write
-//     // server_.add(*cgiStdOut, EPOLLIN, this); // read
-
-//     sockets_[cgiStdIn->getFd()] = cgiStdIn;
-//     sockets_[cgiStdOut->getFd()] = cgiStdOut;
-// }
-
-// void Client::removeCgiSocket(CgiSocket *cgiSocket)
-// {
-//     server_.remove(*cgiSocket);  // write
-
-//     sockets_.erase(cgiSocket->getFd());
-// }
 
 void Client::addSocket(ASocket *socket)
 {

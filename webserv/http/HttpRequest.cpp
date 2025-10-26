@@ -1,8 +1,9 @@
-#include <webserv/http/HttpRequest.hpp>
+#include "webserv/config/ServerConfig.hpp"
 
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/handler/URI.hpp>          // for URI
 #include <webserv/http/HttpConstants.hpp>   // for CRLF, DOUBLE_CRLF
+#include <webserv/http/HttpRequest.hpp>
 #include <webserv/log/Log.hpp>     // for Log, LOCATION
 #include <webserv/utils/utils.hpp> // for stoul
 
@@ -32,12 +33,10 @@ void HttpRequest::setState(State state)
 {
     if (state == State::Complete)
     {
-        // TODO: segfault if server does not exist
-        std::string hostHeader = getHeaders().getHost().value_or("");
-        ServerConfig *serverConfig = ConfigManager::getInstance().getMatchingServerConfig(hostHeader);
-        if (hostHeader.empty() || serverConfig == nullptr)
+        ServerConfig *serverConfig = getServerConfig();
+        if (serverConfig == nullptr)
         {
-            Log::error("No matching server config found for host: " + hostHeader);
+            Log::error("No matching server config found for host");
             state_ = State::ParseError;
             return;
         }
@@ -244,6 +243,16 @@ void HttpRequest::reset()
     // headers_.clear();
     body_.clear();
     // contentLength_ = 0;
+}
+
+ServerConfig *HttpRequest::getServerConfig() const
+{
+    std::string hostHeader = getHeaders().getHost().value_or("");
+    if (hostHeader.empty())
+    {
+        return nullptr;
+    }
+    return ConfigManager::getInstance().getMatchingServerConfig(hostHeader);
 }
 
 const URI &HttpRequest::getUri() const noexcept
