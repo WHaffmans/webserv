@@ -7,6 +7,7 @@
 #include <webserv/socket/ASocket.hpp>
 #include <webserv/socket/ServerSocket.hpp> // for ServerSocket
 
+#include <csignal>
 #include <cstdint>       // for uint32_t
 #include <memory>        // for unique_ptr
 #include <set>           // for set
@@ -31,6 +32,7 @@ class Server
     Server &operator=(Server &&other) noexcept = delete;
 
     ~Server();
+    static void signalHandler(int signum);
 
     void run();
     void add(ASocket &socket, Client *client = nullptr);
@@ -44,6 +46,7 @@ class Server
 
   private:
     int epoll_fd_;
+    static volatile sig_atomic_t stop_;
     const ConfigManager &configManager_;
     std::vector<std::unique_ptr<ServerSocket>> listeners_;
     std::set<int> listener_fds_;

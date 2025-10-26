@@ -25,8 +25,11 @@
 #include <sys/socket.h> // for send, SOMAXCONN
 #include <sys/types.h>  // for ssize_t
 #include <unistd.h>     // for close
+#include <csignal>
 
 class Router;
+
+volatile sig_atomic_t Server::stop_ = 0;
 
 Server::Server(const ConfigManager &configManager) : epoll_fd_(epoll_create1(O_CLOEXEC)), configManager_(configManager)
 {
@@ -269,6 +272,11 @@ void Server::handleEpoll(struct epoll_event *events, int max_events)
     int nfds = epoll_wait(epoll_fd_, events, max_events, 10); // NOLINT
     if (nfds == -1)
     {
+        if (errno == EINTR)
+        {
+            Log::debug("epoll_wait interrupted by signal, continuing...");
+            return;
+        }
         Log::error("epoll_wait failed");
         throw std::runtime_error("epoll_wait failed");
     }
@@ -306,8 +314,22 @@ void Server::run()
     struct epoll_event events[MAX_EVENTS]; // NOLINT
     while (true)
     {
+        if (stop_ != 0)
+        {
+            Log::info("Server stopping...");
+            break;
+        }
         pollSockets();
         pollClients();
         handleEpoll(events, MAX_EVENTS); // NOLINT (cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    }
+}
+
+void Server::signalHandler(int signum)
+{
+
+    if (signum == SIGINT)
+    {
+        stop_ = signum;
     }
 }
