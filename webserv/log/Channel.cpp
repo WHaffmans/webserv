@@ -30,3 +30,8 @@ std::string Channel::printContext(const std::map<std::string, std::string> &cont
 
     return ss.str();
 }
+
+bool Channel::isStdOut() const
+{
+    return false;
+}

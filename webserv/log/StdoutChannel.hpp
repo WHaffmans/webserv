@@ -20,4 +20,6 @@ class StdoutChannel : public Channel
 
     void log(const Log::Level &logLevel, const std::string &message,
              const std::map<std::string, std::string> &context = {}) override;
+
+    [[nodiscard]] bool isStdOut() const override;
 };

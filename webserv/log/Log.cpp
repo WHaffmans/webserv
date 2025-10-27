@@ -1,7 +1,6 @@
-#include <webserv/log/Log.hpp>
-
 #include <webserv/log/Channel.hpp>     // for Channel
 #include <webserv/log/FileChannel.hpp> // for FileChannel
+#include <webserv/log/Log.hpp>
 #include <webserv/log/StdoutChannel.hpp> // for StdoutChannel
 
 #include <chrono>    // for duration_cast, operator-, steady_clock, duration, seconds
@@ -66,8 +65,21 @@ void Log::log(Level level, const std::string &message, const std::map<std::strin
 {
     for (auto &it : channels_)
     {
+        std::string statusBackup = _statusMessage;
+        bool wasActive = _statusActive;
         // extendedMessage += " | " + message;
+        if (it.second->isStdOut() && _statusActive)
+        {
+            // Clear status line before logging to stdout
+            clearStatus();
+        }
         it.second->log(level, message, context);
+
+        if (it.second->isStdOut() && wasActive)
+        {
+            // Reprint status line after logging to stdout
+            status(statusBackup);
+        }
     }
 }
 
@@ -173,4 +185,35 @@ Log::Level Log::stringToLogLevel(const std::string &level)
         }
     }
     return Level::Info; // Default fallback
+}
+
+std::string Log::_statusMessage;
+bool Log::_statusActive = false;
+
+void Log::status(const std::string &message)
+{
+    _statusMessage = message;
+    _statusActive = true;
+
+    // Save cursor position, move to bottom, clear line, print status, restore cursor
+    std::cout << "\033[s"             // Save cursor position
+              << "\033[999;0H"        // Move to bottom row
+              << "\033[2K"            // Clear entire line
+              << "\033[7m"            // Reverse video (inverted colors)
+              << message << "\033[0m" // Reset formatting
+              << "\033[u"             // Restore cursor position
+              << std::flush;
+}
+
+void Log::clearStatus()
+{
+    if (_statusActive)
+    {
+        _statusActive = false;
+        std::cout << "\033[s"      // Save cursor position
+                  << "\033[999;0H" // Move to bottom row
+                  << "\033[2K"     // Clear entire line
+                  << "\033[u"      // Restore cursor position
+                  << std::flush;
+    }
 }

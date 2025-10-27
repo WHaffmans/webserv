@@ -1,6 +1,5 @@
-#include <webserv/log/StdoutChannel.hpp>
-
 #include <webserv/log/Log.hpp> // for Log
+#include <webserv/log/StdoutChannel.hpp>
 
 #include <iomanip>  // for operator<<, setfill, setw
 #include <iostream> // for basic_ostream, operator<<, basic_ostream::operator<<, cerr, cout, flush, ostream
@@ -16,4 +15,9 @@ void StdoutChannel::log(const Log::Level &logLevel, const std::string &message,
     out << message << '\n';
     out << printContext(context);
     out << std::flush;
+}
+
+bool StdoutChannel::isStdOut() const
+{
+    return true;
 }

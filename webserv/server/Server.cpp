@@ -312,6 +312,8 @@ void Server::run()
     struct epoll_event events[MAX_EVENTS]; // NOLINT
     while (stop_ == 0)
     {
+        std::string status = "Active connections: " + std::to_string(clients_.size());
+        Log::status(status);    
         pollSockets();
         pollClients();
         handleEpoll(events, MAX_EVENTS); // NOLINT (cppcoreguidelines-pro-bounds-pointer-arithmetic)

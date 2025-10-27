@@ -63,6 +63,9 @@ class Log
     static void error(const std::string &message, const std::map<std::string, std::string> &context = {});
     static void fatal(const std::string &message, const std::map<std::string, std::string> &context = {});
 
+    static void status(const std::string &message);
+    static void clearStatus();
+
     static std::string logLevelToString(Level level);
     static const char *logLevelToColor(Level level);
     static std::string logLevelToColoredString(Level level);
@@ -71,6 +74,8 @@ class Log
     static void clearChannels();
 
   private:
+    static std::string _statusMessage;
+    static bool _statusActive;
     Log();
 
     ~Log() = default;
