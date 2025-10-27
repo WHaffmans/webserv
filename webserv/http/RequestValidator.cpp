@@ -65,3 +65,15 @@ std::optional<RequestValidator::ValidationError> RequestValidator::validateMetho
     }
     return ValidationError{405, "Method Not Allowed"};
 }
+
+RequestValidator::ValidationException::ValidationException(int code) : code_(code){};
+
+int RequestValidator::ValidationException::code() const noexcept
+{
+    return code_;
+}
+
+const char *RequestValidator::ValidationException::what() const noexcept
+{
+    return "Request validation failed";
+}

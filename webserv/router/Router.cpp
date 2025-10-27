@@ -1,4 +1,5 @@
 #include "webserv/handler/ErrorHandler.hpp"
+#include "webserv/http/RequestValidator.hpp"
 
 #include <webserv/client/Client.hpp>                   // for Client
 #include <webserv/config/AConfig.hpp>                  // for AConfig
@@ -50,26 +51,15 @@ std::unique_ptr<AHandler> Router::handleRequest()
         return nullptr;
     }
     HttpResponse &response = client_->getHttpResponse();
-
-    // const std::string &target = request.getTarget();
-    // static_cast<void>(target); // Suppress unused variable warning
-    // const std::string &method = request.getMethod();
-
     const AConfig *config = request.getUri().getConfig();
+
     auto validator = std::make_unique<RequestValidator>(config, &request);
     auto error = validator->validate();
     if (error.has_value())
     {
         Log::warning("Request validation failed: " + error->message);
-        ErrorHandler::createErrorResponse(error->statusCode, response, config);
-        return nullptr;
+        throw RequestValidator::ValidationException{error->statusCode};
     }
-
-    // if (!isMethodSupported(method, *config))
-    // {
-    //     return nullptr;
-    //     // return ErrorHandler::getErrorResponse(405, config);
-    // }
     if (request.getUri().isCgi())
     {
         try
@@ -80,7 +70,6 @@ std::unique_ptr<AHandler> Router::handleRequest()
         catch (const std::exception &e)
         {
             Log::error("CGI process failed: " + std::string(e.what()));
-            // return ErrorHandler::getErrorResponse(500, config);
         }
     }
     else

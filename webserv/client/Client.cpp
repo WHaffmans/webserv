@@ -1,3 +1,5 @@
+#include "webserv/http/RequestValidator.hpp"
+
 #include <webserv/client/Client.hpp>
 #include <webserv/handler/CgiHandler.hpp>   // for CgiHandler
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
@@ -93,14 +95,21 @@ void Client::request()
 
         try
         {
-            // Thoughts: if a handler isn't returned, this could because of the error handler already setting up the response
-            // so, maybe we don't need to throw a 500 when no handler. Because that would override the actual error response.
-            // How about the router, or a handler, throws an exception if something goes wrong, and we catch it here to make a 500 response?
+            // Thoughts: if a handler isn't returned, this could because of the error handler already setting up the
+            // response so, maybe we don't need to throw a 500 when no handler. Because that would override the actual
+            // error response. How about the router, or a handler, throws an exception if something goes wrong, and we
+            // catch it here to make a 500 response?
             handler_ = router_->handleRequest();
             if (handler_ != nullptr)
             {
                 handler_->handle();
             }
+        }
+        catch (const RequestValidator::ValidationException &e)
+        {
+            Log::error("Exception during request handling: " + std::string(e.what()));
+            ErrorHandler::createErrorResponse(e.code(), *httpResponse_);
+            return;
         }
         catch (const std::exception &e)
         {
