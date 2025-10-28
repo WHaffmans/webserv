@@ -35,7 +35,7 @@ class DirectiveFactory
         {.name = "cgi_timeout", .type = "IntDirective", .context = "gsl"},
         {.name = "upload_enabled", .type = "BoolDirective", .context = "gsl"},
         {.name = "upload_store", .type = "StringDirective", .context = "gsl"},
-        {.name = "redirect", .type = "VectorDirective", .context = "l"},
+        {.name = "redirect", .type = "IntStringDirective", .context = "l"},
         {.name = "timeout", .type = "IntDirective", .context = "gsl"},
     }};
 

@@ -1,8 +1,7 @@
-#include <webserv/handler/URI.hpp>
-
 #include <webserv/config/AConfig.hpp>        // for AConfig
 #include <webserv/config/LocationConfig.hpp> // for LocationConfig
 #include <webserv/config/ServerConfig.hpp>   // for ServerConfig
+#include <webserv/handler/URI.hpp>
 #include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
 #include <webserv/log/Log.hpp>          // for Log, LOCATION
 #include <webserv/utils/FileUtils.hpp>  // for joinPath, isDirectory, isFile, getExtension, isValidPath
@@ -181,6 +180,22 @@ bool URI::isValid() const noexcept
 bool URI::isCgi() const noexcept
 {
     return !getCgiPath().empty();
+}
+
+bool URI::isRedirect() const noexcept
+{
+    auto redirectOpt = config_->get<std::pair<int, std::string>>("redirect");
+    return redirectOpt.has_value();
+}
+
+std::pair<int, std::string> URI::getRedirect() const
+{
+    auto redirectOpt = config_->get<std::pair<int, std::string>>("redirect");
+    if (redirectOpt.has_value())
+    {
+        return redirectOpt.value();
+    }
+    return {0, ""};
 }
 
 std::string URI::getCgiPath() const

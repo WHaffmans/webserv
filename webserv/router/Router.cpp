@@ -13,6 +13,7 @@
 #include <webserv/handler/URI.hpp>                     // for URI
 #include <webserv/http/HttpRequest.hpp>                // for HttpRequest
 #include <webserv/log/Log.hpp>                         // for Log, LOCATION
+#include <webserv/handler/RedirectHandler.hpp>             // for RedirectHandler
 
 #include <exception> // for exception
 #include <format>    // for vector
@@ -60,6 +61,10 @@ std::unique_ptr<AHandler> Router::handleRequest()
     {
         Log::warning("Request validation failed: " + error->message);
         throw RequestValidator::ValidationException{error->statusCode};
+    }
+    if (request.getUri().isRedirect())
+    {
+        return std::make_unique<RedirectHandler>(request, response);
     }
     if (request.getUri().isCgi())
     {

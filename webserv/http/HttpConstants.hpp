@@ -35,6 +35,13 @@ namespace StatusCode
 constexpr uint16_t OK = 200;
 constexpr uint16_t CREATED = 201;
 constexpr uint16_t NO_CONTENT = 204;
+
+constexpr uint16_t MOVED_PERMANENTLY = 301;
+constexpr uint16_t FOUND = 302;
+constexpr uint16_t SEE_OTHER = 303;
+constexpr uint16_t TEMPORARY_REDIRECT = 307;
+constexpr uint16_t PERMANENT_REDIRECT = 308;
+
 constexpr uint16_t BAD_REQUEST = 400;
 constexpr uint16_t UNAUTHORIZED = 401;
 constexpr uint16_t FORBIDDEN = 403;
@@ -53,10 +60,15 @@ struct StatusCodeInfo
     std::string_view reason;
 };
 
-static constexpr std::array<StatusCodeInfo, 13> statusCodeInfos
+static constexpr std::array<StatusCodeInfo, 18> statusCodeInfos
     = {{{.code = StatusCode::OK, .reason = "OK"},
         {.code = StatusCode::CREATED, .reason = "Created"},
         {.code = StatusCode::NO_CONTENT, .reason = "No Content"},
+        {.code = StatusCode::MOVED_PERMANENTLY, .reason = "Moved Permanently"},
+        {.code = StatusCode::FOUND, .reason = "Found"},
+        {.code = StatusCode::SEE_OTHER, .reason = "See Other"},
+        {.code = StatusCode::TEMPORARY_REDIRECT, .reason = "Temporary Redirect"},
+        {.code = StatusCode::PERMANENT_REDIRECT, .reason = "Permanent Redirect"},
         {.code = StatusCode::BAD_REQUEST, .reason = "Bad Request"},
         {.code = StatusCode::UNAUTHORIZED, .reason = "Unauthorized"},
         {.code = StatusCode::FORBIDDEN, .reason = "Forbidden"},
@@ -75,6 +87,7 @@ namespace Header
 {
 constexpr std::string_view CONTENT_TYPE = "Content-Type";
 constexpr std::string_view CONTENT_LENGTH = "Content-Length";
+constexpr std::string_view REDIRECT_LOCATION = "Location";
 constexpr std::string_view HOST = "Host";
 constexpr std::string_view USER_AGENT = "User-Agent";
 constexpr std::string_view ACCEPT = "Accept";

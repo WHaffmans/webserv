@@ -21,9 +21,12 @@ class URI
     [[nodiscard]] bool isDirectory() const noexcept;
     [[nodiscard]] bool isValid() const noexcept;
     [[nodiscard]] bool isCgi() const noexcept;
+    [[nodiscard]] bool isRedirect() const noexcept;
 
     [[nodiscard]] std::string getExtension() const noexcept;
     [[nodiscard]] std::string getCgiPath() const;
+    [[nodiscard]] std::pair<int, std::string> getRedirect() const;
+
     [[nodiscard]] const AConfig *getConfig() const noexcept;
     [[nodiscard]] const std::string &getBaseName() const noexcept;
     [[nodiscard]] const std::string &getFullPath() const noexcept;

@@ -1,17 +1,15 @@
 #include <webserv/client/Client.hpp>
-
-#include <webserv/http/RequestValidator.hpp>
-
 #include <webserv/handler/CgiHandler.hpp>   // for CgiHandler
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
 #include <webserv/http/HttpHeaders.hpp>     // for HttpHeaders
 #include <webserv/http/HttpRequest.hpp>     // for HttpRequest
 #include <webserv/http/HttpResponse.hpp>    // for HttpResponse
-#include <webserv/log/Log.hpp>              // for Log, LOCATION
-#include <webserv/router/Router.hpp>        // for Router
-#include <webserv/server/Server.hpp>        // for Server
-#include <webserv/socket/ASocket.hpp>       // for ASocket
-#include <webserv/socket/ClientSocket.hpp>  // for ClientSocket
+#include <webserv/http/RequestValidator.hpp>
+#include <webserv/log/Log.hpp>             // for Log, LOCATION
+#include <webserv/router/Router.hpp>       // for Router
+#include <webserv/server/Server.hpp>       // for Server
+#include <webserv/socket/ASocket.hpp>      // for ASocket
+#include <webserv/socket/ClientSocket.hpp> // for ClientSocket
 
 #include <cstdint>    // for uint8_t
 #include <functional> // for function, ref, reference_wrapper
@@ -84,40 +82,43 @@ void Client::request()
     if (httpRequest_->getState() == HttpRequest::State::Complete
         || httpRequest_->getState() == HttpRequest::State::ParseError)
     {
-        Log::info("Received complete request",
-                  {
-                      {"request_method", httpRequest_->getMethod()},
-                      {"request_target", httpRequest_->getTarget()},
-                      {"http_version", httpRequest_->getHttpVersion()},
-                      {"headers", httpRequest_->getHeaders().toString()},
-                      {"body", httpRequest_->getBody()},
-                      {"state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
-                  });
+        Log::info("Received request: " + httpRequest_->getHttpVersion() + " " + httpRequest_->getMethod() + " "
+                  + httpRequest_->getTarget() + " ");
+                  
+                  Log::debug("Request details",
+                             {
+                                 {"request_method", httpRequest_->getMethod()},
+                                 {"request_target", httpRequest_->getTarget()},
+                                 {"http_version", httpRequest_->getHttpVersion()},
+                                 {"headers", httpRequest_->getHeaders().toString()},
+                                 {"body", httpRequest_->getBody()},
+                                 {"state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
+                             });
 
-        try
-        {
-            // Thoughts: if a handler isn't returned, this could because of the error handler already setting up the
-            // response so, maybe we don't need to throw a 500 when no handler. Because that would override the actual
-            // error response. How about the router, or a handler, throws an exception if something goes wrong, and we
-            // catch it here to make a 500 response?
-            handler_ = router_->handleRequest();
-            if (handler_ != nullptr)
-            {
-                handler_->handle();
-            }
-        }
-        catch (const RequestValidator::ValidationException &e)
-        {
-            Log::error("Exception during request handling: " + std::string(e.what()));
-            ErrorHandler::createErrorResponse(e.code(), *httpResponse_);
-            return;
-        }
-        catch (const std::exception &e)
-        {
-            Log::error("Exception during request handling: " + std::string(e.what()));
-            ErrorHandler::createErrorResponse(500, *httpResponse_);
-            return;
-        }
+                  try
+                  {
+                      // Thoughts: if a handler isn't returned, this could because of the error handler already setting
+                      // up the response so, maybe we don't need to throw a 500 when no handler. Because that would
+                      // override the actual error response. How about the router, or a handler, throws an exception if
+                      // something goes wrong, and we catch it here to make a 500 response?
+                      handler_ = router_->handleRequest();
+                      if (handler_ != nullptr)
+                      {
+                          handler_->handle();
+                      }
+                  }
+                  catch (const RequestValidator::ValidationException &e)
+                  {
+                      Log::error("Exception during request handling: " + std::string(e.what()));
+                      ErrorHandler::createErrorResponse(e.code(), *httpResponse_);
+                      return;
+                  }
+                  catch (const std::exception &e)
+                  {
+                      Log::error("Exception during request handling: " + std::string(e.what()));
+                      ErrorHandler::createErrorResponse(500, *httpResponse_);
+                      return;
+                  }
     }
     else
     {
@@ -150,7 +151,7 @@ void Client::poll() const
         // CGI handler polling logic if needed
         cgiHandler->wait();
     }
-    if (httpResponse_->isComplete())
+    if (httpResponse_->isComplete() && clientSocket_->getEvent() != ASocket::IoState::WRITE)
     {
         Log::info("Response is ready to be sent to client, fd: " + std::to_string(clientSocket_->getFd()));
         clientSocket_->setCallback([this]() { respond(); });
