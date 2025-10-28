@@ -73,7 +73,7 @@ void FileHandler::handleDirectory(const std::string &dirpath, ResourceType type)
     {
         Log::debug("Requested path is a directory: " + dirpath);
         // ErrorHandler::createErrorResponse(Http::StatusCode::FORBIDDEN, response_, config_);
-        // TODO: This doesn't trigger for some reason :p
+        // TODO: This doesn't trigger for some reason :p (I Know why, i hacked the index in uri.cpp)
         response_.setBody(AutoIndex::generate(dirpath));
         response_.setStatus(Http::StatusCode::OK);
         return;
