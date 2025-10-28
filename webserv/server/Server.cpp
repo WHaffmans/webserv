@@ -1,9 +1,8 @@
-#include <webserv/server/Server.hpp>
-
 #include <webserv/client/Client.hpp>        // for Client
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/ServerConfig.hpp>  // for ServerConfig
 #include <webserv/log/Log.hpp>              // for Log, LOCATION
+#include <webserv/server/Server.hpp>
 #include <webserv/socket/ASocket.hpp>      // for ASocket
 #include <webserv/socket/ClientSocket.hpp> // for ClientSocket
 #include <webserv/socket/ServerSocket.hpp> // for ServerSocket
@@ -27,7 +26,7 @@
 #include <sys/socket.h> // for SOMAXCONN
 #include <unistd.h>     // for close
 
-volatile sig_atomic_t Server::stop_ = 0;
+volatile sig_atomic_t Server::signum_ = 0;
 
 Server::Server(const ConfigManager &configManager) : epoll_fd_(epoll_create1(O_CLOEXEC)), configManager_(configManager)
 {
@@ -308,12 +307,12 @@ void Server::run()
 {
     Log::trace(LOCATION);
     Log::info("Listening...");
-    const int MAX_EVENTS = 10;
+    const int MAX_EVENTS = 1024;
     struct epoll_event events[MAX_EVENTS]; // NOLINT
-    while (stop_ == 0)
+    while (signum_ == 0)
     {
         std::string status = "Active connections: " + std::to_string(clients_.size());
-        Log::status(status);    
+        Log::status(status);
         pollSockets();
         pollClients();
         handleEpoll(events, MAX_EVENTS); // NOLINT (cppcoreguidelines-pro-bounds-pointer-arithmetic)
@@ -323,9 +322,8 @@ void Server::run()
 
 void Server::signalHandler(int signum)
 {
-
     if (signum == SIGINT)
     {
-        stop_ = signum;
+        signum_ = signum;
     }
 }

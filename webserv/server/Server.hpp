@@ -46,7 +46,7 @@ class Server
 
   private:
     int epoll_fd_;
-    static volatile sig_atomic_t stop_;
+    static volatile sig_atomic_t signum_;
     const ConfigManager &configManager_;
     std::vector<std::unique_ptr<ServerSocket>> listeners_;
     std::set<int> listener_fds_;

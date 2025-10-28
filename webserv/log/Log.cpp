@@ -196,9 +196,10 @@ void Log::status(const std::string &message)
     _statusActive = true;
 
     // Save cursor position, move to bottom, clear line, print status, restore cursor
-    std::cout << "\033[s"             // Save cursor position
-              << "\033[999;0H"        // Move to bottom row
-              << "\033[2K"            // Clear entire line
+    std::cout << "\033[s"      // Save cursor position
+              << "\033[999;0H" // Move to bottom row
+              << "\033[2K"     // Clear entire line
+              << "\033[34m"    // Set text color to blue
               << "\033[7m"            // Reverse video (inverted colors)
               << message << "\033[0m" // Reset formatting
               << "\033[u"             // Restore cursor position

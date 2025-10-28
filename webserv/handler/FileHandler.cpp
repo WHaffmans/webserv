@@ -39,11 +39,12 @@ void FileHandler::handleFile(const std::string &filepath) const
 
     std::vector<char> fileData = FileUtils::readBinaryFile(filepath);
     Log::debug("Serving file: " + filepath + " with MIME type: " + mimeType);
-    if (fileData.empty())
-    {
-        ErrorHandler::createErrorResponse(Http::StatusCode::NOT_FOUND, response_, config_);
-        return;
-    }
+    // TODO empty file should not return 404 i guess
+    // if (fileData.empty())
+    // {
+    //     ErrorHandler::createErrorResponse(Http::StatusCode::NOT_FOUND, response_, config_);
+    //     return;
+    // } 
     // TODO: annoying: For reading files, vector<char> is preferred, but for http data vector<uint8_t> is preferred
     response_.setBody(std::vector<uint8_t>{fileData.begin(), fileData.end()});
     response_.setStatus(Http::StatusCode::OK);
@@ -62,7 +63,7 @@ void FileHandler::handleDirectory(const std::string &dirpath, ResourceType type)
         });
         if (first_matching == possible_indexes.end())
         {
-            ErrorHandler::createErrorResponse(Http::StatusCode::FORBIDDEN, response_, config_);
+            ErrorHandler::createErrorResponse(Http::StatusCode::NOT_FOUND, response_, config_);
             return;
         }
         handleFile(FileUtils::joinPath(dirpath, *first_matching));
