@@ -1,7 +1,8 @@
-#include <webserv/handler/FileHandler.hpp>
+#include "webserv/utils/AutoIndex.hpp"
 
 #include <webserv/config/AConfig.hpp>       // for AConfig
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
+#include <webserv/handler/FileHandler.hpp>
 #include <webserv/handler/MIMETypes.hpp>  // for MIMETypes
 #include <webserv/handler/URI.hpp>        // for URI
 #include <webserv/http/HttpConstants.hpp> // for NOT_FOUND, FORBIDDEN, OK
@@ -53,7 +54,6 @@ void FileHandler::handleDirectory(const std::string &dirpath, ResourceType type)
 {
     Log::trace(LOCATION);
     Log::debug("Requested path is a directory: " + dirpath);
-
     if (type == DIRECTORY_INDEX)
     {
         auto possible_indexes = config_->get<std::vector<std::string>>("index").value();
@@ -71,7 +71,10 @@ void FileHandler::handleDirectory(const std::string &dirpath, ResourceType type)
     if (type == DIRECTORY_AUTOINDEX)
     {
         Log::debug("Requested path is a directory: " + dirpath);
-        ErrorHandler::createErrorResponse(Http::StatusCode::FORBIDDEN, response_, config_);
+        // ErrorHandler::createErrorResponse(Http::StatusCode::FORBIDDEN, response_, config_);
+        // TODO: This doesn't trigger for some reason :p
+        response_.setBody(AutoIndex::generate(dirpath));
+        response_.setStatus(Http::StatusCode::OK);
         return;
     }
     ErrorHandler::createErrorResponse(Http::StatusCode::NOT_FOUND, response_, config_);

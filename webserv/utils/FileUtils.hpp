@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -14,4 +15,6 @@ std::string joinPath(const std::string &base, const std::string &addition);
 
 std::vector<char> readBinaryFile(const std::string &filepath);
 std::string readFileAsString(const std::string &filepath);
+
+std::vector<std::filesystem::directory_entry> listDirectory(const std::string &dirpath);
 } // namespace FileUtils

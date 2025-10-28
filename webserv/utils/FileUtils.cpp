@@ -1,11 +1,12 @@
+#include <webserv/log/Log.hpp> // for Log, LOCATION
 #include <webserv/utils/FileUtils.hpp>
 
-#include <webserv/log/Log.hpp> // for Log, LOCATION
-
 #include <cstring> // for size_t
+#include <filesystem>
 #include <fstream> // for basic_ifstream, basic_ios, basic_istream, ios, ifstream, operator|, basic_istream::read, basic_istream::seekg, basic_istream::tellg, streamsize
 #include <iterator> // for istreambuf_iterator, operator==
 #include <string>   // for basic_string, string, char_traits, operator+
+#include <vector>
 
 #include <sys/stat.h> // for stat, S_ISDIR, S_ISREG
 
@@ -13,7 +14,10 @@ namespace FileUtils
 {
 bool isDirectory(const std::string &path)
 {
-    struct stat pathStat{};
+    struct stat pathStat
+    {
+    };
+
     if (stat(path.c_str(), &pathStat) != 0)
     {
         return false; // Could not access path
@@ -23,7 +27,10 @@ bool isDirectory(const std::string &path)
 
 bool isFile(const std::string &path)
 {
-    struct stat pathStat{};
+    struct stat pathStat
+    {
+    };
+
     if (stat(path.c_str(), &pathStat) != 0)
     {
         return false; // Could not access path
@@ -33,7 +40,10 @@ bool isFile(const std::string &path)
 
 bool isValidPath(const std::string &path)
 {
-    struct stat pathStat{};
+    struct stat pathStat
+    {
+    };
+
     return stat(path.c_str(), &pathStat) == 0;
 }
 
@@ -113,6 +123,17 @@ std::string readFileAsString(const std::string &filepath)
     }
 
     return {std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
+}
+
+std::vector<std::filesystem::directory_entry> listDirectory(const std::string &dirpath)
+{
+    std::vector<std::filesystem::directory_entry> entries = {};
+
+    for (const auto &entry : std::filesystem::directory_iterator(dirpath))
+    {
+        entries.emplace_back(entry);
+    }
+    return entries;
 }
 
 } // namespace FileUtils
