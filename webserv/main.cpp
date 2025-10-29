@@ -13,35 +13,55 @@ void printHeader();
 
 int main(int argc, char **argv)
 {
-    if (argc < 2)
+    try
     {
-        std::cerr << "Usage: " + std::string(argv[0]) + " <config_file_path>"; // NOLINT
-        return 1;
-    }
+        std::string configPath;
 
-    Log::setFileChannel("logs/webserv.log");
-    Log::setStdoutChannel();
-    printHeader();
-    ConfigManager &configManager = ConfigManager::getInstance();
-    configManager.init(argv[1]); // NOLINT
-
-    ConfigValidator validator{configManager.getGlobalConfig()};
-    if (validator.hasErrors())
-    {
-        Log::error("Configuration validation failed with the following errors:");
-        for (const auto &error : validator.getErrors())
+        // NOLINTBEGIN
+        if (argc == 3 && std::string(argv[1]) == "-c")
         {
-            Log::error(" - " + error.getMessage());
+            configPath = argv[2];
         }
+        else if (argc == 2)
+        {
+            configPath = argv[1];
+        }
+        else
+        {
+            std::cerr << "Usage: " + std::string(argv[0]) + " [-c] <config_file_path>"; // NOLINT
+            return 1;
+        }
+        // NOLINTEND
+
+        Log::setFileChannel("logs/webserv.log");
+        Log::setStdoutChannel();
+        printHeader();
+        ConfigManager &configManager = ConfigManager::getInstance();
+        configManager.init(configPath); // NOLINT
+
+        ConfigValidator validator{configManager.getGlobalConfig()};
+        if (validator.hasErrors())
+        {
+            Log::error("Configuration validation failed with the following errors:");
+            for (const auto &error : validator.getErrors())
+            {
+                Log::error(" - " + error.getMessage());
+            }
+            return 1;
+        }
+
+        Log::debug("ConfigManager initialized successfully.");
+        Server server(configManager);
+
+        ::signal(SIGINT, Server::signalHandler);
+        server.run();
+        return 0;
+    }
+    catch (const std::exception &e)
+    {
+        Log::error("error caught in main: " + std::string(e.what()));
         return 1;
     }
-
-    Log::debug("ConfigManager initialized successfully.");
-    Server server(configManager);
-
-    ::signal(SIGINT, Server::signalHandler);
-    server.run();
-    return 0;
 }
 
 void printHeader()
