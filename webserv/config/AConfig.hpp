@@ -19,7 +19,7 @@ class AConfig
     AConfig &operator=(AConfig &&other) noexcept = delete;
 
     virtual ~AConfig() = default;
-    [[nodiscard]] virtual std::string getName() const = 0;
+    // [[nodiscard]] virtual std::string getName() const = 0;
     [[nodiscard]] virtual std::string getType() const = 0;
     void addDirective(const std::string &line);
     [[nodiscard]] std::string getErrorPage(int statusCode) const;

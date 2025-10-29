@@ -8,11 +8,11 @@ LocationConfig::LocationConfig(const std::string &block, const std::string &path
     parseBlock(block);
 }
 
-std::string LocationConfig::getName() const
-{
-    auto parentName = parent_ != nullptr ? parent_->getName() : "root";
-    return parentName + ", location: " + _path;
-}
+// std::string LocationConfig::getName() const
+// {
+//     auto parentName = parent_ != nullptr ? parent_->getName() : "root";
+//     return parentName + ", location: " + _path;
+// }
 
 std::string LocationConfig::getType() const
 {

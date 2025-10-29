@@ -13,10 +13,10 @@ GlobalConfig::GlobalConfig(const std::string &block)
     parseBlock(block);
 }
 
-std::string GlobalConfig::getName() const
-{
-    return "global";
-}
+// std::string GlobalConfig::getName() const
+// {
+//     return "global";
+// }
 
 std::string GlobalConfig::getType() const
 {

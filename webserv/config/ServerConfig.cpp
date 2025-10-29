@@ -16,11 +16,11 @@ ServerConfig::ServerConfig(const std::string &block, const AConfig *parent) : AC
     parseBlock(block);
 }
 
-std::string ServerConfig::getName() const
-{
-    return "server: " + get<std::string>("server_name").value_or("unnamed") + " (port "
-           + std::to_string(get<int>("listen").value_or(-1)) + ")";
-}
+// std::string ServerConfig::getName() const
+// {
+//     return "server: " + get<std::string>("server_name").value_or("unnamed") + " (port "
+//            + std::to_string(get<int>("listen").value_or(-1)) + ")";
+// }
 
 std::string ServerConfig::getType() const
 {

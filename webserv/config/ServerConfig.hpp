@@ -21,7 +21,7 @@ class ServerConfig : public AConfig
 
     ~ServerConfig() override = default;
 
-    [[nodiscard]] std::string getName() const override;
+    // [[nodiscard]] std::string getName() const override;
     [[nodiscard]] std::string getType() const override;
 
     [[nodiscard]] const LocationConfig *getLocation(const std::string &path) const;

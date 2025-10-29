@@ -20,7 +20,7 @@ class GlobalConfig : public AConfig
 
     ~GlobalConfig() override = default;
 
-    [[nodiscard]] std::string getName() const override;
+    // [[nodiscard]] std::string getName() const override;
     [[nodiscard]] std::string getType() const override;
 
     [[nodiscard]] std::vector<ServerConfig *> getServerConfigs() const;
