@@ -20,6 +20,8 @@
 #include <utility>    // for move, pair
 #include <vector>     // for vector
 
+#include <arpa/inet.h>
+#include <netinet/in.h>
 #include <sys/socket.h> // for send
 #include <sys/types.h>  // for ssize_t
 
@@ -184,3 +186,18 @@ HttpResponse &Client::getHttpResponse() const noexcept
 {
     return *httpResponse_;
 }
+
+// NOLINTBEGIN
+std::string Client::getClientAddress() const noexcept
+{
+    const struct sockaddr *addr = clientSocket_->getAddress();
+    if (addr->sa_family == AF_INET)
+    {
+        const struct sockaddr_in *ipv4 = reinterpret_cast<const struct sockaddr_in *>(addr);
+        const char *addr = inet_ntoa(ipv4->sin_addr);
+        return std::string(addr);
+    }
+
+    return "";
+}
+// NOLINTEND

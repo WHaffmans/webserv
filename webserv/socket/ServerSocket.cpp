@@ -1,8 +1,7 @@
-#include <webserv/socket/ServerSocket.hpp>
-
 #include <webserv/log/Log.hpp>             // for Log, LOCATION
 #include <webserv/socket/ASocket.hpp>      // for ASocket
 #include <webserv/socket/ClientSocket.hpp> // for ClientSocket
+#include <webserv/socket/ServerSocket.hpp>
 
 #include <memory>    // for allocator, make_unique, unique_ptr
 #include <stdexcept> // for runtime_error
@@ -72,11 +71,13 @@ ASocket::Type ServerSocket::getType() const noexcept
 std::unique_ptr<ClientSocket> ServerSocket::accept() const
 {
     Log::trace(LOCATION);
-    int client_fd = ::accept(getFd(), nullptr, nullptr);
+    struct sockaddr client_address{};
+    socklen_t address_len = sizeof(client_address);
+    int client_fd = ::accept(getFd(), &client_address, &address_len);
     if (client_fd < 0)
     {
         Log::error("Accept failed");
         throw std::runtime_error("Accept failed");
     }
-    return std::make_unique<ClientSocket>(client_fd);
+    return std::make_unique<ClientSocket>(client_fd, client_address);
 }

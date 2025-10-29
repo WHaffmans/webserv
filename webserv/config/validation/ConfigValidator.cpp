@@ -42,6 +42,8 @@ ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make
     engine_->addLocationRule("root", std::make_unique<FolderExistsRule>(true));
     engine_->addLocationRule("cgi_ext", std::make_unique<CgiExtValidationRule>(false));
 
+    // TODO: Add a validation rule for redirect
+
     engine_->validate();
 }
 

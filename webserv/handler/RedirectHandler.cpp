@@ -27,7 +27,6 @@ void RedirectHandler::handle()
                            "<body><a href=\"" +
                            redirect.second + "\">Found</a></body></html>";
         response_.setBody(body);
-        
     }
 }
 

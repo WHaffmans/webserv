@@ -37,7 +37,7 @@ CgiEnvironment::CgiEnvironment(const URI &uri, const HttpRequest &request)
 
     env_["SERVER_NAME"] = host;
     env_["SERVER_PORT"] = std::to_string(port);
-    env_["REMOTE_ADDR"] = "<REMOTE_ADDR>"; // Placeholder, should be set to actual remote address
+    env_["REMOTE_ADDR"] = request.getClient().getClientAddress(); // Placeholder, should be set to actual remote address
     env_["REDIRECT_STATUS"] = "200";       // Required by PHP with force-cgi-redirect enabled
     env_["SERVER_SOFTWARE"] = "Webserv/1.0";
     env_["REQUEST_SCHEME"] = "HTTP";

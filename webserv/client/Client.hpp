@@ -15,6 +15,7 @@
 
 #include <cstddef>       // for size_t
 #include <memory>        // for unique_ptr
+#include <string>
 #include <unordered_map> // for unordered_map
 
 class Server;
@@ -41,19 +42,15 @@ class Client
     void respond() const;
     void poll() const;
 
-    // [[nodiscard]] int getStatusCode() const noexcept;
-
     [[nodiscard]] ASocket &getSocket(int fd = -1) const;
-
-    // void setStatusCode(int code);
-    // void setCgiSockets(CgiSocket *cgiStdIn, CgiSocket *cgiStdOut);
-    // void removeCgiSocket(CgiSocket *cgiSocket);
 
     void addSocket(ASocket *socket);
     void removeSocket(ASocket *socket);
 
     [[nodiscard]] HttpRequest &getHttpRequest() const noexcept;
     [[nodiscard]] HttpResponse &getHttpResponse() const noexcept;
+
+    [[nodiscard]] std::string getClientAddress() const noexcept;
 
   private:
     // int statusCode_ = Http::StatusCode::OK;
