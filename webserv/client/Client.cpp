@@ -86,41 +86,40 @@ void Client::request()
     {
         Log::info("Received request: " + httpRequest_->getHttpVersion() + " " + httpRequest_->getMethod() + " "
                   + httpRequest_->getTarget() + " ");
-                  
-                  Log::debug("Request details",
-                             {
-                                 {"request_method", httpRequest_->getMethod()},
-                                 {"request_target", httpRequest_->getTarget()},
-                                 {"http_version", httpRequest_->getHttpVersion()},
-                                 {"headers", httpRequest_->getHeaders().toString()},
-                                 {"body", httpRequest_->getBody()},
-                                 {"state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
-                             });
 
-                  try
-                  {
-                      // Thoughts: if a handler isn't returned, this could because of the error handler already setting
-                      // up the response so, maybe we don't need to throw a 500 when no handler. Because that would
-                      // override the actual error response. How about the router, or a handler, throws an exception if
-                      // something goes wrong, and we catch it here to make a 500 response?
-                      handler_ = router_->handleRequest();
-                      if (handler_ != nullptr)
-                      {
-                          handler_->handle();
-                      }
-                  }
-                  catch (const RequestValidator::ValidationException &e)
-                  {
-                      Log::error("Validation Exception during request handling: " + std::string(e.what()));
-                      ErrorHandler::createErrorResponse(e.code(), *httpResponse_);
-                      return;
-                  }
-                  catch (const std::exception &e)
-                  {
-                      Log::error("Exception during request handling: " + std::string(e.what()));
-                      ErrorHandler::createErrorResponse(500, *httpResponse_);
-                      return;
-                  }
+        Log::debug("Request details", {
+                                          {"request_method", httpRequest_->getMethod()},
+                                          {"request_target", httpRequest_->getTarget()},
+                                          {"http_version", httpRequest_->getHttpVersion()},
+                                          {"headers", httpRequest_->getHeaders().toString()},
+                                        //   {"body", httpRequest_->getBody()},
+                                          {"state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
+                                      });
+
+        try
+        {
+            // Thoughts: if a handler isn't returned, this could because of the error handler already setting
+            // up the response so, maybe we don't need to throw a 500 when no handler. Because that would
+            // override the actual error response. How about the router, or a handler, throws an exception if
+            // something goes wrong, and we catch it here to make a 500 response?
+            handler_ = router_->handleRequest();
+            if (handler_ != nullptr)
+            {
+                handler_->handle();
+            }
+        }
+        catch (const RequestValidator::ValidationException &e)
+        {
+            Log::error("Validation Exception during request handling: " + std::string(e.what()));
+            ErrorHandler::createErrorResponse(e.code(), *httpResponse_);
+            return;
+        }
+        catch (const std::exception &e)
+        {
+            Log::error("Exception during request handling: " + std::string(e.what()));
+            ErrorHandler::createErrorResponse(500, *httpResponse_);
+            return;
+        }
     }
     else
     {
@@ -200,4 +199,5 @@ std::string Client::getClientAddress() const noexcept
 
     return "";
 }
+
 // NOLINTEND
