@@ -17,7 +17,7 @@ CgiExtValidationRule::CgiExtValidationRule(bool requiresValue)
 
 bool isAllowedCGIExtension(const std::string &extension)
 {
-    static const std::vector<std::string> allowedExtensions = {".php", ".py", ".bla"};
+    static const std::vector<std::string> allowedExtensions = {".php", ".py", ".bla", ".sh"};
     return std::ranges::any_of(allowedExtensions, [&extension](const auto &it) { return extension == it; });
 }
 
