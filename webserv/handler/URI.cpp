@@ -236,7 +236,7 @@ std::string URI::getUriForPath(const std::string &path) const
     }
 
     Log::debug("Generating URI for path", {{"path", path},{"trimmedDir", trimmedLocation}, {"trimmedPath", trimmedPath}, {"Authority", authority_}});
-    std::string result = "http://" + authority_;
+    std::string result = "http://" + authority_; //TODO this should not be hardcoded...
     result = FileUtils::joinPath(result, trimmedLocation);
     return FileUtils::joinPath(result, trimmedPath);
 }
