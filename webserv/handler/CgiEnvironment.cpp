@@ -55,7 +55,7 @@ char **CgiEnvironment::toEnvp() const
 {
     char **envp = new char *[env_.size() + 1];
     size_t index = 0;
-    for (std::map<std::string, std::string>::const_iterator it = env_.begin(); it != env_.end(); ++it, ++index)
+    for (auto it = env_.begin(); it != env_.end(); ++it, ++index)
     {
         std::string entry = it->first + "=" + it->second;
         envp[index] = new char[entry.size() + 1];
