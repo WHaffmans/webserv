@@ -34,12 +34,12 @@ ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make
     /*Server Directive Rules*/
     engine_->addServerRule("listen", std::make_unique<PortValidationRule>());
     engine_->addServerRule("host", std::make_unique<HostValidationRule>());
-    engine_->addServerRule("root", std::make_unique<FolderExistsRule>(false));
+    // engine_->addServerRule("root", std::make_unique<FolderExistsRule>(false));
 
     /*Location Directive Rules*/
     engine_->addLocationRule("allowed_methods", std::make_unique<AllowedValuesRule>(
-                                                    std::vector<std::string>{"GET", "POST", "DELETE", "PUT"}, true));
-    engine_->addLocationRule("root", std::make_unique<FolderExistsRule>(true));
+                                                    std::vector<std::string>{"GET", "POST", "DELETE", "PUT"}, false));
+    // engine_->addLocationRule("root", std::make_unique<FolderExistsRule>(true));
     engine_->addLocationRule("cgi_ext", std::make_unique<CgiExtValidationRule>(false));
 
     // TODO: Add a validation rule for redirect
