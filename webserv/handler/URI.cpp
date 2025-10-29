@@ -22,9 +22,6 @@ URI::URI(const HttpRequest &request, const ServerConfig &serverConfig)
     parseFullpath();
 
     authority_ = request.getHeaders().getHost().value();
-    authority_ += (serverConfig.get<int>("listen") != 80) // NOFORMAT
-                      ? ":" + std::to_string(serverConfig.get<int>("listen").value())
-                      : "";
 }
 
 const AConfig *URI::matchConfig(const std::string &uri, const ServerConfig &serverConfig)
@@ -216,6 +213,34 @@ std::string URI::getCgiPath() const
     auto cgiPath = config_->getCGIPath(getExtension());
     return cgiPath;
 }
+
+std::string URI::getUriForPath(const std::string &path) const
+{
+    // TOPD not good yet zo even naar kijken
+    std::string trimmedPath = utils::trim(path, "/");
+    std::string trimmedDir_;
+    
+    const LocationConfig *locConfig = dynamic_cast<const LocationConfig *>(config_);
+    if (locConfig != nullptr)
+    {
+        trimmedDir_ = utils::trim(locConfig->getPath(), "/");
+    }
+
+    
+    std::string trimmedRoot_ = utils::trim(config_->get<std::string>("root").value_or(""), "/");
+
+    if (trimmedPath.starts_with(trimmedRoot_))
+    {
+        trimmedPath = trimmedDir_.substr(trimmedRoot_.length());
+        trimmedPath = utils::trim(trimmedPath, "/");
+    }
+
+    Log::debug("Generating URI for path", {{"path", path},{"trimmedDir", trimmedDir_}, {"trimmedPath", trimmedPath}, {"Authority", authority_}});
+    std::string result = "http://" + authority_;
+    result = FileUtils::joinPath(result, trimmedDir_);
+    return FileUtils::joinPath(result, trimmedPath);
+}
+    
 
 const std::string &URI::getBaseName() const noexcept
 {

@@ -1,11 +1,13 @@
+#include "webserv/config/AConfig.hpp"
 #include <webserv/utils/AutoIndex.hpp>
 #include <webserv/utils/FileUtils.hpp>
+#include <webserv/handler/URI.hpp>
 
 #include <format>
 #include <string>
 #include <vector>
 
-std::string AutoIndex::generate(const std::string &dir)
+std::string AutoIndex::generate(const std::string &dir, const URI &uri)
 {
     std::ostringstream html;
 
@@ -37,7 +39,7 @@ std::string AutoIndex::generate(const std::string &dir)
 
     for (const auto &entry : entries)
     {
-        std::string href = entry.path().filename().string();
+        std::string href = uri.getUriForPath(entry.path().filename().string());
         if (entry.is_directory())
         {
             href += "/";

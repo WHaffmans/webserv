@@ -26,6 +26,7 @@ class URI
     [[nodiscard]] std::string getExtension() const noexcept;
     [[nodiscard]] std::string getCgiPath() const;
     [[nodiscard]] std::pair<int, std::string> getRedirect() const;
+    [[nodiscard]] std::string getUriForPath(const std::string &path) const;
 
     [[nodiscard]] const AConfig *getConfig() const noexcept;
     [[nodiscard]] const std::string &getBaseName() const noexcept;

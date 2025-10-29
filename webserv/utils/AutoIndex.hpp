@@ -1,5 +1,7 @@
 #pragma once
 
+#include <webserv/handler/URI.hpp> // for URI
+
 #include <cstdint>
 #include <string>
 
@@ -12,7 +14,7 @@ class AutoIndex
     AutoIndex(AutoIndex &&) = delete;
     AutoIndex &operator=(AutoIndex &&) = delete;
     ~AutoIndex() = delete;
-    static std::string generate(const std::string &dir);
+    static std::string generate(const std::string &dir, const URI &uri);
 
   private:
     static std::string formatFileSize(uintmax_t size);

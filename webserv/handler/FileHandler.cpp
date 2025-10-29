@@ -74,7 +74,7 @@ void FileHandler::handleDirectory(const std::string &dirpath, ResourceType type)
         Log::debug("Requested path is a directory: " + dirpath);
         // ErrorHandler::createErrorResponse(Http::StatusCode::FORBIDDEN, response_, config_);
         // TODO: This doesn't trigger for some reason :p (I Know why, i hacked the index in uri.cpp)
-        response_.setBody(AutoIndex::generate(dirpath));
+        response_.setBody(AutoIndex::generate(dirpath, uri_));
         response_.setStatus(Http::StatusCode::OK);
         return;
     }
@@ -107,6 +107,7 @@ FileHandler::ResourceType FileHandler::getResourceType(const std::string &path) 
 {
     static_cast<void>(path);
     Log::trace(LOCATION);
+    Log::debug("Determining resource type for path: " + path);
 
     if (uri_.isFile())
     {
@@ -114,10 +115,10 @@ FileHandler::ResourceType FileHandler::getResourceType(const std::string &path) 
     }
     if (uri_.isDirectory())
     {
-        if (config_->get<std::vector<std::string>>("index").has_value())
-        {
-            return DIRECTORY_INDEX;
-        }
+        // if (config_->get<std::vector<std::string>>("index").has_value())
+        // {
+        //     return DIRECTORY_INDEX;
+        // }
         if (config_->get<bool>("autoindex").value_or(false))
         {
             return DIRECTORY_AUTOINDEX;

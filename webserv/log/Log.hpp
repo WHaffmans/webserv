@@ -49,7 +49,7 @@ class Log
 
     void log(Level level, const std::string &message, const std::map<std::string, std::string> &context);
 
-    static constexpr Log::Level COMPILE_TIME_LOG_LEVEL = Log::Level::Info;
+    static constexpr Log::Level COMPILE_TIME_LOG_LEVEL = Log::Level::Trace;
 
     static void setFileChannel(const std::string &filename);
     static void setStdoutChannel();
