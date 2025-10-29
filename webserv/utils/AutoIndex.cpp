@@ -3,7 +3,6 @@
 #include <webserv/utils/FileUtils.hpp>
 #include <webserv/handler/URI.hpp>
 
-#include <format>
 #include <string>
 #include <vector>
 

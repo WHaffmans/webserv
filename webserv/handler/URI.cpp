@@ -8,7 +8,6 @@
 #include <webserv/utils/utils.hpp>      // for trim, split
 
 #include <cstddef>  // for size_t
-#include <format>   // for vector
 #include <map>      // for map
 #include <optional> // for optional, operator!=
 #include <vector>   // for vector

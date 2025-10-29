@@ -16,7 +16,6 @@
 #include <webserv/handler/RedirectHandler.hpp>             // for RedirectHandler
 
 #include <exception> // for exception
-#include <format>    // for vector
 #include <memory>    // for unique_ptr, make_unique
 #include <optional>  // for optional
 #include <ranges>    // for __find_fn, find
