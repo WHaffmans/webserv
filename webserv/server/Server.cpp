@@ -309,7 +309,7 @@ void Server::run()
     Log::info("Listening...");
     const int MAX_EVENTS = 1024;
     struct epoll_event events[MAX_EVENTS]; // NOLINT
-    while (signum_ == 0)
+    while (signum_ != SIGINT)
     {
         std::string status = "Active connections: " + std::to_string(clients_.size());
         Log::status(status);
