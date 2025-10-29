@@ -13,8 +13,6 @@ if (!isset($_SESSION['request_count'])) {
 // Increment on each request
 $_SESSION['request_count']++;
 
-sleep(8); // Simulate some processing delay
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
