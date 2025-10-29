@@ -218,26 +218,26 @@ std::string URI::getUriForPath(const std::string &path) const
 {
     // TOPD not good yet zo even naar kijken
     std::string trimmedPath = utils::trim(path, "/");
-    std::string trimmedDir_;
+    std::string trimmedLocation;
     
-    const LocationConfig *locConfig = dynamic_cast<const LocationConfig *>(config_);
+    const auto *locConfig = dynamic_cast<const LocationConfig *>(config_);
     if (locConfig != nullptr)
     {
-        trimmedDir_ = utils::trim(locConfig->getPath(), "/");
+        trimmedLocation = utils::trim(locConfig->getPath(), "/");
     }
 
     
-    std::string trimmedRoot_ = utils::trim(config_->get<std::string>("root").value_or(""), "/");
+    std::string trimmedRoot = utils::trim(config_->get<std::string>("root").value_or(""), "/");
 
-    if (trimmedPath.starts_with(trimmedRoot_))
+    if (trimmedPath.starts_with(trimmedRoot))
     {
-        trimmedPath = trimmedDir_.substr(trimmedRoot_.length());
+        trimmedPath = trimmedPath.substr(trimmedRoot.length());
         trimmedPath = utils::trim(trimmedPath, "/");
     }
 
-    Log::debug("Generating URI for path", {{"path", path},{"trimmedDir", trimmedDir_}, {"trimmedPath", trimmedPath}, {"Authority", authority_}});
+    Log::debug("Generating URI for path", {{"path", path},{"trimmedDir", trimmedLocation}, {"trimmedPath", trimmedPath}, {"Authority", authority_}});
     std::string result = "http://" + authority_;
-    result = FileUtils::joinPath(result, trimmedDir_);
+    result = FileUtils::joinPath(result, trimmedLocation);
     return FileUtils::joinPath(result, trimmedPath);
 }
     

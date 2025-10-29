@@ -39,7 +39,7 @@ std::string AutoIndex::generate(const std::string &dir, const URI &uri)
 
     for (const auto &entry : entries)
     {
-        std::string href = uri.getUriForPath(entry.path().filename().string());
+        std::string href = uri.getUriForPath(entry.path().string());
         if (entry.is_directory())
         {
             href += "/";

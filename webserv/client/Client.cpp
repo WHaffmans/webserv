@@ -109,7 +109,7 @@ void Client::request()
                   }
                   catch (const RequestValidator::ValidationException &e)
                   {
-                      Log::error("Exception during request handling: " + std::string(e.what()));
+                      Log::error("Validation Exception during request handling: " + std::string(e.what()));
                       ErrorHandler::createErrorResponse(e.code(), *httpResponse_);
                       return;
                   }
