@@ -130,29 +130,6 @@ void URI::parseFullpath()
     fullPath_ = FileUtils::joinPath(dir_, baseName_);
 }
 
-// std::map<std::string, std::string> URI::getCGIEnvironment() const
-// {
-//     std::map<std::string, std::string> env;
-
-//     // URI components
-//     env["REQUEST_URI"] = uriTrimmed_;
-//     env["SCRIPT_NAME"] = getFullPath();
-//     env["PATH_INFO"] = getPathInfo();
-//     env["QUERY_STRING"] = getQuery();
-
-//     // Authority components
-//     env["SERVER_NAME"] = config_->get<std::string>("server_name").value_or("");
-//     env["SERVER_PORT"] = std::to_string(config_->get<int>("listen").value_or(-1));
-//     env["REQUEST_SCHEME"] = "HTTP";
-
-//     // HTTP context
-//     // env["REQUEST_METHOD"] = requestMethod_;
-//     // env["CONTENT_TYPE"] = contentType_;
-//     // env["CONTENT_LENGTH"] = contentLength_;
-
-//     return env;
-// }
-
 const AConfig *URI::getConfig() const noexcept
 {
     return config_;
