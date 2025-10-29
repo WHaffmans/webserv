@@ -9,6 +9,7 @@
 #include <sstream>   // for basic_stringstream
 #include <stdexcept> // for runtime_error
 #include <string>    // for basic_string, char_traits, operator+, string, to_string, operator==, stoi
+#include <vector>
 
 #include <stddef.h> // for size_t
 
@@ -87,10 +88,10 @@ ServerConfig *ConfigManager::getMatchingServerConfig(const std::string &host, in
     std::vector<ServerConfig *> serverConfigs = globalConfig_->getServerConfigs();
     for (ServerConfig *serverConfig : serverConfigs)
     {
-        auto serverName = serverConfig->get<std::string>("server_name").value_or("");
+        auto serverNames = serverConfig->get<std::vector<std::string>>("server_name").value_or(std::vector<std::string>());
         auto listenPorts = serverConfig->get<int>("listen").value_or(80);
-        Log::debug("Checking server config: " + serverName + " on port " + std::to_string(listenPorts));
-        if ((serverName == host) && (listenPorts == port))
+        // Log::debug("Checking server config: " + serverName + " on port " + std::to_string(listenPorts));
+        if ((std::find(serverNames.begin(), serverNames.end(), host) != serverNames.end()) && (listenPorts == port))
         {
             Log::info("Found matching server config for host: " + host + " and port: " + std::to_string(port));
             return serverConfig;

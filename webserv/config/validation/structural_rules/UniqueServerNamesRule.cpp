@@ -35,19 +35,30 @@ ValidationResult UniqueServerNamesRule::validateGlobal(const GlobalConfig *confi
             continue;
         }
 
-        auto serverNameOpt = server->get<std::string>("server_name");
+        auto serverNameOpt = server->get<std::vector<std::string>>("server_name");
         auto listenOpt = server->get<int>("listen");
         if (serverNameOpt.has_value() && listenOpt.has_value())
         {
-            const std::string &serverName = serverNameOpt.value();
+            const auto &serverNameCandidates = serverNameOpt.value();
             int listenPort = listenOpt.value();
 
-            if (serverNames.contains(serverName + ":" + std::to_string(listenPort)))
+            for (const auto &name : serverNameCandidates)
             {
-                return ValidationResult::error("Duplicate server name '" + serverName + "' found in configuration");
+                std::string uniqueKey = name + ":" + std::to_string(listenPort);
+                if (serverNames.contains(uniqueKey))
+                {
+                    return ValidationResult::error("Duplicate server name '" + name
+                                                   + "' found in configuration on port "
+                                                   + std::to_string(listenPort));
+                }
+                serverNames.insert(uniqueKey);
             }
+            // if (serverNames.contains(serverName + ":" + std::to_string(listenPort)))
+            // {
+            //     return ValidationResult::error("Duplicate server name '" + serverName + "' found in configuration");
+            // }
 
-            serverNames.insert(serverName + ":" + std::to_string(listenPort));
+            // serverNames.insert(serverName + ":" + std::to_string(listenPort));
         }
     }
 

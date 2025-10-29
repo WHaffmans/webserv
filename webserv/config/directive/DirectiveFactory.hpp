@@ -23,7 +23,7 @@ class DirectiveFactory
     constexpr static std::array<DirectiveInfo, 16> supportedDirectives = {{
         {.name = "listen", .type = "IntDirective", .context = "S"},
         {.name = "host", .type = "StringDirective", .context = "S"},
-        {.name = "server_name", .type = "StringDirective", .context = "S"},
+        {.name = "server_name", .type = "VectorDirective", .context = "S"},
         {.name = "root", .type = "StringDirective", .context = "Sl"},
         {.name = "index", .type = "VectorDirective", .context = "sl"},
         {.name = "error_page", .type = "IntStringDirective", .context = "gsl"},
