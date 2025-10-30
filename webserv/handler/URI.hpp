@@ -38,7 +38,7 @@ class URI
     [[nodiscard]] const std::string &getAuthority() const noexcept;
 
   private:
-    void parseUri(const std::string &uri);
+    void parseUri();
     void parseFullpath();
 
     std::string uriTrimmed_;

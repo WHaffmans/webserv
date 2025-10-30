@@ -16,7 +16,7 @@ URI::URI(const HttpRequest &request, const ServerConfig &serverConfig)
     : uriTrimmed_(utils::trim(request.getTarget(), "/")), config_(matchConfig(uriTrimmed_, serverConfig))
 {
     Log::trace(LOCATION);
-    parseUri(request.getTarget());
+    parseUri();
     Log::debug("Parsed URI: " + uriTrimmed_, {{"ConfigType", config_->getType()}});
     parseFullpath();
 
@@ -47,7 +47,7 @@ const AConfig *URI::matchConfig(const std::string &uri, const ServerConfig &serv
     return bestMatch;
 }
 
-void URI::parseUri(const std::string &uri)
+void URI::parseUri()
 {
     if (config_->getType() == "server")
     {
@@ -57,9 +57,8 @@ void URI::parseUri(const std::string &uri)
     {
         auto const *locConfig = dynamic_cast<LocationConfig const *>(config_);
         std::string locTrimmed = utils::trim(locConfig->getPath(), "/");
-        std::string uriTrimmed = utils::trim(uri, "/");
 
-        std::string uriSub = uriTrimmed.substr(locTrimmed.length());
+        std::string uriSub = uriTrimmed_.substr(locTrimmed.length());
         fullPath_ = FileUtils::joinPath(locConfig->get<std::string>("root").value_or(""), uriSub);
     }
 

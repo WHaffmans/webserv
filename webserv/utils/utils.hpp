@@ -19,4 +19,6 @@ std::vector<std::string> split(const std::string &str, char delimiter);
 std::string implode(const std::vector<std::string> &elements, const std::string &delimiter);
 
 uint32_t stateToEpoll(const ASocket::IoState &event);
+std::string uriEncode(const std::string &value);
+std::string uriDecode(const std::string &value);
 } // namespace utils
