@@ -50,6 +50,12 @@ void ConfigManager::parseConfigFile(const std::string &filePath)
     std::stringstream buffer;
     buffer << file.rdbuf();
     std::string content = buffer.str();
+
+    if (content.empty())
+    {
+        throw std::runtime_error("Config file is empty: " + filePath);
+    }
+    
     utils::removeComments(content);
     globalConfig_ = std::make_unique<GlobalConfig>(content);
 
