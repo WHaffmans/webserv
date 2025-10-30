@@ -6,6 +6,7 @@
 #include <webserv/http/HttpConstants.hpp>   // for getStatusCodeReason, INTERNAL_SERVER_ERROR
 #include <webserv/http/HttpResponse.hpp>    // for HttpResponse
 #include <webserv/log/Log.hpp>              // for Log, LOCATION
+#include <webserv/utils/utils.hpp>          // for join
 
 #include <fstream> // for basic_ifstream, basic_filebuf, basic_ostream::operator<<, ifstream, stringstream
 #include <sstream> // for basic_stringstream
@@ -19,6 +20,12 @@ void ErrorHandler::createErrorResponse(uint16_t statusCode, HttpResponse &respon
     response.setStatus(statusCode);
     response.addHeader("Content-Type", "text/html");
     response.addHeader("Connection", "close");
+    if (statusCode == Http::StatusCode::METHOD_NOT_ALLOWED && config != nullptr)
+    {
+        auto allowedMethods = config->get<std::vector<std::string>>("allowed_methods");
+        if (allowedMethods.has_value())
+            response.addHeader("Allow", utils::implode(allowedMethods.value(), ", "));
+    }
     response.appendBody(generateErrorPage(statusCode, config));
     response.setComplete();
 }
