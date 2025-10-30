@@ -1,5 +1,4 @@
 #include <webserv/config/validation/ConfigValidator.hpp>
-
 #include <webserv/config/validation/ValidationEngine.hpp>                            // for ValidationEngine
 #include <webserv/config/validation/directive_rules/AValidationRule.hpp>             // for AValidationRule
 #include <webserv/config/validation/directive_rules/AllowedValuesRule.hpp>           // for AllowedValuesRule
@@ -40,7 +39,7 @@ ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make
     engine_->addLocationRule("allowed_methods", std::make_unique<AllowedValuesRule>(
                                                     std::vector<std::string>{"GET", "POST", "DELETE", "PUT"}, false));
     // engine_->addLocationRule("root", std::make_unique<FolderExistsRule>(true));
-    engine_->addLocationRule("cgi_ext", std::make_unique<CgiExtValidationRule>(false));
+    engine_->addLocationRule("cgi_handler", std::make_unique<CgiExtValidationRule>(false));
 
     // TODO: Add a validation rule for redirect
 

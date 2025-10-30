@@ -1,5 +1,4 @@
 #include <webserv/config/AConfig.hpp>                    // for AConfig
-
 #include <webserv/config/directive/ADirective.hpp>       // for ADirective
 #include <webserv/config/directive/DirectiveFactory.hpp> // for DirectiveFactory
 #include <webserv/config/directive/DirectiveValue.hpp>   // for DirectiveValue
@@ -120,7 +119,7 @@ std::string AConfig::getCGIPath(const std::string &extension) const
     Log::trace(LOCATION);
     for (const auto &directive : directives_)
     {
-        if (directive->getName() != "cgi_ext")
+        if (directive->getName() != "cgi_handler")
         {
             continue;
         }

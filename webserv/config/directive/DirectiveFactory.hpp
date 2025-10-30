@@ -31,7 +31,7 @@ class DirectiveFactory
         {.name = "autoindex", .type = "BoolDirective", .context = "gsl"},
         {.name = "allowed_methods", .type = "VectorDirective", .context = "gsl"},
         {.name = "cgi_enabled", .type = "BoolDirective", .context = "gsl"},
-        {.name = "cgi_ext", .type = "VectorDirective", .context = "gsl"},
+        {.name = "cgi_handler", .type = "VectorDirective", .context = "gsl"},
         {.name = "cgi_timeout", .type = "IntDirective", .context = "gsl"},
         {.name = "upload_enabled", .type = "BoolDirective", .context = "gsl"},
         {.name = "upload_store", .type = "StringDirective", .context = "gsl"},

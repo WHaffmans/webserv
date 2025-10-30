@@ -21,7 +21,7 @@ using DirectiveValueType = std::variant<int, // listen, error_page status, cgi_t
                                         size_t,
                                         bool,                       // autoindex, upload_enabled
                                         std::string,                // host, server_name, root, cgi_pass, upload_store
-                                        std::vector<std::string>,   // index, allowed_methods, cgi_ext
+                                        std::vector<std::string>,   // index, allowed_methods, cgi_handler
                                         std::pair<int, std::string> // error_page (status, path), redirect
                                         >;
 
