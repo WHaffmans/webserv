@@ -161,6 +161,7 @@ void CgiHandler::setPid(int pid)
 void CgiHandler::parseCgiOutput()
 {
     Log::trace(LOCATION);
+    long headerSeperatorSize = 2;
 
     // Parse the headers from the buffer
     auto header = std::string(buffer_.begin(), buffer_.end());
@@ -169,18 +170,25 @@ void CgiHandler::parseCgiOutput()
         header.find("\n\n"),
         header.find("\r\r"),
     });
+
     if (headerEnd == std::string::npos)
     {
         Log::debug("CGI output headers not complete yet");
         return;
     }
+   
+    if (header.substr(static_cast<long>(headerEnd), 2) == "\r\n")
+    {
+        headerSeperatorSize = 4;
+    }
 
+    Log::debug("headerseperator: " + header.substr(static_cast<long>(headerEnd), 2));
     // Parse the headers
     std::string headers(buffer_.begin(), buffer_.begin() + static_cast<long>(headerEnd));
     Log::debug("CGI output headers: " + headers);
     parseCgiHeaders(headers);
 
-    buffer_.erase(buffer_.begin(), buffer_.begin() + static_cast<long>(headerEnd) + 4);
+    buffer_.erase(buffer_.begin(), buffer_.begin() + static_cast<long>(headerEnd) + headerSeperatorSize);
     parseCgiBody();
 }
 
