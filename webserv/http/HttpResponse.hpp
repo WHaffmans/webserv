@@ -31,6 +31,7 @@ class HttpResponse
     void setBody(const std::string &body);
 
     void setComplete();
+    void setError(uint16_t statusCode);
 
     void setStatus(uint16_t statusCode);
 

@@ -81,8 +81,7 @@ void Client::request()
     buffer[bytesRead] = '\0'; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
     httpRequest_->receiveData(static_cast<const char *>(buffer), static_cast<size_t>(bytesRead));
 
-    if (httpRequest_->getState() == HttpRequest::State::Complete
-        || httpRequest_->getState() == HttpRequest::State::ParseError)
+    if (httpRequest_->getState() == HttpRequest::State::Complete)
     {
         Log::info("Received request: " + httpRequest_->getHttpVersion() + " " + httpRequest_->getMethod() + " "
                   + httpRequest_->getTarget() + " ");
@@ -92,7 +91,7 @@ void Client::request()
                                           {"request_target", httpRequest_->getTarget()},
                                           {"http_version", httpRequest_->getHttpVersion()},
                                           {"headers", httpRequest_->getHeaders().toString()},
-                                        //   {"body", httpRequest_->getBody()},
+                                          //   {"body", httpRequest_->getBody()},
                                           {"state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
                                       });
 

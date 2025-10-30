@@ -45,13 +45,8 @@ std::unique_ptr<AHandler> Router::handleRequest()
     Log::trace(LOCATION);
 
     HttpRequest &request = client_->getHttpRequest();
-    if (request.getState() == HttpRequest::State::ParseError)
-    {
-        Log::error("Router::handleRequest() called with incomplete request");
-
-        return nullptr;
-    }
     HttpResponse &response = client_->getHttpResponse();
+    
     const AConfig *config = request.getUri().getConfig();
 
     auto validator = std::make_unique<RequestValidator>(config, &request);

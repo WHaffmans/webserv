@@ -34,10 +34,16 @@ void HttpRequest::setState(State state)
 {
     if (state == State::Complete)
     {
+        if (! headers_.getHost().has_value())
+        {
+            client_->getHttpResponse().setError(Http::StatusCode::BAD_REQUEST);
+            state_ = State::ParseError;
+            return;
+        }
         ServerConfig *serverConfig = getServerConfig();
         if (serverConfig == nullptr)
         {
-            Log::error("No matching server config found for host");
+            client_->getHttpResponse().setError(Http::StatusCode::NOT_FOUND);
             state_ = State::ParseError;
             return;
         }
@@ -135,6 +141,7 @@ bool HttpRequest::parseBufferforRequestLine()
     if (parts.size() != 3)
     {
         Log::warning("Invalid request line: " + requestLine_);
+        client_->getHttpResponse().setError(Http::StatusCode::BAD_REQUEST);
         state_ = State::ParseError; // Mark as complete to avoid further processing
         return true;
     }
@@ -194,6 +201,7 @@ bool HttpRequest::parseBufferforChunkedBody()
         catch (const std::exception &e)
         {
             Log::warning("Invalid chunk size: " + chunkSizeStr + " - " + e.what());
+            client_->getHttpResponse().setError(400);
             setState(State::ParseError);
             return false;
         }

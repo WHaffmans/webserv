@@ -13,16 +13,31 @@ void HttpResponse::addHeader(const std::string &key, const std::string &value)
 
 void HttpResponse::appendBody(const std::vector<uint8_t> &data)
 {
+    if (complete_)
+    {
+        Log::warning("Attempt to set body on a completed HttpResponse");
+        return;
+    }
     body_.insert(body_.end(), data.begin(), data.end());
 }
 
 void HttpResponse::appendBody(const std::string &body)
 {
+    if (complete_)
+    {
+        Log::warning("Attempt to set body on a completed HttpResponse");
+        return;
+    }
     body_.insert(body_.end(), body.begin(), body.end());
 }
 
 void HttpResponse::setBody(const std::vector<uint8_t> &data) // TODO: validate headers
 {
+    if (complete_)
+    {
+        Log::warning("Attempt to set body on a completed HttpResponse");
+        return;
+    }
     body_ = data;
     setComplete();
 }
@@ -40,6 +55,12 @@ void HttpResponse::setStatus(uint16_t statusCode)
 
 void HttpResponse::setComplete()
 {
+    complete_ = true;
+}
+
+void HttpResponse::setError(uint16_t statusCode)
+{
+    statusCode_ = statusCode;
     complete_ = true;
 }
 

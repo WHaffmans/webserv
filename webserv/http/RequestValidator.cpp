@@ -1,8 +1,9 @@
+#include "webserv/log/Log.hpp"
+#include <webserv/config/AConfig.hpp>
 #include <webserv/http/RequestValidator.hpp>
 
-#include <webserv/config/AConfig.hpp>
-
 #include <cstddef>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -20,7 +21,41 @@ std::optional<RequestValidator::ValidationError> RequestValidator::validate() co
     {
         return error;
     }
+    if (auto error = validateHttpVersion())
+    {
+        return error;
+    }
+    if (auto error = validateHostHeader())
+    {
+        return error;
+    }
     return std::nullopt; // No validation errors
+}
+
+std::optional<RequestValidator::ValidationError> RequestValidator::validateHostHeader() const
+{
+    if (!request->getHeaders().has("Host"))
+    {
+        return ValidationError{400, "Bad Request: Missing Host header"};
+    }
+    std::string hostHeader = request->getHeaders().get("Host");
+    // Basic validation: check if host header is not empty
+    if (hostHeader.empty())
+    {
+        return ValidationError{400, "Bad Request: Empty Host header"};
+    }
+    Log::debug("Host header validated: " + hostHeader);
+    return std::nullopt;
+}
+
+std::optional<RequestValidator::ValidationError> RequestValidator::validateHttpVersion() const
+{
+    std::string httpVersion = request->getHttpVersion();
+    if (httpVersion != "HTTP/1.1" && httpVersion != "HTTP/1.0")
+    {
+        return ValidationError{505, "HTTP Version Not Supported"};
+    }
+    return std::nullopt;
 }
 
 std::optional<RequestValidator::ValidationError> RequestValidator::validateContentLength() const
@@ -48,6 +83,10 @@ std::optional<RequestValidator::ValidationError> RequestValidator::validateMetho
     auto allowedMethodsOpt = config->get<std::vector<std::string>>("allowed_methods");
     std::vector<std::string> allowedMethods;
 
+    if (request->getMethod().empty())
+    {
+        return ValidationError{400, "Bad Request: Empty HTTP Method"};
+    }
     if (allowedMethodsOpt.has_value())
     {
         allowedMethods = std::move(*allowedMethodsOpt);

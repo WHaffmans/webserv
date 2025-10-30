@@ -1,5 +1,6 @@
 #pragma once
 
+#include "webserv/http/HttpResponse.hpp"
 #include <webserv/config/ServerConfig.hpp>
 #include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
 

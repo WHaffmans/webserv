@@ -39,4 +39,6 @@ class RequestValidator
 
     [[nodiscard]] std::optional<ValidationError> validateContentLength() const;
     [[nodiscard]] std::optional<ValidationError> validateMethod() const;
+    [[nodiscard]] std::optional<ValidationError> validateHttpVersion() const;
+    [[nodiscard]] std::optional<ValidationError> validateHostHeader() const;
 };
