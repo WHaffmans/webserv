@@ -48,6 +48,7 @@ constexpr uint16_t FORBIDDEN = 403;
 constexpr uint16_t NOT_FOUND = 404;
 constexpr uint16_t METHOD_NOT_ALLOWED = 405;
 constexpr uint16_t PAYLOAD_TOO_LARGE = 413;
+constexpr uint16_t URI_TOO_LONG = 414;
 constexpr uint16_t INTERNAL_SERVER_ERROR = 500;
 constexpr uint16_t NOT_IMPLEMENTED = 501;
 constexpr uint16_t BAD_GATEWAY = 502;
@@ -60,7 +61,7 @@ struct StatusCodeInfo
     std::string_view reason;
 };
 
-static constexpr std::array<StatusCodeInfo, 18> statusCodeInfos
+static constexpr std::array<StatusCodeInfo, 19> statusCodeInfos
     = {{{.code = StatusCode::OK, .reason = "OK"},
         {.code = StatusCode::CREATED, .reason = "Created"},
         {.code = StatusCode::NO_CONTENT, .reason = "No Content"},
@@ -75,6 +76,7 @@ static constexpr std::array<StatusCodeInfo, 18> statusCodeInfos
         {.code = StatusCode::NOT_FOUND, .reason = "Not Found"},
         {.code = StatusCode::METHOD_NOT_ALLOWED, .reason = "Method Not Allowed"},
         {.code = StatusCode::PAYLOAD_TOO_LARGE, .reason = "Payload Too Large"},
+        {.code = StatusCode::URI_TOO_LONG, .reason = "URI Too Long"},
         {.code = StatusCode::INTERNAL_SERVER_ERROR, .reason = "Internal Server Error"},
         {.code = StatusCode::NOT_IMPLEMENTED, .reason = "Not Implemented"},
         {.code = StatusCode::BAD_GATEWAY, .reason = "Bad Gateway"},
