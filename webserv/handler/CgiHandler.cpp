@@ -10,6 +10,7 @@
 #include <webserv/socket/TimerSocket.hpp>   // for TimerSocket
 #include <webserv/utils/utils.hpp>          // for trim
 
+#include <algorithm>
 #include <functional> // for function
 #include <utility>    // for move
 
@@ -116,11 +117,13 @@ void CgiHandler::error()
         request_.getClient().removeSocket(cgiStdErr_.get());
         // request_.getClient().removeSocket(timerSocket_.get()); // todo maybe this dangerous
         cgiStdErr_ = nullptr;
+        parseCgiOutput();
         return;
     }
     else
     {
         buffer[bytesRead] = '\0'; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+        appendToBuffer(buffer, static_cast<size_t>(bytesRead));
         Log::error("CGI stderr output (fd: " + std::to_string(cgiStdErr_->getFd())
                    + "): " + std::string(buffer, static_cast<size_t>(bytesRead)));
     }
@@ -160,7 +163,12 @@ void CgiHandler::parseCgiOutput()
     Log::trace(LOCATION);
 
     // Parse the headers from the buffer
-    size_t headerEnd = std::string(buffer_.begin(), buffer_.end()).find("\r\n\r\n");
+    auto header = std::string(buffer_.begin(), buffer_.end());
+    size_t headerEnd = std::min({
+        header.find("\r\n\r\n"),
+        header.find("\n\n"),
+        header.find("\r\r"),
+    });
     if (headerEnd == std::string::npos)
     {
         Log::debug("CGI output headers not complete yet");
