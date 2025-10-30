@@ -43,7 +43,7 @@ void HttpRequest::setState(State state)
         ServerConfig *serverConfig = getServerConfig();
         if (serverConfig == nullptr)
         {
-            client_->getHttpResponse().setError(Http::StatusCode::NOT_FOUND);
+            client_->getHttpResponse().setError(Http::StatusCode::BAD_REQUEST);
             state_ = State::ParseError;
             return;
         }
@@ -147,6 +147,13 @@ bool HttpRequest::parseBufferforRequestLine()
     }
     method_ = parts[0];
     target_ = parts[1];
+    if (target_.size() > 2048)
+    {
+        Log::warning("Request target too long: " + target_);
+        client_->getHttpResponse().setError(Http::StatusCode::URI_TOO_LONG);
+        state_ = State::ParseError; // Mark as complete to avoid further processing
+        return true;
+    }
     httpVersion_ = parts[2];
     Log::debug("Parsed Request Line: Method=" + method_ + " Target=" + target_ + " Version=" + httpVersion_);
     return true;
