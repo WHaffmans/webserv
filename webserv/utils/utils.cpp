@@ -153,4 +153,52 @@ uint32_t stateToEpoll(const ASocket::IoState &event)
     }
     return epollEvents;
 }
+
+std::string uriEncode(const std::string &value)
+{
+    std::ostringstream escaped;
+    escaped.fill('0');
+    escaped << std::hex;
+
+    for (char c : value)
+    {
+        // Keep alphanumeric and other accepted characters intact
+        if (isalnum(static_cast<unsigned char>(c)) || c == '-' || c == '_' || c == '.' || c == '~')
+        {
+            escaped << c;
+        }
+        else
+        {
+            // Any other characters are percent-encoded
+            escaped << '%' << std::uppercase << std::setw(2) << int(static_cast<unsigned char>(c)) << std::nouppercase;
+        }
+    }
+
+    return escaped.str();
+}
+
+std::string uriDecode(const std::string &value)
+{
+    std::ostringstream unescaped;
+    size_t length = value.length();
+
+    for (size_t i = 0; i < length; ++i)
+    {
+        if (value[i] == '%' && i + 2 < length)
+        {
+            std::istringstream hexStream{value.substr(i + 1, 2)};
+            int hexValue = 0;
+            hexStream >> std::hex >> hexValue;
+            unescaped << static_cast<char>(hexValue);
+            i += 2;
+        }
+        else
+        {
+            unescaped << value[i];
+        }
+    }
+
+    return unescaped.str();
+}
+
 } // namespace utils
