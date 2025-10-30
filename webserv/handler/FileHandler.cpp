@@ -72,6 +72,8 @@ void FileHandler::handleDirectory(const std::string &dirpath, ResourceType type)
     if (type == DIRECTORY_AUTOINDEX)
     {
         Log::debug("Requested path is a directory: " + dirpath);
+        response_.addHeader("Content-Type", "text/html");
+        response_.addHeader("Connection", "close");
         response_.setBody(AutoIndex::generate(dirpath, uri_));
         response_.setStatus(Http::StatusCode::OK);
         return;
