@@ -1,6 +1,5 @@
-#include <webserv/http/HttpResponse.hpp>
-
 #include <webserv/http/HttpConstants.hpp> // for getStatusCodeReason
+#include <webserv/http/HttpResponse.hpp>
 
 #include <string> // for basic_string, operator+, string, char_traits, to_string
 #include <vector> // for vector
@@ -54,9 +53,19 @@ const HttpHeaders &HttpResponse::getHeaders() const noexcept
     return *headers_;
 }
 
-std::string HttpResponse::getContentLength() const
+std::string HttpResponse::getContentLengthHeader() const
 {
     return "Content-Length: " + std::to_string(body_.size()) + "\r\n";
+}
+
+std::string HttpResponse::getDateHeader() const
+{
+    time_t now = time(nullptr);
+    struct tm *gmt = gmtime(&now);
+    char buffer[100];
+    strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", gmt);
+
+    return "Date: " + std::string(buffer) + "\r\n";
 }
 
 std::vector<uint8_t> HttpResponse::toBytes() const
@@ -67,7 +76,11 @@ std::vector<uint8_t> HttpResponse::toBytes() const
     reason = Http::getStatusCodeReason(statusCode_);
 
     headerStr = "HTTP/1.1 " + std::to_string(statusCode_) + " " + reason + "\r\n"; // todo: status line
-    headerStr += getContentLength();
+    headerStr += getContentLengthHeader();
+    headerStr += getDateHeader();
+    headerStr += "Connection: close\r\n";
+    headerStr += "Server: Webserv/1.0\r\n";
+
     headerStr += headers_->toString();
 
     std::vector<uint8_t> responseData(headerStr.begin(), headerStr.end());
