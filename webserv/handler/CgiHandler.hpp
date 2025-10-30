@@ -45,7 +45,7 @@ class CgiHandler : public AHandler
     std::unique_ptr<CgiSocket> cgiStdErr_;
     void parseCgiOutput();
     void parseCgiHeaders(std::string &headers);
-    void parseCgiBody();
+    void finalizeCgiResponse();
     void appendToBuffer(const char *data, size_t length);
 
     int pid_ = -1;

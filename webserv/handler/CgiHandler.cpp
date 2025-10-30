@@ -177,7 +177,7 @@ void CgiHandler::parseCgiOutput()
         Log::debug("CGI output headers not complete yet");
         return;
     }
-   
+
     if (header.substr(static_cast<long>(headerEnd), 2) == "\r\n")
     {
         headerSeperatorSize = 4;
@@ -190,7 +190,7 @@ void CgiHandler::parseCgiOutput()
     parseCgiHeaders(headers);
 
     buffer_.erase(buffer_.begin(), buffer_.begin() + static_cast<long>(headerEnd) + headerSeperatorSize);
-    parseCgiBody();
+    finalizeCgiResponse();
 }
 
 void CgiHandler::parseCgiHeaders(std::string &headers)
@@ -265,13 +265,13 @@ void CgiHandler::handleTimeout()
     // cancelTimer();
 }
 
-void CgiHandler::parseCgiBody()
+void CgiHandler::finalizeCgiResponse()
 {
     Log::trace(LOCATION);
-
     auto status = response_.getHeaders().get("Status");
 
-    if (cgiProcess_->getExitCode() > 0 && !status.empty())
+    wait();
+    if (cgiProcess_->getExitCode() > 0 && status.empty())
     {
         response_.setStatus(500);
     }

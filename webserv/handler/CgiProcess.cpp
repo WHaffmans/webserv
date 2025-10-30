@@ -18,7 +18,8 @@
 #include <sys/wait.h> // for waitpid, WNOHANG
 #include <unistd.h>   // for close, dup2, pipe2, execve, fork, STDERR_FILENO, STDIN_FILENO, STDOUT_FILENO
 
-CgiProcess::CgiProcess(const HttpRequest &request, CgiHandler &handler) : request_(request), handler_(handler), pid_(-1), status_(-1)
+CgiProcess::CgiProcess(const HttpRequest &request, CgiHandler &handler)
+    : request_(request), handler_(handler), pid_(-1), status_(-1)
 {
     if (!request_.getUri().isCgi())
     {
@@ -133,8 +134,9 @@ void CgiProcess::wait() noexcept
             return;
         }
 
-        Log::debug("CGI process with PID " + std::to_string(pid_) + " has terminated with status " + std::to_string(status));
-        status_ = status;
+        Log::debug("CGI process with PID " + std::to_string(pid_) + " has terminated with status "
+                   + std::to_string(WEXITSTATUS(status)));
+        status_ = WEXITSTATUS(status);
         pid_ = -1;
     }
 }
