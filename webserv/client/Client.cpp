@@ -1,6 +1,7 @@
 #include <webserv/client/Client.hpp>
 #include <webserv/handler/CgiHandler.hpp>   // for CgiHandler
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
+#include <webserv/handler/URI.hpp>  
 #include <webserv/http/HttpHeaders.hpp>     // for HttpHeaders
 #include <webserv/http/HttpRequest.hpp>     // for HttpRequest
 #include <webserv/http/HttpResponse.hpp>    // for HttpResponse
@@ -110,7 +111,8 @@ void Client::request()
         catch (const RequestValidator::ValidationException &e)
         {
             Log::error("Validation Exception during request handling: " + std::string(e.what()));
-            ErrorHandler::createErrorResponse(e.code(), *httpResponse_);
+            const auto &config = httpRequest_->getUri().getConfig();
+            ErrorHandler::createErrorResponse(e.code(), *httpResponse_, config);
             return;
         }
         catch (const std::exception &e)
