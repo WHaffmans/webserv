@@ -20,11 +20,14 @@ class CgiProcess
     void kill() const noexcept;
     void wait() noexcept;
 
+    [[nodiscard]] int getExitCode() const noexcept;
+
   private:
     const HttpRequest &request_;
     CgiHandler &handler_;
 
-    int _pid;
+    int pid_;
+    int status_;
     // int _cgiFd;
 
     void spawn();

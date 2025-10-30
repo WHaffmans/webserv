@@ -1,7 +1,6 @@
-#include <webserv/handler/CgiProcess.hpp>
-
 #include <webserv/handler/CgiEnvironment.hpp> // for CgiEnvironment
 #include <webserv/handler/CgiHandler.hpp>     // for CgiHandler
+#include <webserv/handler/CgiProcess.hpp>
 #include <webserv/handler/URI.hpp>      // for URI
 #include <webserv/http/HttpRequest.hpp> // for HttpRequest
 #include <webserv/log/Log.hpp>          // for Log
@@ -19,7 +18,7 @@
 #include <sys/wait.h> // for waitpid, WNOHANG
 #include <unistd.h>   // for close, dup2, pipe2, execve, fork, STDERR_FILENO, STDIN_FILENO, STDOUT_FILENO
 
-CgiProcess::CgiProcess(const HttpRequest &request, CgiHandler &handler) : request_(request), handler_(handler), _pid(-1)
+CgiProcess::CgiProcess(const HttpRequest &request, CgiHandler &handler) : request_(request), handler_(handler), pid_(-1), status_(-1)
 {
     if (!request_.getUri().isCgi())
     {
@@ -49,8 +48,8 @@ void CgiProcess::spawn()
     }
     // NOLINTEND
     CgiEnvironment cgiEnv(uri, request_);
-    _pid = fork();
-    if (_pid < 0)
+    pid_ = fork();
+    if (pid_ < 0)
     {
         close(pipeStdin[0]);
         close(pipeStdin[1]);
@@ -60,7 +59,7 @@ void CgiProcess::spawn()
         close(pipeStderr[1]);
         throw std::runtime_error("Failed to fork");
     }
-    if (_pid == 0)
+    if (pid_ == 0)
     {
         dup2(pipeStdin[0], STDIN_FILENO);
         dup2(pipeStdout[1], STDOUT_FILENO);
@@ -98,34 +97,34 @@ void CgiProcess::spawn()
         close(pipeStdout[1]);
         close(pipeStderr[1]);
 
-        Log::debug("CGI process forked with PID: " + std::to_string(_pid));
+        Log::debug("CGI process forked with PID: " + std::to_string(pid_));
 
         // request_.getClient().setCgiSockets(std::move(cgiStdIn), std::move(cgiStdOut)); // move the sockets to the
         // client
         handler_.setCgiSockets(std::move(cgiStdIn), std::move(cgiStdOut), std::move(cgiStdErr));
 
-        handler_.setPid(_pid);
+        handler_.setPid(pid_);
     }
 }
 
 void CgiProcess::kill() const noexcept
 {
-    if (_pid > 0)
+    if (pid_ > 0)
     {
-        ::kill(_pid, SIGKILL);
-        Log::debug("Killed CGI process with PID: " + std::to_string(_pid));
+        ::kill(pid_, SIGKILL);
+        Log::debug("Killed CGI process with PID: " + std::to_string(pid_));
     }
 }
 
 void CgiProcess::wait() noexcept
 {
-    if (_pid > 0)
+    if (pid_ > 0)
     {
         int status;
-        int waitResult = ::waitpid(_pid, &status, WNOHANG);
+        int waitResult = ::waitpid(pid_, &status, WNOHANG);
         if (waitResult == -1)
         {
-            Log::error("Error while waiting for CGI process with PID: " + std::to_string(_pid));
+            Log::error("Error while waiting for CGI process with PID: " + std::to_string(pid_));
             return;
         }
         if (waitResult == 0)
@@ -134,8 +133,13 @@ void CgiProcess::wait() noexcept
             return;
         }
 
-        Log::debug("CGI process with PID " + std::to_string(_pid) + " has terminated");
-        ;
-        _pid = -1;
+        Log::debug("CGI process with PID " + std::to_string(pid_) + " has terminated with status " + std::to_string(status));
+        status_ = status;
+        pid_ = -1;
     }
+}
+
+int CgiProcess::getExitCode() const noexcept
+{
+    return status_;
 }

@@ -1,12 +1,13 @@
-#include <webserv/http/HttpHeaders.hpp>   // for HttpHeaders
-
 #include <webserv/http/HttpConstants.hpp> // for CRLF
+#include <webserv/http/HttpHeaders.hpp>   // for HttpHeaders
 #include <webserv/log/Log.hpp>
 #include <webserv/utils/utils.hpp> // for trim
 
 #include <algorithm> // for __transform_fn, transform
 #include <cctype>    // for tolower
-#include <utility>   // for pair
+#include <string>
+#include <unordered_map>
+#include <utility> // for pair
 
 std::optional<size_t> HttpHeaders::getContentLength() const
 {
@@ -92,6 +93,11 @@ void HttpHeaders::parse(const std::string &rawHeaders) noexcept
         start = end + Http::Protocol::CRLF.size();
         end = rawHeaders.find(Http::Protocol::CRLF, start);
     }
+}
+
+const std::unordered_map<std::string, std::string> &HttpHeaders::getAll() const noexcept
+{
+    return headers_;
 }
 
 std::string HttpHeaders::toString() const noexcept

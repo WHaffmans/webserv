@@ -1,6 +1,5 @@
-#include <webserv/handler/CgiHandler.hpp>
-
 #include <webserv/client/Client.hpp> // for Client
+#include <webserv/handler/CgiHandler.hpp>
 #include <webserv/handler/CgiProcess.hpp>   // for CgiProcess
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
 #include <webserv/http/HttpRequest.hpp>     // for HttpRequest
@@ -11,6 +10,8 @@
 #include <webserv/utils/utils.hpp>          // for trim
 
 #include <algorithm>
+#include <cstddef>
+#include <cstdlib>
 #include <functional> // for function
 #include <utility>    // for move
 
@@ -268,7 +269,16 @@ void CgiHandler::parseCgiBody()
 {
     Log::trace(LOCATION);
 
-    // Append the body to the response
+    auto status = response_.getHeaders().get("Status");
+
+    if (cgiProcess_->getExitCode() > 0 && !status.empty())
+    {
+        response_.setStatus(500);
+    }
+    else if (!status.empty())
+    {
+        response_.setStatus(std::atoi(status.c_str()));
+    }
     response_.appendBody(buffer_);
     response_.setComplete();
     buffer_.clear();

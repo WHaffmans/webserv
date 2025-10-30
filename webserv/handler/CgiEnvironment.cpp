@@ -1,14 +1,19 @@
-#include <webserv/handler/CgiEnvironment.hpp>
+#include "webserv/http/HttpRequest.hpp"
+#include "webserv/log/Log.hpp"
 
+#include <webserv/handler/CgiEnvironment.hpp>
 #include <webserv/handler/URI.hpp>      // for URI
 #include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
 
+#include <algorithm>
+#include <cctype>
 #include <cstring>  // for strcpy, size_t
 #include <optional> // for optional
 #include <utility>  // for pair
 
 CgiEnvironment::CgiEnvironment(const URI &uri, const HttpRequest &request)
 {
+    Log::trace(LOCATION);
     env_["GATEWAY_INTERFACE"] = "CGI/1.1";
     env_["SERVER_PROTOCOL"] = "HTTP/1.1";
     env_["REQUEST_METHOD"] = request.getMethod();
@@ -38,7 +43,7 @@ CgiEnvironment::CgiEnvironment(const URI &uri, const HttpRequest &request)
     env_["SERVER_NAME"] = host;
     env_["SERVER_PORT"] = std::to_string(port);
     env_["REMOTE_ADDR"] = request.getClient().getClientAddress(); // Placeholder, should be set to actual remote address
-    env_["REDIRECT_STATUS"] = "200";       // Required by PHP with force-cgi-redirect enabled
+    env_["REDIRECT_STATUS"] = "200";                              // Required by PHP with force-cgi-redirect enabled
     env_["SERVER_SOFTWARE"] = "Webserv/1.0";
     env_["REQUEST_SCHEME"] = "HTTP";
     env_["HTTP_VERSION"] = "1.1";
@@ -49,6 +54,8 @@ CgiEnvironment::CgiEnvironment(const URI &uri, const HttpRequest &request)
     env_["HTTP_ACCEPT"] = headers.get("Accept");
     env_["HTTP_ACCEPT_LANGUAGE"] = headers.get("Accept-Language");
     env_["HTTP_ACCEPT_ENCODING"] = headers.get("Accept-Encoding");
+
+    appendCustomHeaders(headers);
 }
 
 char **CgiEnvironment::toEnvp() const
@@ -63,4 +70,21 @@ char **CgiEnvironment::toEnvp() const
     }
     envp[index] = nullptr; // Null-terminate the array
     return envp;
+}
+
+void CgiEnvironment::appendCustomHeaders(const HttpHeaders &headers)
+{
+    Log::trace(LOCATION);
+    for (const auto &header : headers.getAll())
+    {
+        if (!header.first.starts_with("x-"))
+        {
+            continue;
+        }
+        std::string key = "HTTP_" + header.first;
+        std::transform(key.begin(), key.end(), key.begin(), ::toupper);
+        std::replace(key.begin(), key.end(), '-', '_');
+        env_[key] = header.second;
+        Log::debug("Added custom header with key: " + key + " And value: " + header.second);
+    }
 }

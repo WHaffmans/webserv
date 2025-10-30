@@ -18,5 +18,6 @@ class CgiEnvironment
     [[nodiscard]] char **toEnvp() const;
 
   private:
+    void appendCustomHeaders(const HttpHeaders &headers);
     std::map<std::string, std::string> env_;
 };

@@ -29,6 +29,7 @@ class HttpHeaders
     [[nodiscard]] std::optional<size_t> getContentLength() const;
     [[nodiscard]] std::optional<std::string> getContentType() const noexcept;
     [[nodiscard]] std::optional<std::string> getHost() const noexcept;
+    [[nodiscard]] const std::unordered_map<std::string, std::string> &getAll() const noexcept;
 
   private:
     std::unordered_map<std::string, std::string> headers_;
