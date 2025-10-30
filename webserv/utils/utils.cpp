@@ -4,6 +4,7 @@
 #include <webserv/socket/ASocket.hpp>
 
 #include <cstdint>
+#include <iomanip>
 #include <sstream>
 #include <stdexcept>
 #include <string>
