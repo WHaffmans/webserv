@@ -22,8 +22,12 @@ void AConfig::addDirective(const std::string &line)
             ++semicolon_count;
         }
     }
+    if (semicolon_count > 1)
+    {
+        throw std::runtime_error("Directive contains multiple semicolons: " + line);
+    }
 
-    if (semicolon_count != 1 || line.back() != ';')
+    if (line.back() != ';')
     {
         throw std::runtime_error("Directive must end with a single semicolon");
     }
