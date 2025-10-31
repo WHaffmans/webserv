@@ -1,5 +1,4 @@
 #include <webserv/config/GlobalConfig.hpp>
-
 #include <webserv/log/Log.hpp>     // for Log
 #include <webserv/utils/utils.hpp> // for findCorrespondingClosingBrace
 
@@ -49,6 +48,11 @@ void GlobalConfig::parseBlock(const std::string &block)
         std::string serverBlock = block.substr(bracePos + 1, closeBrace - bracePos - 1);
         servers_.emplace_back(std::make_unique<ServerConfig>(serverBlock, this));
         pos = closeBrace + 1;
+    }
+    
+    if (block.find("location", 0) != std::string::npos)
+    {
+        throw std::runtime_error("Location blocks are not allowed in the global context.");
     }
 
     parseDirectives(directives);
