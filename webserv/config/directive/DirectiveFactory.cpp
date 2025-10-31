@@ -33,12 +33,16 @@ std::unique_ptr<ADirective> DirectiveFactory::createDirective(const std::string 
         }
     }
 
+    if (arg.empty())
+    {
+        throw std::invalid_argument("Directive argument is empty: " + name);
+    }
     if (type.empty())
     {
         throw std::invalid_argument("Unsupported directive: " + name);
     }
 
-    Log::debug("Creating directive of type: " + std::string(type) + " with name: " + name + " and arg: " + arg);
+    Log::debug("Creating directive of type: " + std::string(type) + " with name: " + name + " and arg: |" + arg + "|");
     return create(type, name, arg);
 }
 
