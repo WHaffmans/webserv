@@ -50,7 +50,7 @@ void GlobalConfig::parseBlock(const std::string &block)
         pos = closeBrace + 1;
     }
     
-    if (block.find("location", 0) != std::string::npos)
+    if (directives.find("location", 0) != std::string::npos)
     {
         throw std::runtime_error("Location blocks are not allowed in the global context.");
     }

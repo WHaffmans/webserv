@@ -20,6 +20,10 @@ void VectorDirective::parse(const std::string &value)
         std::getline(ss, item, ' '); // index    indx.html
         if (!item.empty())
         {
+            if (item.size() > 4096) //TODO: use PATH_MAX or NAME_MAX where appropriate 
+            {
+                throw std::invalid_argument("VectorDirective: string value exceeds maximum length");
+            }
             value_.push_back(item);
         }
     }

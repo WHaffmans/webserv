@@ -55,8 +55,12 @@ void ConfigManager::parseConfigFile(const std::string &filePath)
     {
         throw std::runtime_error("Config file is empty: " + filePath);
     }
-    
+
     utils::removeComments(content);
+    if (content.find('\0') != std::string::npos)
+    {
+        throw std::runtime_error("null byte detected in config file: " + filePath);
+    }
     globalConfig_ = std::make_unique<GlobalConfig>(content);
 
     // Implement this function to handle global config

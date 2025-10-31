@@ -47,6 +47,18 @@ void HttpRequest::setState(State state)
             state_ = State::ParseError;
             return;
         }
+        if (target_.starts_with("http://") || target_.starts_with("https://"))
+        {
+            size_t pos = target_.find('/', 8); // Skip "http://" or "https://"
+            if (pos == std::string::npos)
+            {
+                target_ = "/";
+            }
+            else
+            {
+                target_ = target_.substr(pos);
+            }
+        }
         uri_ = std::make_unique<URI>(*this, *serverConfig);
     }
     state_ = state;
@@ -175,6 +187,13 @@ bool HttpRequest::parseBufferforHeaders()
     {
         state_ = State::Body;
         return true;
+    }
+    if (headers_.has("X-Folded-Header"))
+    {
+        Log::debug("HttpRequest::parseBuffer() in state Headers with folded headers");
+        client_->getHttpResponse().setError(400);
+        setState(State::ParseError);
+        return false;
     }
     if (this->headers_.has("Transfer-Encoding") && this->headers_.get("Transfer-Encoding") == "chunked")
     {

@@ -11,6 +11,10 @@ StringDirective::StringDirective(const std::string &name, const std::string &val
 
 void StringDirective::parse(const std::string &value)
 {
+    if (value.size() > 4096) //TODO: use PATH_MAX or NAME_MAX where appropriate 
+    {
+        throw std::invalid_argument("StringDirective: string value exceeds maximum length");
+    }
     value_ = value;
 }
 

@@ -48,6 +48,12 @@ void ServerConfig::parseBlock(const std::string &block)
         std::string locationPath
             = utils::trim(block.substr(locationPos + 9, bracePos - (locationPos + 9))); // TODO magic numbers
         // Add global declarations before this server block
+
+        if (locationPath.front() != '/')
+        {
+            throw std::runtime_error("Location path must start with '/': " + locationPath);
+        }
+
         directives += block.substr(pos, locationPos - pos);
         size_t closeBrace = utils::findCorrespondingClosingBrace(block, bracePos);
         if (closeBrace == std::string::npos)

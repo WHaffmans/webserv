@@ -37,6 +37,8 @@ std::unique_ptr<ADirective> DirectiveFactory::createDirective(const std::string 
     {
         throw std::invalid_argument("Directive argument is empty: " + name);
     }
+
+    
     if (type.empty())
     {
         throw std::invalid_argument("Unsupported directive: " + name);
