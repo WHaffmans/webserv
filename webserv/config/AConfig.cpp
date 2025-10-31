@@ -13,7 +13,24 @@ AConfig::AConfig(const AConfig *parent) : parent_(parent) {}
 
 void AConfig::addDirective(const std::string &line)
 {
-    auto directive = DirectiveFactory::createDirective(line);
+
+    std::size_t semicolon_count = 0;
+    for (char c : line)
+    {
+        if (c == ';')
+        {
+            ++semicolon_count;
+        }
+    }
+
+    if (semicolon_count != 1 || line.back() != ';')
+    {
+        throw std::runtime_error("Directive must end with a single semicolon");
+    }
+
+    std::string trimmedLine = utils::trim(line, " \n\r\t;");
+    Log::debug(" Adding directive: |" + trimmedLine + "| to config");
+    auto directive = DirectiveFactory::createDirective(trimmedLine);
     if (directive)
     {
         directives_.emplace_back(std::move(directive));
