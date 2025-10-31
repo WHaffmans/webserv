@@ -30,26 +30,32 @@ ValidationResult CgiExtValidationRule::validateValue(const AConfig *config, cons
     }
 
     auto cgiExt = directive->getValue().get<std::vector<std::string>>();
-    if (cgiExt.size() != 2)
+    if (cgiExt.size() == 0 || cgiExt.size() > 2)
     {
         return ValidationResult::error("Directive '" + directive->getName()
-                                       + "' has invalid format, expected extension and path");
+                                       + "' has invalid format, expected extension [and path]");
     }
+
     auto extension = std::string(cgiExt[0]);
-    auto path = std::string(cgiExt[1]);
     if (extension.empty() || extension[0] != '.')
     {
         return ValidationResult::error("Directive '" + directive->getName() + "' has invalid extension '" + extension
-                                       + "'");
+        + "'");
     }
     if (!isAllowedCGIExtension(extension))
     {
         return ValidationResult::error("Directive '" + directive->getName() + "' has unsupported extension '"
-                                       + extension + "'");
+        + extension + "'");
     }
-    if (!FileUtils::isFile(path))
+
+    if (cgiExt.size() == 2)
     {
-        return ValidationResult::error("Directive '" + directive->getName() + "' has invalid path '" + path + "'");
+        auto path = std::string(cgiExt[1]);
+        if (!FileUtils::isFile(path))
+        {
+            return ValidationResult::error("Directive '" + directive->getName() + "' has invalid path '" + path + "'");
+        }
     }
+
     return ValidationResult::success();
 }

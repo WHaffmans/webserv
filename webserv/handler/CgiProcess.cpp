@@ -79,12 +79,20 @@ void CgiProcess::spawn()
 
         // Prepare arguments
         std::string fullPath = uri.getFullPath();
-
-        char *args[] = {const_cast<char *>(cgiPath.c_str()), const_cast<char *>(fullPath.c_str()), nullptr};
+        char *args[3] = {nullptr, nullptr, nullptr};
+        if (!cgiPath.empty())
+        {
+            args[0] = const_cast<char *>(cgiPath.c_str());
+            args[1] = const_cast<char *>(fullPath.c_str());
+        }
+        else
+        {
+            args[0] = const_cast<char *>(fullPath.c_str());
+        }
         // Log::debug("With args:", {args[0], args[1]});
 
         // TODO: Close all FDs
-        execve(const_cast<char *>(cgiPath.c_str()), args, cgiEnv.toEnvp());
+        execve(args[0], args, cgiEnv.toEnvp());
         exit(1);
     }
     else

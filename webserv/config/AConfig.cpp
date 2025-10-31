@@ -150,6 +150,10 @@ std::string AConfig::getCGIPath(const std::string &extension) const
         }
         auto exts = directive->getValue().try_get<std::vector<std::string>>().value();
         auto cgiPath = exts.back();
+        if (cgiPath.starts_with("."))
+        {
+            continue;
+        }
         exts.pop_back(); // Last element is the CGI path
         auto it = std::ranges::find(exts, "." + extension);
         if (it != exts.end())
@@ -162,4 +166,36 @@ std::string AConfig::getCGIPath(const std::string &extension) const
         return parent_->getCGIPath(extension);
     }
     return {}; // Return empty string if not found
+}
+
+bool AConfig::isCGI(const std::string &extension) const
+{
+    Log::trace(LOCATION);
+    for (const auto &directive : directives_)
+    {
+        if (directive->getName() != "cgi_handler")
+        {
+            continue;
+        }
+        if (!directive->getValue().holds<std::vector<std::string>>())
+        {
+            continue;
+        }
+        auto exts = directive->getValue().try_get<std::vector<std::string>>().value();
+        if (!exts.back().starts_with("."))
+        {
+            exts.pop_back(); // Last element is the CGI path
+        }
+        auto it = std::ranges::find(exts, "." + extension);
+        if (it != exts.end())
+        {
+            return true;
+        }
+    }
+
+    if (parent_ != nullptr)
+    {
+        return parent_->isCGI(extension);
+    }
+    return false; // Return false if not found
 }

@@ -151,7 +151,7 @@ bool URI::isValid() const noexcept
 
 bool URI::isCgi() const noexcept
 {
-    return !getCgiPath().empty();
+    return config_->isCGI(getExtension());
 }
 
 bool URI::isRedirect() const noexcept

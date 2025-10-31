@@ -24,6 +24,7 @@ class AConfig
     void addDirective(const std::string &line);
     [[nodiscard]] std::string getErrorPage(int statusCode) const;
     [[nodiscard]] std::string getCGIPath(const std::string &extension) const;
+    [[nodiscard]] bool isCGI(const std::string &extension) const;
 
     [[nodiscard]] bool has(const std::string &name) const;
     [[nodiscard]] bool owns(const std::string &name) const;
