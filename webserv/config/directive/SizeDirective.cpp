@@ -24,7 +24,7 @@ void SizeDirective::parse(const std::string &value)
     number = utils::trim(number);
     if (number.find_first_not_of("01234567890kmg") != std::string::npos)
     {
-        throw std::invalid_argument("Invalid size directive: " + value);
+        throw std::invalid_argument("Invalid size directive: " + value + " in " + name_);
     }
     try
     {
@@ -32,7 +32,7 @@ void SizeDirective::parse(const std::string &value)
     }
     catch (const std::exception &e)
     {
-        throw std::invalid_argument("Invalid size directive: " + value + " - " + e.what());
+        throw std::invalid_argument("Invalid size directive: " + value + " in " + name_ + " - " + e.what());
     }
     if (idx == number.size())
     {
@@ -53,7 +53,7 @@ void SizeDirective::parse(const std::string &value)
     }
     else
     {
-        throw std::invalid_argument("Invalid size directive: " + value);
+        throw std::invalid_argument("Invalid size directive: " + value + " in " + name_);
     }
 
     value_ *= multiplier;
