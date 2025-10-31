@@ -89,7 +89,7 @@ void removeEmptyLines(std::string &str)
     {
         if (!utils::trim(line).empty())
         {
-            result += utils::trim(line, " \t\n\r;") + '\n';
+            result += utils::trim(line, " \t\n\r") + '\n';
         }
     }
     str = result;
