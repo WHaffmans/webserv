@@ -241,9 +241,52 @@ void Server::handleEvent(struct epoll_event *event)
     Log::trace(LOCATION);
     if ((event->events & EPOLLERR) > 0)
     {
-        Log::error("Epoll error on fd " + std::to_string(event->data.fd) + ": " + std::strerror(errno));
-        remove(getListener(event->data.fd));
-        close(event->data.fd);
+        int fd = event->data.fd;
+        Log::error("Epoll error on fd " + std::to_string(fd) + ": " + std::strerror(errno));
+        // If this is a listener socket, remove just that listener
+        if (listener_fds_.contains(fd))
+        {
+            try
+            {
+                remove(getListener(fd));
+            }
+            catch (const std::exception &e)
+            {
+                Log::warning(std::string("Failed to remove listener on EPOLLERR: ") + e.what());
+            }
+            close(fd);
+            listener_fds_.erase(fd);
+        }
+        else
+        {
+            // Non-listener sockets: resolve to client/socket and handle gracefully
+            try
+            {
+                Client &client = getClient(fd);
+                ASocket &socket = client.getSocket(fd);
+                if (socket.getType() == ASocket::Type::CGI_SOCKET)
+                {
+                    Log::info("EPOLLERR on CGI socket fd " + std::to_string(fd) + ", invoking callback");
+                    socket.callback();
+                }
+                else if (socket.getType() == ASocket::Type::CLIENT_SOCKET)
+                {
+                    Log::warning("EPOLLERR on client socket fd " + std::to_string(fd) + ", disconnecting client");
+                    disconnect(client);
+                }
+                else
+                {
+                    Log::warning("EPOLLERR on auxiliary socket fd " + std::to_string(fd) + ", removing");
+                    remove(socket);
+                    close(fd);
+                }
+            }
+            catch (const std::exception &e)
+            {
+                Log::warning(std::string("EPOLLERR on unknown/non-tracked fd, closing: ") + e.what());
+                close(fd);
+            }
+        }
         return;
     }
     if ((event->events & EPOLLHUP) > 0)

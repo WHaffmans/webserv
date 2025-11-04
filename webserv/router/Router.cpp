@@ -1,19 +1,17 @@
-#include <webserv/router/Router.hpp>                   // for Router
-
-#include <webserv/handler/ErrorHandler.hpp>
-#include <webserv/http/RequestValidator.hpp>
-
 #include <webserv/client/Client.hpp>                   // for Client
 #include <webserv/config/AConfig.hpp>                  // for AConfig
 #include <webserv/config/directive/ADirective.hpp>     // for ADirective
 #include <webserv/config/directive/DirectiveValue.hpp> // for DirectiveValue
 #include <webserv/handler/CgiHandler.hpp>              // for CgiHandler
 #include <webserv/handler/CgiProcess.hpp>              // for CgiProcess
-#include <webserv/handler/FileHandler.hpp>             // for FileHandler
-#include <webserv/handler/URI.hpp>                     // for URI
-#include <webserv/http/HttpRequest.hpp>                // for HttpRequest
-#include <webserv/log/Log.hpp>                         // for Log, LOCATION
-#include <webserv/handler/RedirectHandler.hpp>             // for RedirectHandler
+#include <webserv/handler/ErrorHandler.hpp>
+#include <webserv/handler/FileHandler.hpp>     // for FileHandler
+#include <webserv/handler/RedirectHandler.hpp> // for RedirectHandler
+#include <webserv/handler/URI.hpp>             // for URI
+#include <webserv/http/HttpRequest.hpp>        // for HttpRequest
+#include <webserv/http/RequestValidator.hpp>
+#include <webserv/log/Log.hpp>       // for Log, LOCATION
+#include <webserv/router/Router.hpp> // for Router
 
 #include <exception> // for exception
 #include <memory>    // for unique_ptr, make_unique
@@ -46,7 +44,7 @@ std::unique_ptr<AHandler> Router::handleRequest()
 
     HttpRequest &request = client_->getHttpRequest();
     HttpResponse &response = client_->getHttpResponse();
-    
+
     const AConfig *config = request.getUri().getConfig();
 
     auto validator = std::make_unique<RequestValidator>(config, &request);
@@ -70,6 +68,9 @@ std::unique_ptr<AHandler> Router::handleRequest()
         catch (const std::exception &e)
         {
             Log::error("CGI process failed: " + std::string(e.what()));
+            // Ensure we return an error response instead of a null handler to avoid hanging/connection drops
+            ErrorHandler::createErrorResponse(500, response, config);
+            return nullptr;
         }
     }
     else
