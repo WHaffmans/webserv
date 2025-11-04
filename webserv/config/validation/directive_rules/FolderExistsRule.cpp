@@ -24,6 +24,14 @@ ValidationResult FolderExistsRule::validateValue(const AConfig *config, const st
 
     auto folderPath = directive->getValue().get<std::string>();
     Log::debug("Validating folder exists: " + folderPath);
+
+    // if (!FileUtils::isDirectory(folderPath))
+    // {
+    //     return ValidationResult::error(folderPath + " is not a valid directory");
+    // }
+
+    // TODO check if we change the basedir = cwd stuff if this is coreect?
+    // originally it just returns success when the previous tests didnt fail
     // Try multiple resolution strategies:
     // 1) As provided (relative to current working directory)
     // 2) Relative to config base directory

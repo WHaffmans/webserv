@@ -36,6 +36,7 @@ const AConfig *URI::matchConfig(const std::string &uri, const ServerConfig &serv
         {
             return serverConfig.getLocation(locationPath);
         }
+        // TODO this matches only prefix, need to handle exact match
         if (uri.starts_with(utils::trim(locationPath, "/")))
         {
             if (locationPath.length() > maxMatchLength)

@@ -63,6 +63,8 @@ void ConfigManager::parseConfigFile(const std::string &filePath)
     }
     // Resolve base directory for relative paths based on the config file location
     std::filesystem::path p(filePath);
+
+    //TODO should be cwd or should be global root?
     std::string baseDir = p.parent_path().string();
     globalConfig_ = std::make_unique<GlobalConfig>(baseDir, content);
 

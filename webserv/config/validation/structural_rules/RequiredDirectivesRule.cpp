@@ -61,6 +61,8 @@ ValidationResult validateUniversal(const AConfig *config, std::string configType
     return ValidationResult::error(result);
 }
 
+// TODO ! WTF is happening here, we should look at the hard coded validation rules again
+
 ValidationResult RequiredDirectivesRule::validateGlobal(const GlobalConfig *config) const
 {
     // No globally required directives at this time; only prohibit invalid ones.
@@ -85,6 +87,7 @@ ValidationResult RequiredDirectivesRule::validateGlobal(const GlobalConfig *conf
 
 ValidationResult RequiredDirectivesRule::validateServer(const ServerConfig *config) const
 {
+    // TODO missing directives are hard coded, it doesnt look at the table?
     // Only a minimal set is required for server blocks; other directives are optional.
     std::vector<std::string> missing;
     if (!config->owns("listen"))

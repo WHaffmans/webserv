@@ -19,6 +19,7 @@ class HttpHeaders
 {
   public:
     // Reasonable safety limits (aligned with common servers)
+    // TODO make configurable? or put in constants file?
     static constexpr size_t MAX_SINGLE_HEADER_SIZE = 8192; // 8KB per header value
     static constexpr size_t MAX_HEADER_COUNT = 64;         // max number of distinct headers
 

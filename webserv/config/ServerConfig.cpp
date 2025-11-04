@@ -50,19 +50,7 @@ void ServerConfig::parseBlock(const std::string &block)
 
         if (locationPath.front() != '/')
         {
-            // Allow exact match syntax: "= /path"
-            if (locationPath.starts_with('='))
-            {
-                std::string exactPath = utils::trim(locationPath.substr(1));
-                if (exactPath.empty() || exactPath.front() != '/')
-                {
-                    throw std::runtime_error("Exact match location path must start with '/': " + locationPath);
-                }
-            }
-            else
-            {
-                throw std::runtime_error("Location path must start with '/': " + locationPath);
-            }
+            throw std::runtime_error("Location path must start with '/': " + locationPath);
         }
 
         directives += block.substr(pos, locationPos - pos);

@@ -42,6 +42,7 @@ void AConfig::addDirective(const std::string &line)
     std::string trimmedLine = utils::trim(line, " \n\r\t;");
 
     // Reject unescaped quotes in directive values (quotes not supported by our parser)
+    //TODO should we support escaped quotes?
     if (trimmedLine.find('"') != std::string::npos)
     {
         throw std::runtime_error("Syntax error: unescaped quote in directive: " + trimmedLine);

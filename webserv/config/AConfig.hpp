@@ -42,6 +42,7 @@ class AConfig
     }
 
     // Path resolution helpers
+    //TODO move to cpp file
     [[nodiscard]] std::string getBaseDir() const { return baseDir_; }
 
     void setBaseDir(const std::string &dir) { baseDir_ = dir; }
