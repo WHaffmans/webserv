@@ -10,8 +10,9 @@
 #include <webserv/config/validation/structural_rules/MinimumServerBlocksRule.hpp>    // for MinimumServerBlocksRule
 #include <webserv/config/validation/structural_rules/RequiredDirectivesRule.hpp>     // for RequiredDirectivesRule
 #include <webserv/config/validation/structural_rules/RequiredLocationBlocksRule.hpp> // for RequiredLocationBlocksRule
-#include <webserv/config/validation/structural_rules/UniqueServerNamesRule.hpp>      // for UniqueServerNamesRule
-#include <webserv/log/Log.hpp>                                                       // for LOCATION, Log
+#include <webserv/config/validation/structural_rules/SingleDefaultServerPerPortRule.hpp> // for SingleDefaultServerPerPortRule
+#include <webserv/config/validation/structural_rules/UniqueServerNamesRule.hpp>          // for UniqueServerNamesRule
+#include <webserv/log/Log.hpp>                                                           // for LOCATION, Log
 
 #include <memory> // for unique_ptr, make_unique
 #include <string> // for basic_string, string
@@ -27,17 +28,20 @@ ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make
     engine_->addStructuralRule(std::make_unique<RequiredLocationBlocksRule>(1));
     engine_->addStructuralRule(std::make_unique<UniqueServerNamesRule>());
     engine_->addStructuralRule(std::make_unique<RequiredDirectivesRule>());
+    engine_->addStructuralRule(std::make_unique<SingleDefaultServerPerPortRule>());
 
     /*Global Directive Rules*/
 
     /*Server Directive Rules*/
     engine_->addServerRule("listen", std::make_unique<PortValidationRule>());
     engine_->addServerRule("host", std::make_unique<HostValidationRule>());
+    // Folder existence validation disabled - paths are relative to server runtime directory
     // engine_->addServerRule("root", std::make_unique<FolderExistsRule>(false));
 
     /*Location Directive Rules*/
     engine_->addLocationRule("allowed_methods", std::make_unique<AllowedValuesRule>(
                                                     std::vector<std::string>{"GET", "POST", "DELETE", "PUT"}, false));
+    // Folder existence validation disabled - paths are relative to server runtime directory
     // engine_->addLocationRule("root", std::make_unique<FolderExistsRule>(true));
     engine_->addLocationRule("cgi_handler", std::make_unique<CgiExtValidationRule>(false));
 

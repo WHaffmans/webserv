@@ -1,7 +1,6 @@
-#include <webserv/config/ServerConfig.hpp>
-
 #include <webserv/config/AConfig.hpp>        // for AConfig
 #include <webserv/config/LocationConfig.hpp> // for LocationConfig
+#include <webserv/config/ServerConfig.hpp>
 #include <webserv/log/Log.hpp>     // for Log, LOCATION
 #include <webserv/utils/utils.hpp> // for findCorrespondingClosingBrace, trim
 
@@ -62,12 +61,21 @@ void ServerConfig::parseBlock(const std::string &block)
         }
         // Optionally parse the server block here
         std::string locationBlock = block.substr(bracePos + 1, closeBrace - bracePos - 1);
+        if (locations_.contains(locationPath))
+        {
+            throw std::runtime_error("Conflicting location block: " + locationPath);
+        }
         locations_[locationPath] = std::make_unique<LocationConfig>(locationBlock, locationPath, this);
         Log::debug("Added location: " + locationPath, {{"block", locationBlock}});
         pos = closeBrace + 1;
     }
 
     // parseGlobalDeclarations(Declarations); // Implement this function to handle global config
+    // Detect unexpected nested blocks like 'http { ... }' in server context
+    if (directives.find('{') != std::string::npos || directives.find('}') != std::string::npos)
+    {
+        throw std::runtime_error("Invalid block type in server context (http block not allowed)");
+    }
     parseDirectives(directives);
 }
 

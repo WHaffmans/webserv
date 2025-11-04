@@ -42,10 +42,19 @@ class AConfig
         return directive->getValue().try_get<T>();
     }
 
+    // Path resolution helpers
+    //TODO move to cpp file
+    [[nodiscard]] std::string getBaseDir() const { return baseDir_; }
+
+    void setBaseDir(const std::string &dir) { baseDir_ = dir; }
+
+    [[nodiscard]] std::string resolvePath(const std::string &path) const;
+
   protected:
     virtual void parseBlock(const std::string &block) = 0;
     void parseDirectives(const std::string &declarations);
     std::vector<std::unique_ptr<ADirective>>
         directives_;                  // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
     const AConfig *parent_ = nullptr; // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
+    std::string baseDir_{};           // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
 };

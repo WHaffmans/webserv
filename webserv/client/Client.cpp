@@ -1,10 +1,10 @@
 #include <webserv/client/Client.hpp>
 #include <webserv/handler/CgiHandler.hpp>   // for CgiHandler
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
-#include <webserv/handler/URI.hpp>  
-#include <webserv/http/HttpHeaders.hpp>     // for HttpHeaders
-#include <webserv/http/HttpRequest.hpp>     // for HttpRequest
-#include <webserv/http/HttpResponse.hpp>    // for HttpResponse
+#include <webserv/handler/URI.hpp>
+#include <webserv/http/HttpHeaders.hpp>  // for HttpHeaders
+#include <webserv/http/HttpRequest.hpp>  // for HttpRequest
+#include <webserv/http/HttpResponse.hpp> // for HttpResponse
 #include <webserv/http/RequestValidator.hpp>
 #include <webserv/log/Log.hpp>             // for Log, LOCATION
 #include <webserv/router/Router.hpp>       // for Router
@@ -81,6 +81,19 @@ void Client::request()
 
     buffer[bytesRead] = '\0'; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
     httpRequest_->receiveData(static_cast<const char *>(buffer), static_cast<size_t>(bytesRead));
+
+    // If parsing failed, proactively send an error response (avoid timeouts on malformed requests)
+    if (httpRequest_->getState() == HttpRequest::State::ParseError)
+    {
+        Log::warning("Request parsing failed; preparing error response");
+        if (!httpResponse_->isComplete())
+        {
+            ErrorHandler::createErrorResponse(400, *httpResponse_);
+        }
+        clientSocket_->setCallback([this]() { respond(); });
+        clientSocket_->setIOState(ASocket::IoState::WRITE);
+        return;
+    }
 
     if (httpRequest_->getState() == HttpRequest::State::Complete)
     {

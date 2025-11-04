@@ -3,13 +3,20 @@
 #include <webserv/config/directive/DirectiveFactory.hpp> // for DirectiveFactory
 #include <webserv/config/directive/DirectiveValue.hpp>   // for DirectiveValue
 #include <webserv/log/Log.hpp>                           // for Log, LOCATION
+#include <webserv/utils/FileUtils.hpp>                   // for joinPath
 #include <webserv/utils/utils.hpp>                       // for trim
 
 #include <ranges>  // for filter
 #include <sstream> // for basic_stringstream, stringstream
 #include <utility> // for pair, move
 
-AConfig::AConfig(const AConfig *parent) : parent_(parent) {}
+AConfig::AConfig(const AConfig *parent) : parent_(parent)
+{
+    if (parent_ != nullptr)
+    {
+        baseDir_ = parent_->getBaseDir();
+    }
+}
 
 void AConfig::addDirective(const std::string &line)
 {
@@ -24,15 +31,22 @@ void AConfig::addDirective(const std::string &line)
     }
     if (semicolon_count > 1)
     {
-        throw std::runtime_error("Directive contains multiple semicolons: " + line);
+        throw std::runtime_error("Syntax error: unexpected semicolons in directive: " + line);
     }
 
     if (line.back() != ';')
     {
-        throw std::runtime_error("Directive must end with a single semicolon");
+        throw std::runtime_error("Syntax error: directive must end with a single semicolon");
     }
 
     std::string trimmedLine = utils::trim(line, " \n\r\t;");
+
+    // Reject unescaped quotes in directive values (quotes not supported by our parser)
+    //TODO should we support escaped quotes?
+    if (trimmedLine.find('"') != std::string::npos)
+    {
+        throw std::runtime_error("Syntax error: unescaped quote in directive: " + trimmedLine);
+    }
     Log::debug(" Adding directive: |" + trimmedLine + "| to config");
     auto directive = DirectiveFactory::createDirective(trimmedLine);
     if (directive)
@@ -132,7 +146,24 @@ std::string AConfig::getErrorPage(int statusCode) const
     {
         return parent_->getErrorPage(statusCode);
     }
-    return ""; // Return empty string if not found
+    return {}; // Return empty string if not found
+}
+
+std::string AConfig::resolvePath(const std::string &path) const
+{
+    if (path.empty())
+    {
+        return path;
+    }
+    if (path[0] == '/')
+    {
+        return path; // absolute
+    }
+    if (!baseDir_.empty())
+    {
+        return FileUtils::joinPath(baseDir_, path);
+    }
+    return path; // fallback to relative as-is
 }
 
 std::string AConfig::getCGIPath(const std::string &extension) const

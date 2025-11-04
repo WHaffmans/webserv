@@ -7,8 +7,9 @@
 
 #include <stddef.h> // for size_t
 
-GlobalConfig::GlobalConfig(const std::string &block)
+GlobalConfig::GlobalConfig(const std::string &baseDir, const std::string &block)
 {
+    setBaseDir(baseDir);
     parseBlock(block);
 }
 
@@ -49,7 +50,7 @@ void GlobalConfig::parseBlock(const std::string &block)
         servers_.emplace_back(std::make_unique<ServerConfig>(serverBlock, this));
         pos = closeBrace + 1;
     }
-    
+
     if (directives.find("location", 0) != std::string::npos)
     {
         throw std::runtime_error("Location blocks are not allowed in the global context.");

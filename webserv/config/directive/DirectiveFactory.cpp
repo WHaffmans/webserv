@@ -1,6 +1,5 @@
-#include <webserv/config/directive/DirectiveFactory.hpp>   // for DirectiveFactory
-
 #include <webserv/config/directive/BoolDirective.hpp>      // for BoolDirective
+#include <webserv/config/directive/DirectiveFactory.hpp>   // for DirectiveFactory
 #include <webserv/config/directive/IntDirective.hpp>       // for IntDirective
 #include <webserv/config/directive/IntStringDirective.hpp> // for IntStringDirective
 #include <webserv/config/directive/SizeDirective.hpp>      // for SizeDirective
@@ -33,12 +32,19 @@ std::unique_ptr<ADirective> DirectiveFactory::createDirective(const std::string 
         }
     }
 
+    // Allow special no-arg directive: 'default;'
     if (arg.empty())
     {
-        throw std::invalid_argument("Directive argument is empty: " + name);
+        if (name == "default")
+        {
+            arg = "on"; // treat as boolean true
+        }
+        else
+        {
+            throw std::invalid_argument("Directive argument is empty: " + name);
+        }
     }
 
-    
     if (type.empty())
     {
         throw std::invalid_argument("Unsupported directive: " + name);

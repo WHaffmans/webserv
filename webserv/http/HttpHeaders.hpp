@@ -18,10 +18,15 @@
 class HttpHeaders
 {
   public:
+    // Reasonable safety limits (aligned with common servers)
+    // TODO make configurable? or put in constants file?
+    static constexpr size_t MAX_SINGLE_HEADER_SIZE = 8192; // 8KB per header value
+    static constexpr size_t MAX_HEADER_COUNT = 64;         // max number of distinct headers
+
     [[nodiscard]] const std::string &get(const std::string &name) const noexcept;
     [[nodiscard]] bool has(const std::string &name) const noexcept;
 
-    void parse(const std::string &rawHeaders) noexcept;
+    [[nodiscard]] bool parse(const std::string &rawHeaders) noexcept;
     void add(const std::string &name, const std::string &value) noexcept;
     void remove(const std::string &name) noexcept;
 
