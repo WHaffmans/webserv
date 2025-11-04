@@ -72,11 +72,12 @@ bool HttpHeaders::has(const std::string &name) const noexcept
     return headers_.contains(lower);
 }
 
-void HttpHeaders::parse(const std::string &rawHeaders) noexcept
+bool HttpHeaders::parse(const std::string &rawHeaders) noexcept
 {
     Log::trace(LOCATION);
     size_t start = 0;
     size_t end = rawHeaders.find(Http::Protocol::CRLF);
+    size_t headerCount = 0;
 
     while (end != std::string::npos)
     {
@@ -88,11 +89,61 @@ void HttpHeaders::parse(const std::string &rawHeaders) noexcept
             std::string value = line.substr(col + 1);
             name = utils::trim(name);
             value = utils::trim(value);
+
+            // Reject headers with empty names
+            if (name.empty())
+            {
+                Log::warning("Malformed header line (empty header name): " + line);
+                return false;
+            }
+
+            // Validate header name characters (RFC 7230: field-name must be a token)
+            // Token characters: alphanumeric, !, #, $, %, &, ', *, +, -, ., ^, _, `, |, ~
+            for (char c : name)
+            {
+                if (std::isalnum(static_cast<unsigned char>(c)) == 0 && c != '!' && c != '#' && c != '$' && c != '%'
+                    && c != '&' && c != '\'' && c != '*' && c != '+' && c != '-' && c != '.' && c != '^' && c != '_'
+                    && c != '`' && c != '|' && c != '~')
+                {
+                    Log::warning("Malformed header line (invalid character in header name): " + line);
+                    return false;
+                }
+            }
+
+            // Reject values that start with ':' (e.g., "Badly-Formed:: value")
+            if (!value.empty() && value.front() == ':')
+            {
+                Log::warning("Malformed header line (value starts with colon): " + line);
+                return false;
+            }
+
+            // Enforce per-header value size limit
+            if (value.size() > HttpHeaders::MAX_SINGLE_HEADER_SIZE)
+            {
+                Log::warning("Header value exceeds maximum size (" + std::to_string(value.size()) + ") for: " + name);
+                return false;
+            }
+
+            // Enforce maximum number of headers
+            ++headerCount;
+            if (headerCount > HttpHeaders::MAX_HEADER_COUNT)
+            {
+                Log::warning("Too many headers: " + std::to_string(headerCount));
+                return false;
+            }
+
             this->add(name, value);
+        }
+        else if (!line.empty())
+        {
+            // Malformed header line (no colon) - this is an error
+            Log::warning("Malformed header line (missing colon): " + line);
+            return false;
         }
         start = end + Http::Protocol::CRLF.size();
         end = rawHeaders.find(Http::Protocol::CRLF, start);
     }
+    return true;
 }
 
 const std::unordered_map<std::string, std::string> &HttpHeaders::getAll() const noexcept

@@ -13,7 +13,8 @@
 #include <vector>   // for vector
 
 URI::URI(const HttpRequest &request, const ServerConfig &serverConfig)
-    : uriTrimmed_(utils::trim(request.getTarget(), "/")), config_(matchConfig(uriTrimmed_, serverConfig))
+    : uriTrimmed_(utils::uriDecode(utils::trim(request.getTarget(), "/"))),
+      config_(matchConfig(uriTrimmed_, serverConfig))
 {
     Log::trace(LOCATION);
     parseUri();
@@ -194,14 +195,13 @@ std::string URI::getUriForPath(const std::string &path) const
     // TOPD not good yet zo even naar kijken
     std::string trimmedPath = utils::trim(path, "/");
     std::string trimmedLocation;
-    
+
     const auto *locConfig = dynamic_cast<const LocationConfig *>(config_);
     if (locConfig != nullptr)
     {
         trimmedLocation = utils::trim(locConfig->getPath(), "/");
     }
 
-    
     std::string trimmedRoot = utils::trim(config_->get<std::string>("root").value_or(""), "/");
 
     if (trimmedPath.starts_with(trimmedRoot))
@@ -210,12 +210,13 @@ std::string URI::getUriForPath(const std::string &path) const
         trimmedPath = utils::trim(trimmedPath, "/");
     }
 
-    Log::debug("Generating URI for path", {{"path", path},{"trimmedDir", trimmedLocation}, {"trimmedPath", trimmedPath}, {"Authority", authority_}});
-    std::string result = "http://" + authority_; //TODO this should not be hardcoded...
+    Log::debug(
+        "Generating URI for path",
+        {{"path", path}, {"trimmedDir", trimmedLocation}, {"trimmedPath", trimmedPath}, {"Authority", authority_}});
+    std::string result = "http://" + authority_; // TODO this should not be hardcoded...
     result = FileUtils::joinPath(result, trimmedLocation);
     return FileUtils::joinPath(result, trimmedPath);
 }
-    
 
 const std::string &URI::getBaseName() const noexcept
 {

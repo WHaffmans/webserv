@@ -1,14 +1,14 @@
 #include <webserv/config/ConfigManager.hpp>
-
 #include <webserv/config/GlobalConfig.hpp> // for GlobalConfig
 #include <webserv/log/Log.hpp>             // for Log
 #include <webserv/utils/utils.hpp>         // for removeComments
 
-#include <fstream>   // for basic_ifstream, basic_filebuf, basic_ostream::operator<<, ifstream, stringstream
-#include <optional>  // for optional
-#include <sstream>   // for basic_stringstream
-#include <stdexcept> // for runtime_error
-#include <string>    // for basic_string, char_traits, operator+, string, to_string, operator==, stoi
+#include <filesystem> // for path
+#include <fstream>    // for basic_ifstream, basic_filebuf, basic_ostream::operator<<, ifstream, stringstream
+#include <optional>   // for optional
+#include <sstream>    // for basic_stringstream
+#include <stdexcept>  // for runtime_error
+#include <string>     // for basic_string, char_traits, operator+, string, to_string, operator==, stoi
 #include <vector>
 
 #include <stddef.h> // for size_t
@@ -61,7 +61,10 @@ void ConfigManager::parseConfigFile(const std::string &filePath)
     {
         throw std::runtime_error("null byte detected in config file: " + filePath);
     }
-    globalConfig_ = std::make_unique<GlobalConfig>(content);
+    // Resolve base directory for relative paths based on the config file location
+    std::filesystem::path p(filePath);
+    std::string baseDir = p.parent_path().string();
+    globalConfig_ = std::make_unique<GlobalConfig>(baseDir, content);
 
     // Implement this function to handle global config
     file.close();
@@ -96,17 +99,73 @@ ServerConfig *ConfigManager::getMatchingServerConfig(const std::string &host, in
         throw std::runtime_error("ConfigManager is not initialized.");
     }
     std::vector<ServerConfig *> serverConfigs = globalConfig_->getServerConfigs();
+    ServerConfig *defaultServer = nullptr;
+    ServerConfig *defaultServerForPort = nullptr;
+
+    // Track the first server as the overall default
+    if (!serverConfigs.empty())
+    {
+        defaultServer = serverConfigs[0];
+    }
+
+    // If port is 0 or not specified in Host header, match only by host name
+    if (port == 0)
+    {
+        for (ServerConfig *serverConfig : serverConfigs)
+        {
+            auto serverNames
+                = serverConfig->get<std::vector<std::string>>("server_name").value_or(std::vector<std::string>());
+
+            // Check for exact host match (port not considered)
+            if (std::find(serverNames.begin(), serverNames.end(), host) != serverNames.end())
+            {
+                Log::info("Found matching server config for host: " + host + " (any port)");
+                return serverConfig;
+            }
+        }
+        // No host match found, return default server
+        if (defaultServer != nullptr)
+        {
+            Log::info("Using default server (no Host match, port not specified)");
+            return defaultServer;
+        }
+    }
+
+    // Port is specified, do full matching (host + port)
     for (ServerConfig *serverConfig : serverConfigs)
     {
-        auto serverNames = serverConfig->get<std::vector<std::string>>("server_name").value_or(std::vector<std::string>());
+        auto serverNames
+            = serverConfig->get<std::vector<std::string>>("server_name").value_or(std::vector<std::string>());
         auto listenPorts = serverConfig->get<int>("listen").value_or(80);
-        // Log::debug("Checking server config: " + serverName + " on port " + std::to_string(listenPorts));
+
+        // Track first server for this port as default
+        if (listenPorts == port && defaultServerForPort == nullptr)
+        {
+            defaultServerForPort = serverConfig;
+        }
+
+        // Check for exact match (host + port)
         if ((std::find(serverNames.begin(), serverNames.end(), host) != serverNames.end()) && (listenPorts == port))
         {
             Log::info("Found matching server config for host: " + host + " and port: " + std::to_string(port));
             return serverConfig;
         }
     }
+
+    // If no exact match found, use the default server for the port (first server block with matching port)
+    if (defaultServerForPort != nullptr)
+    {
+        Log::info("Using default server for port: " + std::to_string(port));
+        return defaultServerForPort;
+    }
+
+    // Last resort: return the first server (overall default)
+    if (defaultServer != nullptr)
+    {
+        Log::info("Using overall default server");
+        return defaultServer;
+    }
+
     Log::warning("No matching server config found for host: " + host + " and port: " + std::to_string(port));
     return nullptr;
 }

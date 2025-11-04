@@ -1,7 +1,6 @@
 
-#include <webserv/utils/utils.hpp>
-
 #include <webserv/socket/ASocket.hpp>
+#include <webserv/utils/utils.hpp>
 
 #include <cstdint>
 #include <iomanip>
@@ -190,6 +189,27 @@ std::string uriDecode(const std::string &value)
             std::istringstream hexStream{value.substr(i + 1, 2)};
             int hexValue = 0;
             hexStream >> std::hex >> hexValue;
+
+            // Reject null bytes
+            if (hexValue == 0)
+            {
+                throw std::invalid_argument("Null byte in URI");
+            }
+
+            // Reject CR or LF to prevent header/request splitting through CGI parameters
+            if (hexValue == 10 /*\n*/ || hexValue == 13 /*\r*/)
+            {
+                throw std::invalid_argument("CR/LF in URI not allowed");
+            }
+
+            // Don't decode slashes - they have special meaning in URIs
+            if (hexValue == '/')
+            {
+                unescaped << value[i] << value[i + 1] << value[i + 2];
+                i += 2;
+                continue;
+            }
+
             unescaped << static_cast<char>(hexValue);
             i += 2;
         }

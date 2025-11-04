@@ -1,10 +1,8 @@
-#include <webserv/http/HttpRequest.hpp>
-
-#include <webserv/config/ServerConfig.hpp>
-
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
-#include <webserv/handler/URI.hpp>          // for URI
-#include <webserv/http/HttpConstants.hpp>   // for CRLF, DOUBLE_CRLF
+#include <webserv/config/ServerConfig.hpp>
+#include <webserv/handler/URI.hpp>        // for URI
+#include <webserv/http/HttpConstants.hpp> // for CRLF, DOUBLE_CRLF
+#include <webserv/http/HttpRequest.hpp>
 #include <webserv/log/Log.hpp>     // for Log, LOCATION
 #include <webserv/utils/utils.hpp> // for stoul
 
@@ -34,7 +32,7 @@ void HttpRequest::setState(State state)
 {
     if (state == State::Complete)
     {
-        if (! headers_.getHost().has_value())
+        if (!headers_.getHost().has_value())
         {
             client_->getHttpResponse().setError(Http::StatusCode::BAD_REQUEST);
             state_ = State::ParseError;
@@ -59,7 +57,17 @@ void HttpRequest::setState(State state)
                 target_ = target_.substr(pos);
             }
         }
-        uri_ = std::make_unique<URI>(*this, *serverConfig);
+        try
+        {
+            uri_ = std::make_unique<URI>(*this, *serverConfig);
+        }
+        catch (const std::invalid_argument &)
+        {
+            Log::warning("Invalid URI encoding (null byte or malformed)");
+            client_->getHttpResponse().setError(Http::StatusCode::BAD_REQUEST);
+            state_ = State::ParseError;
+            return;
+        }
     }
     state_ = state;
 }
@@ -180,8 +188,33 @@ bool HttpRequest::parseBufferforHeaders()
         Log::debug("Headers waiting for more data: " + LOCATION);
         return false; // Wait for more data
     }
-    headers_.parse(buffer_.substr(0, pos + Http::Protocol::CRLF.size()));
+
+    if (!headers_.parse(buffer_.substr(0, pos + Http::Protocol::CRLF.size())))
+    {
+        Log::warning("Failed to parse headers - malformed header detected");
+        client_->getHttpResponse().setError(400);
+        setState(State::ParseError);
+        return false;
+    }
+
     buffer_.erase(0, pos + Http::Protocol::DOUBLE_CRLF.size());
+
+    // Validate Content-Length value (must be a valid integer)
+    const std::string &cl = headers_.get("Content-Length");
+    if (!cl.empty())
+    {
+        try
+        {
+            static_cast<void>(utils::stoul(cl));
+        }
+        catch (const std::exception &)
+        {
+            Log::warning("Invalid Content-Length value: " + cl);
+            client_->getHttpResponse().setError(400);
+            setState(State::ParseError);
+            return false;
+        }
+    }
 
     if (this->headers_.getContentLength().value_or(0) > 0)
     {

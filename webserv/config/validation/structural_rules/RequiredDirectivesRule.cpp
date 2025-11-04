@@ -1,5 +1,3 @@
-#include <webserv/config/validation/structural_rules/RequiredDirectivesRule.hpp>
-
 #include <webserv/config/AConfig.hpp>                                               // for AConfig
 #include <webserv/config/GlobalConfig.hpp>                                          // for GlobalConfig
 #include <webserv/config/LocationConfig.hpp>                                        // for LocationConfig
@@ -7,6 +5,7 @@
 #include <webserv/config/directive/DirectiveFactory.hpp>                            // for DirectiveFactory
 #include <webserv/config/validation/ValidationResult.hpp>                           // for ValidationResult
 #include <webserv/config/validation/structural_rules/AStructuralValidationRule.hpp> // for AStructuralValidationRule
+#include <webserv/config/validation/structural_rules/RequiredDirectivesRule.hpp>
 #include <webserv/utils/utils.hpp> // for implode
 
 #include <array>  // for array
@@ -64,15 +63,88 @@ ValidationResult validateUniversal(const AConfig *config, std::string configType
 
 ValidationResult RequiredDirectivesRule::validateGlobal(const GlobalConfig *config) const
 {
-    return validateUniversal(config, "global");
+    // No globally required directives at this time; only prohibit invalid ones.
+    std::vector<std::string> prohibited;
+    for (const auto &info : DirectiveFactory::supportedDirectives)
+    {
+        bool allowedInGlobal
+            = (info.context.find('G') != std::string::npos) || (info.context.find('g') != std::string::npos);
+        if (!allowedInGlobal && config->owns(std::string(info.name)))
+        {
+            prohibited.emplace_back(info.name);
+        }
+    }
+    if (prohibited.empty())
+    {
+        return ValidationResult::success();
+    }
+    std::string result = "Prohibited global directive: ";
+    result += utils::implode(prohibited, ", ");
+    return ValidationResult::error(result);
 }
 
 ValidationResult RequiredDirectivesRule::validateServer(const ServerConfig *config) const
 {
-    return validateUniversal(config, "server");
+    // Only a minimal set is required for server blocks; other directives are optional.
+    std::vector<std::string> missing;
+    if (!config->owns("listen"))
+    {
+        missing.emplace_back("listen");
+    }
+    if (!config->owns("root"))
+    {
+        missing.emplace_back("root");
+    }
+
+    // Detect prohibited directives (those not allowed in server context but present)
+    std::vector<std::string> prohibited;
+    for (const auto &info : DirectiveFactory::supportedDirectives)
+    {
+        bool allowedInServer
+            = (info.context.find('S') != std::string::npos) || (info.context.find('s') != std::string::npos);
+        if (!allowedInServer && config->owns(std::string(info.name)))
+        {
+            prohibited.emplace_back(info.name);
+        }
+    }
+
+    if (missing.empty() && prohibited.empty())
+    {
+        return ValidationResult::success();
+    }
+
+    std::string result;
+    if (!missing.empty())
+    {
+        result += "Missing server directive: ";
+        result += utils::implode(missing, ", ");
+    }
+    if (!prohibited.empty())
+    {
+        result += "Prohibited server directive: ";
+        result += utils::implode(prohibited, ", ");
+    }
+    return ValidationResult::error(result);
 }
 
 ValidationResult RequiredDirectivesRule::validateLocation(const LocationConfig *config) const
 {
-    return validateUniversal(config, "location");
+    // No required directives in a location; only prohibit invalid ones.
+    std::vector<std::string> prohibited;
+    for (const auto &info : DirectiveFactory::supportedDirectives)
+    {
+        bool allowedInLocation
+            = (info.context.find('L') != std::string::npos) || (info.context.find('l') != std::string::npos);
+        if (!allowedInLocation && config->owns(std::string(info.name)))
+        {
+            prohibited.emplace_back(info.name);
+        }
+    }
+    if (prohibited.empty())
+    {
+        return ValidationResult::success();
+    }
+    std::string result = "Prohibited location directive: ";
+    result += utils::implode(prohibited, ", ");
+    return ValidationResult::error(result);
 }

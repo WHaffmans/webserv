@@ -11,7 +11,7 @@ class GlobalConfig : public AConfig
 {
   public:
     GlobalConfig() = delete;
-    GlobalConfig(const std::string &Block);
+    GlobalConfig(const std::string &baseDir, const std::string &Block);
 
     GlobalConfig(const GlobalConfig &other) = delete;
     GlobalConfig &operator=(const GlobalConfig &other) = delete;
