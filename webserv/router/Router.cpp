@@ -1,3 +1,4 @@
+#include "webserv/handler/DeleteHandler.hpp"
 #include <webserv/client/Client.hpp>                   // for Client
 #include <webserv/config/AConfig.hpp>                  // for AConfig
 #include <webserv/config/directive/ADirective.hpp>     // for ADirective
@@ -57,6 +58,10 @@ std::unique_ptr<AHandler> Router::handleRequest()
     if (request.getUri().isRedirect())
     {
         return std::make_unique<RedirectHandler>(request, response);
+    }
+    if (request.getMethod() == "DELETE" && !request.getUri().isCgi())
+    {
+        return std::make_unique<DeleteHandler>(request, response);
     }
     if (request.getUri().isCgi())
     {
