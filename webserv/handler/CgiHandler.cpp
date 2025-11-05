@@ -7,6 +7,7 @@
 #include <webserv/log/Log.hpp>              // for Log, LOCATION
 #include <webserv/socket/CgiSocket.hpp>     // for CgiSocket
 #include <webserv/socket/TimerSocket.hpp>   // for TimerSocket
+#include <webserv/handler/URI.hpp>          // for URI
 #include <webserv/utils/utils.hpp>          // for trim
 
 #include <algorithm>
@@ -27,6 +28,11 @@ void CgiHandler::handle()
 {
     Log::info("CgiHandler handling request");
 
+    if (request_.getUri().isCgi() && request_.getUri().getCgiPath().empty() && access(request_.getUri().getFullPath().c_str(), X_OK) != 0)
+    {
+        ErrorHandler::createErrorResponse(403, response_);
+        return;
+    }
     // Initialize CGI process
     cgiProcess_ = std::make_unique<CgiProcess>(request_, *this);
 
