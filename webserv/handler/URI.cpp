@@ -186,6 +186,12 @@ bool URI::isRedirect() const noexcept
     return redirectOpt.has_value();
 }
 
+bool URI::isUpload() const noexcept
+{
+    auto uploadStoreOpt = config_->get<std::string>("upload_store");
+    return uploadStoreOpt.has_value();
+}
+
 std::pair<int, std::string> URI::getRedirect() const
 {
     auto redirectOpt = config_->get<std::pair<int, std::string>>("redirect");

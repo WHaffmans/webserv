@@ -9,6 +9,7 @@
 #include <webserv/handler/FileHandler.hpp>     // for FileHandler
 #include <webserv/handler/RedirectHandler.hpp> // for RedirectHandler
 #include <webserv/handler/URI.hpp>             // for URI
+#include <webserv/handler/UploadHandler.hpp>   // for UploadHandler
 #include <webserv/http/HttpRequest.hpp>        // for HttpRequest
 #include <webserv/http/RequestValidator.hpp>
 #include <webserv/log/Log.hpp>       // for Log, LOCATION
@@ -62,6 +63,11 @@ std::unique_ptr<AHandler> Router::handleRequest()
     if (request.getMethod() == "DELETE" && !request.getUri().isCgi())
     {
         return std::make_unique<DeleteHandler>(request, response);
+    }
+    if (request.getUri().isUpload() && request.getMethod() == "POST")
+    {
+        Log::debug("Handling file upload");
+        return std::make_unique<UploadHandler>(request, response);
     }
     if (request.getUri().isCgi())
     {
