@@ -1,8 +1,7 @@
-#include <webserv/handler/UploadHandler.hpp>
-
 #include <webserv/config/AConfig.hpp>
 #include <webserv/handler/ErrorHandler.hpp>
 #include <webserv/handler/URI.hpp>
+#include <webserv/handler/UploadHandler.hpp>
 #include <webserv/http/HttpRequest.hpp>
 #include <webserv/http/HttpResponse.hpp>
 #include <webserv/log/Log.hpp>
@@ -13,6 +12,7 @@
 #include <fstream>
 #include <random>
 #include <sstream>
+
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -30,10 +30,8 @@ UploadHandler::UploadHandler(const HttpRequest &request, HttpResponse &response)
     // Get max file size from config (uses client_max_body_size)
     maxFileSize_ = config->get<size_t>("client_max_body_size").value_or(1048576); // Default 1MB
 
-    Log::debug("Upload handler initialized", {
-        {"upload_dir", uploadDir_},
-        {"max_file_size", std::to_string(maxFileSize_)}
-    });
+    Log::debug("Upload handler initialized",
+               {{"upload_dir", uploadDir_}, {"max_file_size", std::to_string(maxFileSize_)}});
 }
 
 void UploadHandler::handle()
