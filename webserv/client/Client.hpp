@@ -63,6 +63,6 @@ class Client
     std::unordered_map<int, ASocket *> sockets_;
 
     Server &server_;
-    void writeToCgi();
-    void readFromCgi();
+    // void writeToCgi();
+    // void readFromCgi();
 };

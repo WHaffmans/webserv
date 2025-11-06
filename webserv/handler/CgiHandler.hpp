@@ -4,6 +4,7 @@
 #include <webserv/http/HttpRequest.hpp> // for HttpRequest
 #include <webserv/socket/CgiSocket.hpp> // for CgiSocket
 
+#include <cstddef>
 #include <memory> // for unique_ptr
 #include <string> // for string
 #include <vector> // for vector
@@ -36,6 +37,7 @@ class CgiHandler : public AHandler
     void handleTimeout() override;
 
   private:
+    constexpr static size_t CHUNK_SIZE = 32768;
     constexpr static size_t bufferSize_ = 8192; // TODO: remove duplicate definition and move to configmanager
     std::vector<uint8_t> buffer_;
 
@@ -43,12 +45,17 @@ class CgiHandler : public AHandler
     std::unique_ptr<CgiSocket> cgiStdIn_;
     std::unique_ptr<CgiSocket> cgiStdOut_;
     std::unique_ptr<CgiSocket> cgiStdErr_;
+
     void parseCgiOutput();
     void parseCgiHeaders(std::string &headers);
     void finalizeCgiResponse();
     void appendToBuffer(const char *data, size_t length);
 
     int pid_ = -1;
+    size_t writeOffset_ = 0;
+    bool headersParsed_ = false;
+    bool bodyWriteCompleted_ = false;
+    std::optional<size_t> contentLength_;
 
     void write();
     void read();

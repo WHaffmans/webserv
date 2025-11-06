@@ -2,19 +2,23 @@
 #include <webserv/handler/CgiHandler.hpp>
 #include <webserv/handler/CgiProcess.hpp>   // for CgiProcess
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
+#include <webserv/handler/URI.hpp>          // for URI
 #include <webserv/http/HttpRequest.hpp>     // for HttpRequest
 #include <webserv/http/HttpResponse.hpp>    // for HttpResponse
 #include <webserv/log/Log.hpp>              // for Log, LOCATION
 #include <webserv/socket/CgiSocket.hpp>     // for CgiSocket
 #include <webserv/socket/TimerSocket.hpp>   // for TimerSocket
-#include <webserv/handler/URI.hpp>          // for URI
 #include <webserv/utils/utils.hpp>          // for trim
 
 #include <algorithm>
+#include <cerrno>
 #include <cstddef>
 #include <cstdlib>
+#include <cstring>
 #include <functional> // for function
-#include <utility>    // for move
+#include <optional>
+#include <string>
+#include <utility> // for move
 
 #include <sys/types.h> // for ssize_t
 
@@ -28,7 +32,8 @@ void CgiHandler::handle()
 {
     Log::info("CgiHandler handling request");
 
-    if (request_.getUri().isCgi() && request_.getUri().getCgiPath().empty() && access(request_.getUri().getFullPath().c_str(), X_OK) != 0)
+    if (request_.getUri().isCgi() && request_.getUri().getCgiPath().empty()
+        && access(request_.getUri().getFullPath().c_str(), X_OK) != 0)
     {
         ErrorHandler::createErrorResponse(403, response_);
         return;
@@ -41,6 +46,23 @@ void CgiHandler::handle()
     Log::info("CGI process started and sockets registered");
 }
 
+static inline bool findHeaderEnd(const std::string &s, size_t &pos, long &sepSize)
+{
+    Log::trace(LOCATION);
+    size_t a = s.find("\r\n\r\n");
+    size_t b = s.find("\n\n");
+    size_t c = s.find("\r\r");
+    size_t end = std::min({a, b, c});
+
+    if (end == std::string::npos)
+    {
+        return false;
+    }
+    sepSize = (end == a) ? 4 : 2;
+    pos = end;
+    return true;
+}
+
 void CgiHandler::write()
 {
     Log::trace(LOCATION);
@@ -49,25 +71,36 @@ void CgiHandler::write()
         Log::error("CGI stdin socket is null");
         return;
     }
-    if (request_.getBody().empty())
+    const std::string &body = request_.getBody();
+    size_t before = writeOffset_;
+    while (writeOffset_ < body.size())
     {
-        Log::debug("No body to write to CGI stdin, fd: " + std::to_string(cgiStdIn_->getFd()));
-        request_.getClient().removeSocket(cgiStdIn_.get());
-        cgiStdIn_ = nullptr;
-        return;
+        const char *data = body.data() + writeOffset_; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+        size_t remaining = body.size() - writeOffset_;
+        size_t chunk = remaining > CHUNK_SIZE ? CHUNK_SIZE : remaining;
+        ssize_t bytesRead = cgiStdIn_->write(data, chunk);
+        if (bytesRead > 0)
+        {
+            writeOffset_ += static_cast<size_t>(bytesRead);
+        }
+        else
+        {
+            break; // would block or peer closed; try again on next EPOLLOUT
+        }
     }
-    ssize_t bytesWritten = cgiStdIn_->write(request_.getBody().data(), request_.getBody().size());
-    if (bytesWritten < 0)
+    if (writeOffset_ >= body.size())
     {
-        Log::error("Failed to write to CGI stdin, fd: " + std::to_string(cgiStdIn_->getFd()));
+        Log::debug("CGI stdin sent " + std::to_string(body.size()) + " bytes, closing write end");
+        request_.getClient().removeSocket(cgiStdIn_.get());
+        cgiStdIn_.reset();
+        bodyWriteCompleted_ = true;
     }
     else
     {
-        Log::debug("Wrote " + std::to_string(bytesWritten)
-                   + " bytes to CGI stdin, fd: " + std::to_string(cgiStdIn_->getFd()));
+        Log::debug("Wrote " + std::to_string(writeOffset_ - before) + " bytes, write offset "
+                   + std::to_string(writeOffset_) + "/ " + std::to_string(body.size()));
+        // Log::debug("CGI stdin progress " + std::to_string(before) + "→" + std::to_string(writeOffset_));
     }
-    request_.getClient().removeSocket(cgiStdIn_.get());
-    cgiStdIn_ = nullptr;
 }
 
 void CgiHandler::read()
@@ -75,31 +108,108 @@ void CgiHandler::read()
     Log::trace(LOCATION);
     if (cgiStdOut_ == nullptr)
     {
-        Log::error("CGI stdout socket is null");
+        Log::debug("CGI stdout socket is null in read()");
         return;
     }
-    char buffer[bufferSize_] = {}; // NOLINT(cppcoreguidelines-avoid-c-arrays)
-    ssize_t bytesRead
-        = cgiStdOut_->read(buffer, sizeof(buffer) - 1); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
-    if (bytesRead < 0)
+
+    char buffer[bufferSize_] = {};
+    ssize_t bytesRead = cgiStdOut_->read(buffer, sizeof(buffer));
+
+    if (bytesRead > 0)
     {
-        Log::error("Failed to read from CGI stdout, fd: " + std::to_string(cgiStdOut_->getFd()));
-    }
-    else if (bytesRead == 0)
-    {
-        Log::info("CGI process closed stdout, fd: " + std::to_string(cgiStdOut_->getFd()));
-        request_.getClient().removeSocket(cgiStdOut_.get());
-        // request_.getClient().removeSocket(timerSocket_.get());
-        cgiStdOut_ = nullptr;
-        parseCgiOutput();
-        return;
-    }
-    else
-    {
-        buffer[bytesRead] = '\0'; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
         appendToBuffer(buffer, static_cast<size_t>(bytesRead));
         Log::debug("Read " + std::to_string(bytesRead)
-                   + " bytes from CGI stdout, fd: " + std::to_string(cgiStdOut_->getFd()));
+                   + " bytes from CGI stdout (buffer size: " + std::to_string(buffer_.size()) + ")");
+
+        // Parse headers once, as soon as we have them
+        if (!headersParsed_)
+        {
+            size_t headerEnd = 0;
+            long sepSize = 0;
+            std::string snapshot(buffer_.begin(), buffer_.end());
+            if (findHeaderEnd(snapshot, headerEnd, sepSize))
+            {
+                std::string headers(snapshot.begin(), snapshot.begin() + static_cast<long>(headerEnd));
+                parseCgiHeaders(headers);
+                // After headers parsed, remove them from buffer_ so it contains only body
+                buffer_.erase(buffer_.begin(), buffer_.begin() + static_cast<long>(headerEnd) + sepSize);
+                headersParsed_ = true;
+                contentLength_ = response_.getHeaders().getContentLength();
+                Log::debug("CGI headers parsed, Content-Length: "
+                           + (contentLength_.has_value() ? std::to_string(contentLength_.value()) : "not set"));
+            }
+        }
+
+        // Only finalize if we've finished writing the request body AND we have complete response
+        bool responseComplete = false;
+        if (headersParsed_ && contentLength_.has_value())
+        {
+            responseComplete = (buffer_.size() >= contentLength_.value());
+        }
+
+        if (bodyWriteCompleted_ && responseComplete)
+        {
+            Log::debug("Response complete: headers parsed and content received");
+            request_.getClient().removeSocket(cgiStdOut_.get());
+            cgiStdOut_.reset();
+            finalizeCgiResponse();
+            return;
+        }
+        return;
+    }
+
+    if (bytesRead == 0)
+    {
+        // EOF from CGI process
+    Log::info("CGI process closed stdout, fd: " + std::to_string(cgiStdOut_->getFd()));
+        request_.getClient().removeSocket(cgiStdOut_.get());
+        cgiStdOut_.reset();
+
+        // If headers not parsed yet, try once more
+        if (!headersParsed_)
+        {
+            size_t headerEnd = 0;
+            long sep = 0;
+            std::string snap(buffer_.begin(), buffer_.end());
+            if (findHeaderEnd(snap, headerEnd, sep))
+            {
+                std::string headers(snap.begin(), snap.begin() + static_cast<long>(headerEnd));
+                parseCgiHeaders(headers);
+                buffer_.erase(buffer_.begin(), buffer_.begin() + static_cast<long>(headerEnd) + sep);
+                headersParsed_ = true;
+            }
+        }
+
+        // Only finalize if we've finished writing the request body
+        if (bodyWriteCompleted_)
+        {
+            finalizeCgiResponse();
+        }
+        else
+        {
+            Log::warning("CGI process closed stdout before request body was completely written");
+            // Set error response but don't finalize until write is complete
+            // ErrorHandler::createErrorResponse(500, response_);
+        }
+        return;
+    }
+
+    if (bytesRead < 0)
+    {
+        if (errno == EAGAIN || errno == EWOULDBLOCK)
+        {
+            Log::debug("CGI stdout would block, will retry on next EPOLLIN");
+            return;
+        }
+        else
+        {
+            Log::error("Error reading from CGI stdout: " + std::string(strerror(errno)));
+            // Only finalize if write is complete
+            if (bodyWriteCompleted_)
+            {
+                finalizeCgiResponse();
+            }
+        }
     }
 }
 
@@ -108,31 +218,27 @@ void CgiHandler::error()
     Log::trace(LOCATION);
     if (cgiStdErr_ == nullptr)
     {
-        Log::error("CGI stderr socket is null");
         return;
     }
-    char buffer[bufferSize_] = {}; // NOLINT(cppcoreguidelines-avoid-c-arrays)
-    ssize_t bytesRead
-        = cgiStdErr_->read(buffer, sizeof(buffer) - 1); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
-    if (bytesRead < 0)
+    while (true)
     {
-        Log::error("Failed to read from CGI stderr, fd: " + std::to_string(cgiStdErr_->getFd()));
-    }
-    else if (bytesRead == 0)
-    {
-        Log::info("CGI process closed stderr, fd: " + std::to_string(cgiStdErr_->getFd()));
-        request_.getClient().removeSocket(cgiStdErr_.get());
-        // request_.getClient().removeSocket(timerSocket_.get()); // todo maybe this dangerous
-        cgiStdErr_ = nullptr;
-        parseCgiOutput();
-        return;
-    }
-    else
-    {
-        buffer[bytesRead] = '\0'; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
-        appendToBuffer(buffer, static_cast<size_t>(bytesRead));
-        Log::error("CGI stderr output (fd: " + std::to_string(cgiStdErr_->getFd())
-                   + "): " + std::string(buffer, static_cast<size_t>(bytesRead)));
+        char buffer[bufferSize_] = {};
+        ssize_t bytesRead = cgiStdErr_->read(buffer, sizeof(buffer));
+        if (bytesRead > 0)
+        {
+            appendToBuffer(buffer, static_cast<size_t>(bytesRead));
+            Log::error("CGI stderr output (fd: " + std::to_string(cgiStdErr_->getFd())
+                       + "): " + std::string(buffer, static_cast<size_t>(bytesRead)));
+            continue;
+        }
+        if (bytesRead == 0)
+        {
+            Log::info("CGI process closed stderr, fd: " + std::to_string(cgiStdErr_->getFd()));
+            request_.getClient().removeSocket(cgiStdErr_.get());
+            cgiStdErr_.reset();
+            break;
+        }
+        break;
     }
 }
 
@@ -150,6 +256,12 @@ void CgiHandler::setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_
     request_.getClient().addSocket(cgiStdIn_.get());
     request_.getClient().addSocket(cgiStdOut_.get());
     request_.getClient().addSocket(cgiStdErr_.get());
+
+    if (request_.getBody().empty())
+    {
+        request_.getClient().removeSocket(cgiStdIn_.get());
+        cgiStdIn_.reset();
+    }
 }
 
 void CgiHandler::wait() noexcept
@@ -168,35 +280,24 @@ void CgiHandler::setPid(int pid)
 void CgiHandler::parseCgiOutput()
 {
     Log::trace(LOCATION);
-    long headerSeperatorSize = 2;
-
-    // Parse the headers from the buffer
-    auto header = std::string(buffer_.begin(), buffer_.end());
-    size_t headerEnd = std::min({
-        header.find("\r\n\r\n"),
-        header.find("\n\n"),
-        header.find("\r\r"),
-    });
-
-    if (headerEnd == std::string::npos)
+    if (headersParsed_)
+    {
+        return;
+    }
+    size_t headerEnd = 0;
+    long sepSize = 0;
+    std::string header(buffer_.begin(), buffer_.end());
+    if (!findHeaderEnd(header, headerEnd, sepSize))
     {
         Log::debug("CGI output headers not complete yet");
         return;
     }
-
-    if (header.substr(static_cast<long>(headerEnd), 2) == "\r\n")
-    {
-        headerSeperatorSize = 4;
-    }
-
-    Log::debug("headerseperator: " + header.substr(static_cast<long>(headerEnd), 2));
-    // Parse the headers
-    std::string headers(buffer_.begin(), buffer_.begin() + static_cast<long>(headerEnd));
+    std::string headers(header.begin(), header.begin() + static_cast<long>(headerEnd));
     Log::debug("CGI output headers: " + headers);
     parseCgiHeaders(headers);
-
-    buffer_.erase(buffer_.begin(), buffer_.begin() + static_cast<long>(headerEnd) + headerSeperatorSize);
-    finalizeCgiResponse();
+    buffer_.erase(buffer_.begin(), buffer_.begin() + static_cast<long>(headerEnd) + sepSize);
+    headersParsed_ = true;
+    contentLength_ = response_.getHeaders().getContentLength();
 }
 
 void CgiHandler::parseCgiHeaders(std::string &headers)
@@ -247,6 +348,8 @@ void CgiHandler::parseCgiHeaders(std::string &headers)
             response_.addHeader(name, value);
         }
     }
+
+    contentLength_ = response_.getHeaders().getContentLength();
 }
 
 void CgiHandler::handleTimeout()
@@ -275,9 +378,8 @@ void CgiHandler::finalizeCgiResponse()
 {
     Log::trace(LOCATION);
     auto status = response_.getHeaders().get("Status");
-
     wait();
-    if (cgiProcess_->getExitCode() > 0 && status.empty())
+    if (cgiProcess_ && cgiProcess_->getExitCode() > 0 && status.empty())
     {
         response_.setStatus(500);
     }

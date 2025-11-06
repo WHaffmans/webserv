@@ -10,6 +10,7 @@
 #include <cstring>  // for strcpy, size_t
 #include <optional> // for optional
 #include <utility>  // for pair
+#include <sys/stat.h>
 
 CgiEnvironment::CgiEnvironment(const URI &uri, const HttpRequest &request)
 {
@@ -54,6 +55,9 @@ CgiEnvironment::CgiEnvironment(const URI &uri, const HttpRequest &request)
     env_["HTTP_ACCEPT"] = headers.get("Accept");
     env_["HTTP_ACCEPT_LANGUAGE"] = headers.get("Accept-Language");
     env_["HTTP_ACCEPT_ENCODING"] = headers.get("Accept-Encoding");
+
+    env_["UPLOAD_TMP_DIR"] = "./htdocs/tmp"; // Example upload directory, adjust as needed
+    env_["TMP_DIR"] = "./htdocs/tmp";        // Example temp directory, adjust as needed
 
     appendCustomHeaders(headers);
 }
