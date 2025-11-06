@@ -3,6 +3,7 @@
 #include <cstddef> // for size_t
 #include <cstdint>
 #include <functional> // for function
+#include <string>
 
 #include <sys/types.h> // for ssize_t
 
@@ -47,6 +48,8 @@ class ASocket
 
     void setIOState(IoState event);
     void processed();
+
+    [[nodiscard]] virtual std::string toString() const;
 
   protected:
     void setNonBlocking() const;

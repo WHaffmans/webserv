@@ -72,34 +72,26 @@ void CgiHandler::write()
         return;
     }
     const std::string &body = request_.getBody();
-    size_t before = writeOffset_;
-    while (writeOffset_ < body.size())
+
+    if (writeOffset_ < body.size())
     {
         const char *data = body.data() + writeOffset_; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         size_t remaining = body.size() - writeOffset_;
         size_t chunk = remaining > CHUNK_SIZE ? CHUNK_SIZE : remaining;
-        ssize_t bytesRead = cgiStdIn_->write(data, chunk);
-        if (bytesRead > 0)
+        ssize_t bytesWritten = cgiStdIn_->write(data, chunk);
+        if (bytesWritten > 0)
         {
-            writeOffset_ += static_cast<size_t>(bytesRead);
-        }
-        else
-        {
-            break; // would block or peer closed; try again on next EPOLLOUT
+            writeOffset_ += static_cast<size_t>(bytesWritten);
+            Log::debug("Wrote " + std::to_string(bytesWritten) + " bytes, write offset " + std::to_string(writeOffset_)
+                       + "/ " + std::to_string(body.size()));
         }
     }
+
     if (writeOffset_ >= body.size())
     {
         Log::debug("CGI stdin sent " + std::to_string(body.size()) + " bytes, closing write end");
         request_.getClient().removeSocket(cgiStdIn_.get());
         cgiStdIn_.reset();
-        bodyWriteCompleted_ = true;
-    }
-    else
-    {
-        Log::debug("Wrote " + std::to_string(writeOffset_ - before) + " bytes, write offset "
-                   + std::to_string(writeOffset_) + "/ " + std::to_string(body.size()));
-        // Log::debug("CGI stdin progress " + std::to_string(before) + "→" + std::to_string(writeOffset_));
     }
 }
 
@@ -147,7 +139,7 @@ void CgiHandler::read()
             responseComplete = (buffer_.size() >= contentLength_.value());
         }
 
-        if (bodyWriteCompleted_ && responseComplete)
+        if (responseComplete)
         {
             Log::debug("Response complete: headers parsed and content received");
             request_.getClient().removeSocket(cgiStdOut_.get());
@@ -161,7 +153,7 @@ void CgiHandler::read()
     if (bytesRead == 0)
     {
         // EOF from CGI process
-    Log::info("CGI process closed stdout, fd: " + std::to_string(cgiStdOut_->getFd()));
+        Log::info("CGI process closed stdout, fd: " + std::to_string(cgiStdOut_->getFd()));
         request_.getClient().removeSocket(cgiStdOut_.get());
         cgiStdOut_.reset();
 
@@ -181,35 +173,15 @@ void CgiHandler::read()
         }
 
         // Only finalize if we've finished writing the request body
-        if (bodyWriteCompleted_)
-        {
-            finalizeCgiResponse();
-        }
-        else
-        {
-            Log::warning("CGI process closed stdout before request body was completely written");
-            // Set error response but don't finalize until write is complete
-            // ErrorHandler::createErrorResponse(500, response_);
-        }
+        finalizeCgiResponse();
         return;
     }
 
     if (bytesRead < 0)
     {
-        if (errno == EAGAIN || errno == EWOULDBLOCK)
-        {
-            Log::debug("CGI stdout would block, will retry on next EPOLLIN");
-            return;
-        }
-        else
-        {
-            Log::error("Error reading from CGI stdout: " + std::string(strerror(errno)));
-            // Only finalize if write is complete
-            if (bodyWriteCompleted_)
-            {
-                finalizeCgiResponse();
-            }
-        }
+        
+        Log::error("Error reading from CGI stdout: " + std::string(strerror(errno)));
+        finalizeCgiResponse();
     }
 }
 

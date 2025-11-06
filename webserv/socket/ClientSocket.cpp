@@ -17,3 +17,8 @@ const struct sockaddr *ClientSocket::getAddress() const noexcept
 {
     return &address_;
 }
+
+std::string ClientSocket::toString() const
+{
+    return "ClientSocket(fd=" + std::to_string(getFd()) + ")";
+}

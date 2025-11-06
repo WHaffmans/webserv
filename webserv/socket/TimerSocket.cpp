@@ -64,3 +64,8 @@ ssize_t TimerSocket::write(const void *buf, size_t len) const
 
     return bytesSent;
 }
+
+std::string TimerSocket::toString() const
+{
+    return "TimerSocket(fd=" + std::to_string(getFd()) + "), active (" + (active_ ? "true" : "false") + "), timeout (" + std::to_string(timeout_.count()) + "ms)";
+}

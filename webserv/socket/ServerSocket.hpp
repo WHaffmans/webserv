@@ -17,4 +17,6 @@ class ServerSocket : public ASocket
 
     [[nodiscard]] ASocket::Type getType() const noexcept override;
     [[nodiscard]] std::unique_ptr<ClientSocket> accept() const;
+
+    [[nodiscard]] std::string toString() const override;
 };

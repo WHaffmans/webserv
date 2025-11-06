@@ -15,6 +15,7 @@ class CgiEnvironment
   public:
     CgiEnvironment(const URI &uri, const HttpRequest &request);
 
+    std::string get(const std::string &key) const;
     [[nodiscard]] char **toEnvp() const;
 
   private:

@@ -95,7 +95,7 @@ void ASocket::setNonBlocking() const
     }
     flagStr += ")";
 
-    Log::debug("ASocket: FD " + std::to_string(fd_) + " configured. Flags: " + flagStr);
+    Log::debug(this->toString()  + " configured. Flags: " + flagStr);
 }
 
 int ASocket::getFd() const noexcept
@@ -127,7 +127,7 @@ void ASocket::setIOState(IoState event)
 
 void ASocket::processed()
 {
-    Log::debug("Socket " + std::to_string(fd_) + " processed");
+    Log::debug(this->toString() + " processed");
     dirty_ = false;
 }
 
@@ -147,4 +147,9 @@ void ASocket::callback() const
 void ASocket::setCallback(std::function<void()> callback)
 {
     callback_ = std::move(callback);
+}
+
+std::string ASocket::toString() const
+{
+    return "ASocket(fd=" + std::to_string(fd_) + ")";
 }

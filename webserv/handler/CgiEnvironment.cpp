@@ -76,6 +76,16 @@ char **CgiEnvironment::toEnvp() const
     return envp;
 }
 
+std::string CgiEnvironment::get(const std::string &key) const
+{
+    auto it = env_.find(key);
+    if (it != env_.end())
+    {
+        return it->second;
+    }
+    return "";
+}
+
 void CgiEnvironment::appendCustomHeaders(const HttpHeaders &headers)
 {
     Log::trace(LOCATION);

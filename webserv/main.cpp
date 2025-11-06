@@ -35,6 +35,7 @@ int main(int argc, char **argv)
 
         Log::setFileChannel("logs/webserv.log");
         Log::setStdoutChannel();
+        // ::signal(SIGPIPE, SIG_IGN); // Ignore SIGPIPE globally
         printHeader();
         ConfigManager &configManager = ConfigManager::getInstance();
         configManager.init(configPath); // NOLINT

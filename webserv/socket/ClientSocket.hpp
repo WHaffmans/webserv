@@ -13,6 +13,8 @@ class ClientSocket : public ASocket
 
     [[nodiscard]] ASocket::Type getType() const noexcept override;
     [[nodiscard]] const struct sockaddr *getAddress() const noexcept;
+
+    [[nodiscard]] std::string toString() const override;
   private:
     struct sockaddr address_;
 };

@@ -8,8 +8,9 @@
 #include <webserv/socket/ServerSocket.hpp> // for ServerSocket
 #include <webserv/utils/utils.hpp>         // for stateToEpoll
 
-#include <cerrno>        // for errno, EBADF, ENOENT, EINTR
-#include <csignal>       // for SIGINT, sig_atomic_t
+#include <cerrno>  // for errno, EBADF, ENOENT, EINTR
+#include <csignal> // for SIGINT, sig_atomic_t
+#include <cstdio>
 #include <cstring>       // for strerror
 #include <exception>     // for exception
 #include <memory>        // for unique_ptr, allocator, make_unique
@@ -76,10 +77,10 @@ void Server::add(ASocket &socket, Client *client)
     event.data.fd = fd;
     if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, fd, &event) == -1)
     {
-        Log::error("epoll_ctl ADD failed for fd: " + std::to_string(fd) + " with error: " + std::strerror(errno));
+        Log::error(socket.toString() + ": epoll_ctl ADD failed with error: " + std::strerror(errno));
         throw std::runtime_error("epoll_ctl ADD failed");
     }
-    Log::debug("Socket added to epoll, fd: " + std::to_string(fd));
+    Log::debug(socket.toString() + ": added to epoll");
     socketToClient_[fd] = client;
     sockets_.insert(&socket);
 }
@@ -92,10 +93,10 @@ void Server::remove(ASocket &socket)
     {
         if (errno == EBADF || errno == ENOENT)
         {
-            Log::debug("Socket fd " + std::to_string(fd) + " was already closed or removed from epoll");
+            Log::debug(socket.toString() + " was already closed or removed from epoll");
             return;
         }
-        Log::error("epoll_ctl DEL failed for fd: " + std::to_string(fd) + " with error: " + std::strerror(errno));
+        Log::error(socket.toString() + ": epoll_ctl DEL failed with error: " + std::string(std::strerror(errno)));
         throw std::runtime_error("epoll_ctl DEL failed");
     }
     socketToClient_.erase(fd);
@@ -181,13 +182,15 @@ void Server::handleRequest(struct epoll_event *event) const
 void Server::writable(int client_fd) const
 {
     Log::trace(LOCATION);
-    Log::debug("Response ready for client fd: " + std::to_string(client_fd));
+    Client &client = getClient(client_fd);
+    ASocket &socket = client.getSocket(client_fd);
+    Log::debug(socket.toString() + ": response ready");
     struct epoll_event ev{};
     ev.events = EPOLLOUT;
     ev.data.fd = client_fd;
     if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, client_fd, &ev) == -1)
     {
-        Log::error("epoll_ctl MOD failed for fd: " + std::to_string(client_fd));
+        Log::error(socket.toString() + ": epoll_ctl MOD failed with error: " + std::string(std::strerror(errno)));
         throw std::runtime_error("epoll_ctl MOD failed");
     }
 }
@@ -198,7 +201,7 @@ void Server::update(const ASocket &socket) const
 
     int socketFd = socket.getFd();
     uint32_t events = utils::stateToEpoll(socket.getEvent());
-    Log::debug("Socket (" + std::to_string(socket.getFd()) + ") is being updated");
+    Log::debug(socket.toString() + ": is being updated");
     struct epoll_event evt{};
     evt.events = events;
     evt.data.fd = socketFd;
@@ -206,10 +209,10 @@ void Server::update(const ASocket &socket) const
     {
         if (errno == EBADF || errno == ENOENT)
         {
-            Log::debug("Socket fd " + std::to_string(socketFd) + " was already closed or removed from epoll");
+            Log::debug(socket.toString() + ": was already closed or removed from epoll");
             return;
         }
-        Log::error("epoll_ctl MOD failed for fd: " + std::to_string(socketFd) + " with error: " + std::strerror(errno));
+        Log::error(socket.toString() + ": epoll_ctl MOD failed with error: " + std::string(std::strerror(errno)));
         throw std::runtime_error("epoll_ctl MOD failed");
     }
 }
@@ -217,23 +220,24 @@ void Server::update(const ASocket &socket) const
 void Server::handleResponse(struct epoll_event *event) const
 {
     int socket_fd = event->data.fd;
-    Log::debug("Attempting to send data to fd: " + std::to_string(socket_fd));
     Client &client = getClient(socket_fd);
-    client.getSocket(socket_fd).callback();
+    ASocket &socket = client.getSocket(socket_fd);
+    Log::debug(socket.toString() + ": attempting to send data");
+    socket.callback();
     // disconnect(client);
 }
 
-void Server::handleEpollHangUp(struct epoll_event *event) const
+void Server::handleEpollHangUp(struct epoll_event *event)
 {
     Client &client = getClient(event->data.fd);
     ASocket &socket = client.getSocket(event->data.fd);
     if (socket.getType() == ASocket::Type::CGI_SOCKET)
     {
-        Log::info("CGI socket hang up on fd " + std::to_string(event->data.fd));
+        Log::info(socket.toString() + ": CGI socket hang up");
         socket.callback();
         return;
     }
-    Log::warning("Epoll hang up on fd " + std::to_string(event->data.fd) + ": " + std::strerror(errno));
+    Log::warning(socket.toString() + ": Epoll hang up with error: " + std::string(std::strerror(errno)));
 }
 
 void Server::handleEvent(struct epoll_event *event)
@@ -266,17 +270,18 @@ void Server::handleEvent(struct epoll_event *event)
                 ASocket &socket = client.getSocket(fd);
                 if (socket.getType() == ASocket::Type::CGI_SOCKET)
                 {
-                    Log::info("EPOLLERR on CGI socket fd " + std::to_string(fd) + ", invoking callback");
-                    socket.callback();
+                    Log::info(socket.toString() + ": EPOLLERR invoking callback");
+                    remove(socket);
+                    close(fd);
                 }
                 else if (socket.getType() == ASocket::Type::CLIENT_SOCKET)
                 {
-                    Log::warning("EPOLLERR on client socket fd " + std::to_string(fd) + ", disconnecting client");
+                    Log::warning(socket.toString() + ": EPOLLERR disconnecting client");
                     disconnect(client);
                 }
                 else
                 {
-                    Log::warning("EPOLLERR on auxiliary socket fd " + std::to_string(fd) + ", removing");
+                    Log::warning(socket.toString() + ": EPOLLERR removing auxiliary socket");
                     remove(socket);
                     close(fd);
                 }

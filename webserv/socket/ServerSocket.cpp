@@ -81,3 +81,8 @@ std::unique_ptr<ClientSocket> ServerSocket::accept() const
     }
     return std::make_unique<ClientSocket>(client_fd, client_address);
 }
+
+std::string ServerSocket::toString() const
+{
+    return "ServerSocket(fd=" + std::to_string(getFd()) + ")";
+}

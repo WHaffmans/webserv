@@ -74,7 +74,7 @@ void Client::request()
     }
     if (bytesRead == 0)
     {
-        Log::info("Client closed connection, fd: " + std::to_string(clientSocket_->getFd()));
+        Log::info("Client closed connection: " + clientSocket_->toString());
         server_.disconnect(*this); // CRITICAL: RETURN IMMEDIATELY
         return;
     }
@@ -168,7 +168,7 @@ void Client::poll() const
     }
     if (httpResponse_->isComplete() && clientSocket_->getEvent() != ASocket::IoState::WRITE)
     {
-        Log::info("Response is ready to be sent to client, fd: " + std::to_string(clientSocket_->getFd()));
+        Log::info("Response is ready to be sent to client: " + clientSocket_->toString());
         clientSocket_->setCallback([this]() { respond(); });
         // server_.writable(clientSocket_->getFd());
         clientSocket_->setIOState(ASocket::IoState::WRITE);
@@ -181,11 +181,11 @@ void Client::respond() const
     ssize_t bytesSent = send(clientSocket_->getFd(), payload.data(), payload.size(), 0);
     if (bytesSent < 0)
     {
-        Log::error("Send failed for fd: " + std::to_string(clientSocket_->getFd()));
+        Log::error("Send failed for: " + clientSocket_->toString());
     }
     else
     {
-        Log::debug("Sent " + std::to_string(bytesSent) + " bytes to fd: " + std::to_string(clientSocket_->getFd()));
+        Log::debug("Sent " + std::to_string(bytesSent) + " bytes to: " + clientSocket_->toString());
     }
     server_.disconnect(*this); // ! CRITICAL: RETURN IMMEDIATELY
 }

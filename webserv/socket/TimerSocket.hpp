@@ -3,6 +3,7 @@
 #include <webserv/socket/ASocket.hpp> // for ASocket
 
 #include <chrono> // for milliseconds
+#include <string>
 
 #include <stddef.h>    // for size_t
 #include <sys/types.h> // for ssize_t
@@ -19,6 +20,8 @@ class TimerSocket : public ASocket
     ssize_t write(const void *buf, size_t len) const override;
 
     void activate();
+
+    [[nodiscard]] std::string toString() const override;
 
   private:
     bool active_ = false;
