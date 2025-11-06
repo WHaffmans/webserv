@@ -27,31 +27,50 @@ URI::URI(const HttpRequest &request, const ServerConfig &serverConfig)
 const AConfig *URI::matchConfig(const std::string &uri, const ServerConfig &serverConfig)
 {
     const auto &locations = serverConfig.getLocationPaths();
-    const AConfig *bestMatch = &serverConfig;
+    const AConfig *matchedConfig = &serverConfig;
 
     size_t maxMatchLength = 0;
-    for (const auto &locationPath : locations)
+    for (const auto &location : locations)
     {
-        if (uri.empty() && locationPath == "/")
+        if (location == "/")
         {
-            return serverConfig.getLocation(locationPath);
+            if (uri.empty())
+            {
+                return serverConfig.getLocation(location);
+            }
+            // Root location matches everything, but with lowest priority
+            if (maxMatchLength == 0)
+            {
+                matchedConfig = serverConfig.getLocation(location);
+                maxMatchLength = 1;
+            }
+            continue;
         }
-        if (!uri.starts_with(utils::trim(locationPath, "/")))
+
+        // Trim leading/trailing slashes for consistent matching
+        std::string trimmedLocation = utils::trim(location, "/");
+
+        // Check if URI starts with the location path
+        if (!uri.starts_with(trimmedLocation))
         {
             continue;
         }
-        if (uri.substr(utils::trim(locationPath, "/").length())[0] != '/'
-            || !uri.substr(utils::trim(locationPath, "/").length()).empty())
+
+        // Ensure we have an exact path boundary match
+        // Either the URI is exactly the location, or the next character is '/'
+        if (uri.length() > trimmedLocation.length() && uri[trimmedLocation.length()] != '/')
         {
-            continue;
+            continue; // Not a path boundary match
         }
-        if (locationPath.length() > maxMatchLength)
+
+        // This is a valid match - check if it's the longest so far
+        if (trimmedLocation.length() > maxMatchLength)
         {
-            maxMatchLength = locationPath.length();
-            bestMatch = serverConfig.getLocation(locationPath);
+            maxMatchLength = trimmedLocation.length();
+            matchedConfig = serverConfig.getLocation(location);
         }
     }
-    return bestMatch;
+    return matchedConfig;
 }
 
 void URI::parseUri()
