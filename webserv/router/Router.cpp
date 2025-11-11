@@ -29,17 +29,6 @@ Router::Router(Client *client) : client_(client)
     Log::trace(LOCATION);
 }
 
-// bool Router::isMethodSupported(const std::string &method, const AConfig &config) noexcept
-// {
-//     const ADirective *allowedMethods = config.getDirective("allowed_methods");
-//     if (allowedMethods == nullptr || !allowedMethods->getValue().try_get<std::vector<std::string>>().has_value())
-//     {
-//         return true;
-//     }
-//     auto methods = allowedMethods->getValue().get<std::vector<std::string>>();
-//     return std::ranges::find(methods, method) != methods.end();
-// }
-
 std::unique_ptr<AHandler> Router::handleRequest()
 {
     Log::trace(LOCATION);
