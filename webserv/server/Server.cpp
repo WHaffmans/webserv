@@ -227,7 +227,7 @@ void Server::handleResponse(struct epoll_event *event) const
     // disconnect(client);
 }
 
-void Server::handleEpollHangUp(struct epoll_event *event)
+void Server::handleEpollHangUp(struct epoll_event *event) const
 {
     Client &client = getClient(event->data.fd);
     ASocket &socket = client.getSocket(event->data.fd);
@@ -270,7 +270,7 @@ void Server::handleEvent(struct epoll_event *event)
                 ASocket &socket = client.getSocket(fd);
                 if (socket.getType() == ASocket::Type::CGI_SOCKET)
                 {
-                    Log::info(socket.toString() + ": EPOLLERR invoking callback");
+                    Log::info(socket.toString() + ": EPOLLERR removing socket");
                     remove(socket);
                     close(fd);
                 }
