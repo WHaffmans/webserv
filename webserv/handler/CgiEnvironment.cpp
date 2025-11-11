@@ -22,7 +22,11 @@ CgiEnvironment::CgiEnvironment(const URI &uri, const HttpRequest &request)
     env_["SCRIPT_FILENAME"] = uri.getFullPath(); // Full filesystem path to the script (required by PHP)
     env_["QUERY_STRING"] = uri.getQuery();
     env_["REQUEST_URI"] = request.getTarget();
-    env_["PATH_INFO"] = request.getTarget(); // TODO This is only correct for the tester;
+    env_["PATH_INFO"] = uri.getPathInfo();
+    if (uri.getConfig()->get<bool>("42_tester").value_or(false))
+    {
+        env_["PATH_INFO"] = request.getTarget(); // TODO This is only correct for the tester;
+    }
 
     // Only set CONTENT_TYPE and CONTENT_LENGTH if they have values
     auto contentType = request.getHeaders().getContentType();

@@ -134,7 +134,10 @@ void URI::parseFullpath()
         else // not file or dir, and no baseName yet
         {
             valid_ = false;
-            baseName_ = segment; // TODO: is this correct? works for tester but seems odd
+            if (config_->get<bool>("42_tester").value_or(false))
+            {
+                baseName_ = segment; // TODO: is this correct? works for tester but seems odd
+            }
             Log::warning("Invalid path segment encountered: " + currentPath);
             return;
         }
