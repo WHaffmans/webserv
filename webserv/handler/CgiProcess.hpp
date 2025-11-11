@@ -16,7 +16,7 @@ class CgiProcess
     CgiProcess &operator=(const CgiProcess &other) = delete;
     CgiProcess &operator=(CgiProcess &&other) noexcept = delete;
 
-    ~CgiProcess() = default;
+    ~CgiProcess();
     void kill() const noexcept;
     void wait() noexcept;
 

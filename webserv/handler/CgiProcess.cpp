@@ -29,6 +29,11 @@ CgiProcess::CgiProcess(const HttpRequest &request, CgiHandler &handler)
     spawn();
 }
 
+CgiProcess::~CgiProcess()
+{
+    this->kill();
+}
+
 void CgiProcess::spawn()
 {
     const URI &uri = request_.getUri();
@@ -64,10 +69,10 @@ void CgiProcess::spawn()
     {
         int flags = fcntl(pipeStdin[0], F_GETFL, 0);
         fcntl(pipeStdin[0], F_SETFL, flags & ~O_NONBLOCK);
-        
+
         flags = fcntl(pipeStdout[1], F_GETFL, 0);
         fcntl(pipeStdout[1], F_SETFL, flags & ~O_NONBLOCK);
-        
+
         flags = fcntl(pipeStderr[1], F_GETFL, 0);
         fcntl(pipeStderr[1], F_SETFL, flags & ~O_NONBLOCK);
 
