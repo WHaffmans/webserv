@@ -106,7 +106,6 @@ void URI::parseUri()
 void URI::parseFullpath()
 {
     auto uriSegments = utils::split(fullPath_, '/');
-
     for (const auto &segment : uriSegments)
     {
         std::string currentPath = FileUtils::joinPath(dir_, segment);
@@ -135,6 +134,7 @@ void URI::parseFullpath()
         else // not file or dir, and no baseName yet
         {
             valid_ = false;
+            baseName_ = segment; // TODO: is this correct? works for tester but seems odd
             Log::warning("Invalid path segment encountered: " + currentPath);
             return;
         }
@@ -177,6 +177,7 @@ bool URI::isValid() const noexcept
 
 bool URI::isCgi() const noexcept
 {
+    Log::debug("Check for CGI extension: " + getExtension() + ", with basename " + baseName_);
     return config_->isCGI(getExtension());
 }
 
