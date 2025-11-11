@@ -181,7 +181,7 @@ std::string AConfig::getCGIPath(const std::string &extension) const
         }
         auto exts = directive->getValue().try_get<std::vector<std::string>>().value();
         auto cgiPath = exts.back();
-        if (cgiPath.starts_with("."))
+        if (cgiPath.starts_with(".") && !cgiPath.starts_with("./"))
         {
             continue;
         }
