@@ -1,3 +1,5 @@
+#include "webserv/config/validation/directive_rules/StatusCodeRule.hpp"
+
 #include <webserv/config/validation/ConfigValidator.hpp>
 #include <webserv/config/validation/ValidationEngine.hpp>                            // for ValidationEngine
 #include <webserv/config/validation/directive_rules/AValidationRule.hpp>             // for AValidationRule
@@ -31,6 +33,7 @@ ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make
     engine_->addStructuralRule(std::make_unique<SingleDefaultServerPerPortRule>());
 
     /*Global Directive Rules*/
+    engine_->addServerRule("error_page", std::make_unique<StatusCodeRule>(false));
 
     /*Server Directive Rules*/
     engine_->addServerRule("listen", std::make_unique<PortValidationRule>());
@@ -41,6 +44,7 @@ ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make
     /*Location Directive Rules*/
     engine_->addLocationRule("allowed_methods", std::make_unique<AllowedValuesRule>(
                                                     std::vector<std::string>{"GET", "POST", "DELETE", "PUT"}, false));
+    engine_->addLocationRule("error_page", std::make_unique<StatusCodeRule>(false));
     // Folder existence validation disabled - paths are relative to server runtime directory
     // engine_->addLocationRule("root", std::make_unique<FolderExistsRule>(true));
     engine_->addLocationRule("cgi_handler", std::make_unique<CgiExtValidationRule>(false));
