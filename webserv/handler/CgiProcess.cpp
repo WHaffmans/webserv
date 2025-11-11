@@ -63,7 +63,14 @@ void CgiProcess::spawn()
     if (pid_ == 0)
     {
         int flags = fcntl(pipeStdin[0], F_GETFL, 0);
-        if (flags != -1) {fcntl(pipeStdin[0], F_SETFL, flags & ~O_NONBLOCK);}
+        fcntl(pipeStdin[0], F_SETFL, flags & ~O_NONBLOCK);
+        
+        flags = fcntl(pipeStdout[1], F_GETFL, 0);
+        fcntl(pipeStdout[1], F_SETFL, flags & ~O_NONBLOCK);
+        
+        flags = fcntl(pipeStderr[1], F_GETFL, 0);
+        fcntl(pipeStderr[1], F_SETFL, flags & ~O_NONBLOCK);
+
         dup2(pipeStdin[0], STDIN_FILENO);
         dup2(pipeStdout[1], STDOUT_FILENO);
         dup2(pipeStderr[1], STDERR_FILENO);
