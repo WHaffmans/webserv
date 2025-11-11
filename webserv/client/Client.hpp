@@ -39,8 +39,8 @@ class Client
     ~Client();
 
     void request();
-    void respond() const;
-    void poll() const;
+    void respond();
+    void poll();
 
     [[nodiscard]] ASocket &getSocket(int fd = -1) const;
 
@@ -63,6 +63,7 @@ class Client
     std::unordered_map<int, ASocket *> sockets_;
 
     Server &server_;
+    long writeOffset_ = 0;
     // void writeToCgi();
     // void readFromCgi();
 };
