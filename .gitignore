@@ -7,3 +7,4 @@ webserv.log
 compile_commands.json
 iwyu_results/
 build_coverage/
+uploads/
