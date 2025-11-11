@@ -39,7 +39,7 @@ class HttpResponse
 
     [[nodiscard]] const HttpHeaders &getHeaders() const noexcept;
 
-    [[nodiscard]] std::vector<uint8_t> toBytes() const;
+    [[nodiscard]] std::vector<uint8_t> toBytes(long offset = 0) const;
 
   private:
     [[nodiscard]] std::string getStatusLine() const;

@@ -89,7 +89,7 @@ std::string HttpResponse::getDateHeader() const
     return "Date: " + std::string(buffer) + "\r\n";
 }
 
-std::vector<uint8_t> HttpResponse::toBytes() const
+std::vector<uint8_t> HttpResponse::toBytes(long offset) const
 {
     std::string headerStr;
     std::string reason;
@@ -107,5 +107,5 @@ std::vector<uint8_t> HttpResponse::toBytes() const
     std::vector<uint8_t> responseData(headerStr.begin(), headerStr.end());
     responseData.insert(responseData.end(), body_.begin(), body_.end());
 
-    return responseData;
+    return {responseData.begin() + offset, responseData.end()};
 }
