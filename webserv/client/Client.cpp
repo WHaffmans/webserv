@@ -137,11 +137,11 @@ void Client::request()
     }
     else
     {
-        Log::debug("Received partial request",
-                   {
-                       {"current_state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
-                       {"buffer_length", std::to_string(bytesRead)},
-                   });
+        Log::debug("Received partial request");
+                //    {
+                    //    {"current_state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
+                    //    {"buffer_length", std::to_string(bytesRead)},
+                //    });
     }
 }
 
@@ -157,7 +157,7 @@ void Client::removeSocket(ASocket *socket)
     sockets_.erase(socket->getFd());
 }
 
-void Client::poll() const
+void Client::poll()
 {
     auto *cgiHandler = dynamic_cast<CgiHandler *>(handler_.get());
     if (cgiHandler != nullptr)
@@ -175,9 +175,9 @@ void Client::poll() const
     }
 }
 
-void Client::respond() const
+void Client::respond()
 {
-    auto payload = httpResponse_->toBytes();
+    auto payload = httpResponse_->toBytes(writeOffset_);
     ssize_t bytesSent = send(clientSocket_->getFd(), payload.data(), payload.size(), 0);
     if (bytesSent < 0)
     {
@@ -185,9 +185,15 @@ void Client::respond() const
     }
     else
     {
-        Log::debug("Sent " + std::to_string(bytesSent) + " bytes to: " + clientSocket_->toString());
+        writeOffset_ += bytesSent;
+        Log::debug("Sent " + std::to_string(bytesSent) + " bytes out of " + std::to_string(writeOffset_ + payload.size())
+                   + " to: " + clientSocket_->toString());
     }
-    server_.disconnect(*this); // ! CRITICAL: RETURN IMMEDIATELY
+    if (payload.empty())
+    {
+        Log::info("Closing connection to client: " + clientSocket_->toString());
+        server_.disconnect(*this); // ! CRITICAL: RETURN IMMEDIATELY
+    }
 }
 
 HttpRequest &Client::getHttpRequest() const noexcept
