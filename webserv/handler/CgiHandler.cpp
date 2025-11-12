@@ -1,3 +1,4 @@
+#include "webserv/http/HttpConstants.hpp"
 #include <webserv/client/Client.hpp> // for Client
 #include <webserv/handler/CgiHandler.hpp>
 #include <webserv/handler/CgiProcess.hpp>   // for CgiProcess
@@ -342,7 +343,7 @@ void CgiHandler::handleTimeout()
         Log::info("Terminated CGI process with PID: " + std::to_string(pid_));
     }
 
-    ErrorHandler::createErrorResponse(504, response_);
+    ErrorHandler::createErrorResponse(Http::StatusCode::GATEWAY_TIMEOUT, response_);
     // cancelTimer();
 }
 

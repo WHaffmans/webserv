@@ -34,6 +34,6 @@ void RedirectHandler::handleTimeout()
 {
 
     Log::warning("Redirect handler timeout occurred for path: " + request_.getUri().getFullPath());
-    ErrorHandler::createErrorResponse(504, response_, request_.getUri().getConfig());
+    ErrorHandler::createErrorResponse(Http::StatusCode::GATEWAY_TIMEOUT, response_, request_.getUri().getConfig());
 }
 

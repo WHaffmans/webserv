@@ -53,6 +53,7 @@ constexpr uint16_t INTERNAL_SERVER_ERROR = 500;
 constexpr uint16_t NOT_IMPLEMENTED = 501;
 constexpr uint16_t BAD_GATEWAY = 502;
 constexpr uint16_t SERVICE_UNAVAILABLE = 503;
+constexpr uint16_t GATEWAY_TIMEOUT = 504;
 } // namespace StatusCode
 
 struct StatusCodeInfo

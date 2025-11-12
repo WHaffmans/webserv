@@ -73,5 +73,5 @@ void DeleteHandler::deleteDirectory(const std::string &path)
 void DeleteHandler::handleTimeout()
 {
     Log::debug("DeleteHandler: Request timed out");
-    ErrorHandler::createErrorResponse(504, response_, request_.getUri().getConfig());
+    ErrorHandler::createErrorResponse(Http::StatusCode::GATEWAY_TIMEOUT, response_, request_.getUri().getConfig());
 }
