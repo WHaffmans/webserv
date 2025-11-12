@@ -44,17 +44,16 @@ void UploadHandler::handle()
         return;
     }
 
-    // TODO: So wtf does this do for non-multipart uploads?
+    // TODO: Tester expects 200 OK for non-multipart uploads - weird but sure, okay
     if (contentType->find("multipart/form-data") == std::string::npos)
     {
-        // For application/x-www-form-urlencoded or other types, just return success
-        // The upload endpoint can accept form data without files
         Log::debug("Upload request with non-multipart Content-Type: " + *contentType);
         response_.setStatus(200);
         response_.addHeader("Content-Type", "application/json");
         response_.setBody("{\"success\": true, \"message\": \"Form data received\"}\n");
         return;
     }
+
     if (!FileUtils::isDirectory(uploadStore_))
     {
         ErrorHandler::createErrorResponse(Http::StatusCode::FORBIDDEN,
@@ -80,37 +79,6 @@ void UploadHandler::handleTimeout()
 {
     Log::warning("Upload handler timeout");
     ErrorHandler::createErrorResponse(Http::StatusCode::GATEWAY_TIMEOUT, response_);
-}
-
-std::string UploadHandler::extractBoundary(const std::string &contentType) const
-{
-    Log::trace(LOCATION);
-
-    size_t boundaryPos = contentType.find("boundary=");
-    if (boundaryPos == std::string::npos)
-    {
-        throw std::runtime_error("No boundary found in Content-Type");
-    }
-    std::string boundary = contentType.substr(boundaryPos + std::strlen("boundary=")); // "boundary=" is 9 chars
-    // Remove quotes if present
-    if (!boundary.empty() && boundary[0] == '"')
-    {
-        boundary = boundary.substr(1);
-        size_t endQuote = boundary.find('"');
-        if (endQuote == std::string::npos)
-        {
-            throw std::runtime_error("Malformed boundary in Content-Type");
-        }
-        boundary = boundary.substr(0, endQuote);
-    }
-    // Remove any trailing characters after semicolon or whitespace
-    size_t endPos = boundary.find_first_of("; \t\r\n");
-    if (endPos != std::string::npos)
-    {
-        boundary = boundary.substr(0, endPos);
-    }
-    Log::debug("Extracted boundary: " + boundary);
-    return boundary;
 }
 
 void UploadHandler::parseMultipart()
@@ -179,6 +147,27 @@ void UploadHandler::parseMultipart()
         }
     }
     Log::info("Parsed " + std::to_string(uploadedFiles_.size()) + " file(s) from multipart form data");
+}
+
+std::string UploadHandler::extractBoundary(const std::string &contentType)
+{
+    Log::trace(LOCATION);
+
+    size_t boundaryPos = contentType.find("boundary=");
+    if (boundaryPos == std::string::npos)
+    {
+        throw std::runtime_error("No boundary found in Content-Type");
+    }
+    std::string boundary = contentType.substr(boundaryPos + std::strlen("boundary=")); // "boundary=" is 9 chars
+    boundary = utils::extractQuotedValue(boundary);
+    if (boundary.empty())
+    {
+        throw std::runtime_error("Malformed boundary in Content-Type");
+    }
+    // Remove any trailing characters after semicolon or whitespace
+    boundary = utils::trim(boundary, "\t\r\n ");
+    Log::debug("Extracted boundary: " + boundary);
+    return boundary;
 }
 
 bool UploadHandler::decodeSection(const std::string &part)
@@ -280,7 +269,7 @@ std::string UploadHandler::getHeaderValue(const std::string &headers, const std:
     return "";
 }
 
-std::string UploadHandler::getFileName(const std::string &disposition) const
+std::string UploadHandler::getFileName(const std::string &disposition)
 {
     // Look for filename="..." or filename*=UTF-8''...
     size_t filenamePos = disposition.find("filename=");
@@ -290,30 +279,17 @@ std::string UploadHandler::getFileName(const std::string &disposition) const
     }
     // TODO: strlen is extra function call, but magic number otherwise
     std::string filename = disposition.substr(filenamePos + std::strlen("filename="));
-    // TODO: DRY, this is similar to boundary extraction
-    if (!filename.empty() && filename[0] == '"')
+    filename = utils::extractQuotedValue(filename);
+    if (filename.empty())
     {
-        filename = filename.substr(1);
-        size_t endQuote = filename.find('"');
-        if (endQuote != std::string::npos)
-        {
-            filename = filename.substr(0, endQuote);
-        }
-        else
-        {
-            // Malformed filename
-            Log::warning("Malformed filename in Content-Disposition");
-            return "";
-        }
+        Log::warning("Malformed filename in Content-Disposition");
+        return "";
     }
-    else
+    // Unquoted - take until semicolon or end
+    size_t endPos = filename.find(';');
+    if (endPos != std::string::npos)
     {
-        // Unquoted - take until semicolon or end
-        size_t endPos = filename.find(';');
-        if (endPos != std::string::npos)
-        {
-            filename = filename.substr(0, endPos);
-        }
+        filename = filename.substr(0, endPos);
     }
 
     return utils::trim(filename);

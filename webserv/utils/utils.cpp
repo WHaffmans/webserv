@@ -51,6 +51,21 @@ std::string trimSemi(const std::string &str)
     return str;
 }
 
+std::string extractQuotedValue(const std::string &str)
+{
+    size_t first = str.find('"');
+    if (first == std::string::npos)
+    {
+        return str;
+    }
+    size_t second = str.find('"', first + 1);
+    if (second == std::string::npos)
+    {
+        return ""; // No closing quote found, return empty string
+    }
+    return str.substr(first + 1, second - first - 1);
+}
+
 size_t findCorrespondingClosingBrace(const std::string &str, size_t openPos)
 {
     int braceCount = 1;

@@ -44,14 +44,12 @@ class UploadHandler : public AHandler
     bool save(UploadedFile &info, const std::vector<uint8_t> &data);
     std::string sanitizeFilename(const std::string &filename) const;
     std::string generateFilename(const std::string &baseFilename) const;
-    // void sendSuccessResponse();
-    // void sendErrorResponse(uint16_t statusCode, const std::string &message);
 
     // Multipart parsing helpers
-    std::string extractBoundary(const std::string &contentType) const;
+    [[nodiscard]] static std::string extractBoundary(const std::string &contentType);
     bool decodeSection(const std::string &part);
-    std::string getHeaderValue(const std::string &headers, const std::string &headerName) const;
-    std::string getFileName(const std::string &disposition) const;
+    [[nodiscard]] std::string getHeaderValue(const std::string &headers, const std::string &key) const;
+    [[nodiscard]] static std::string getFileName(const std::string &disposition);
     std::string getFieldName(const std::string &disposition) const;
 
     static const std::string DEFAULT_UPLOAD_STORE;
