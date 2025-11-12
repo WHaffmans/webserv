@@ -53,6 +53,9 @@ RUN git clone https://github.com/WHaffmans/webserv.git
 
 RUN cd webserv && make
 
+
+## RUN STAGE
+
 FROM ubuntu:22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -72,6 +75,8 @@ COPY ./conf/hosts /etc/hosts
 
 # RUN chmod 777 /webserv/default.conf
 
-RUN mkdir /logs && touch /logs/webserv.log
 
-CMD ["./webserv/webserv", "/webserv/default.conf"]
+WORKDIR /webserv
+RUN mkdir logs && touch logs/webserv.log
+
+CMD ["./webserv", "default.conf"]

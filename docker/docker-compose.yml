@@ -46,8 +46,13 @@ services:
       - WP_ADMIN_EMAIL=admin@admin.admin
     networks:
       - docker-network
+    ports:
+      - '8080:8080'
+      - '8081:8081'
+      - '8082:8082'
+      
     volumes:
-      - data_wordpress:/var/www/html
+      - data_wordpress:/webserv/htdocs
     restart: unless-stopped
 
 networks:
@@ -67,5 +72,5 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /home/kali/data/wordpress
+      device: /home/kali/webserv/htdocs
       o: bind

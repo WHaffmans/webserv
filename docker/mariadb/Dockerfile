@@ -8,7 +8,7 @@ RUN apk add --no-cache \
 
 ARG HOST_UID
 
-RUN addgroup -S -g $HOST_UID mariadb && \
+RUN addgroup -S -g $HOST_UID mariadb && \		
 	adduser -S -u $HOST_UID mariadb -G mariadb
 
 RUN mkdir -p /var/run/mysqld && \
@@ -22,8 +22,9 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 WORKDIR /var/lib/mysql
 
+USER mariadb
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 CMD ["mysqld", "--datadir=/var/lib/mysql", "--user=mariadb"]
-HEALTHCHECK --interval=5s --timeout=3s --start-period=5s --retries=1 CMD mysqladmin ping -h localhost || exit 1
+# HEALTHCHECK --interval=5s --timeout=3s --start-period=5s --retries=1 CMD mysqladmin ping -h localhost || exit 1
