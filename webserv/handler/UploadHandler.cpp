@@ -1,3 +1,6 @@
+#include "webserv/http/HttpConstants.hpp"
+#include "webserv/utils/FileUtils.hpp"
+
 #include <webserv/config/AConfig.hpp>
 #include <webserv/handler/ErrorHandler.hpp>
 #include <webserv/handler/URI.hpp>
@@ -8,54 +11,40 @@
 #include <webserv/utils/utils.hpp>
 
 #include <algorithm>
+#include <cstring>
 #include <ctime>
 #include <fstream>
 #include <random>
+#include <ranges>
 #include <sstream>
+#include <string>
 
 #include <sys/stat.h>
 #include <unistd.h>
 
+const std::string UploadHandler::DEFAULT_UPLOAD_STORE = "data/uploads";
+
 UploadHandler::UploadHandler(const HttpRequest &request, HttpResponse &response)
-    : AHandler(request, response), maxFileSize_(0)
+    : AHandler(request, response),
+      uploadStore_(request.getUri().getConfig()->get<std::string>("upload_store").value_or(DEFAULT_UPLOAD_STORE))
 {
     Log::trace(LOCATION);
-
-    // Get upload configuration from the matched location
-    const AConfig *config = request_.getUri().getConfig();
-
-    // Get upload directory from config (default: "uploads")
-    uploadDir_ = config->get<std::string>("upload_store").value_or("data/uploads");
-
-    // Get max file size from config (uses client_max_body_size)
-    maxFileSize_ = config->get<size_t>("client_max_body_size").value_or(1048576); // Default 1MB
-
-    Log::debug("Upload handler initialized",
-               {{"upload_dir", uploadDir_}, {"max_file_size", std::to_string(maxFileSize_)}});
 }
 
 void UploadHandler::handle()
 {
     Log::trace(LOCATION);
 
-    // Verify request method is POST
-    if (request_.getMethod() != "POST")
-    {
-        Log::warning("Upload attempted with non-POST method: " + request_.getMethod());
-        sendErrorResponse(405, "Method Not Allowed");
-        return;
-    }
-
     // Check Content-Type header
     auto contentType = request_.getHeaders().getContentType();
     if (!contentType.has_value())
     {
         Log::warning("Upload request missing Content-Type header");
-        sendErrorResponse(400, "Missing Content-Type header");
+        ErrorHandler::createErrorResponse(Http::StatusCode::BAD_REQUEST, response_);
         return;
     }
 
-    // Check if it's multipart/form-data
+    // TODO: So wtf does this do for non-multipart uploads?
     if (contentType->find("multipart/form-data") == std::string::npos)
     {
         // For application/x-www-form-urlencoded or other types, just return success
@@ -66,56 +55,31 @@ void UploadHandler::handle()
         response_.setBody("{\"success\": true, \"message\": \"Form data received\"}\n");
         return;
     }
-
-    // Check body size doesn't exceed limit
-    if (request_.getBody().size() > maxFileSize_)
+    if (!FileUtils::isDirectory(uploadStore_))
     {
-        Log::warning("Upload request body exceeds max size: " + std::to_string(request_.getBody().size())
-                    + " > " + std::to_string(maxFileSize_));
-        sendErrorResponse(413, "Payload Too Large");
+        ErrorHandler::createErrorResponse(Http::StatusCode::FORBIDDEN,
+                                          response_); // TODO: Not sure if 403 is appropriate
         return;
     }
-
-    // Verify upload directory exists and is writable
-    struct stat st = {};
-    if (stat(uploadDir_.c_str(), &st) != 0)
-    {
-        Log::error("Upload directory does not exist: " + uploadDir_);
-        sendErrorResponse(500, "Upload directory not configured");
-        return;
-    }
-    if (!S_ISDIR(st.st_mode))
-    {
-        Log::error("Upload path is not a directory: " + uploadDir_);
-        sendErrorResponse(500, "Upload directory not configured");
-        return;
-    }
-    if (access(uploadDir_.c_str(), W_OK) != 0)
-    {
-        Log::error("Upload directory is not writable: " + uploadDir_);
-        sendErrorResponse(500, "Upload directory not writable");
-        return;
-    }
-
-    // Parse multipart form data
     try
     {
-        parseMultipartFormData();
+        parseMultipart();
 
-        // Success even if no files were uploaded (could be just form fields or empty file)
-        sendSuccessResponse();
+        response_.setStatus(Http::StatusCode::CREATED);
+        response_.addHeader("Content-Type", "application/json");
+        response_.setBody("{\"success\": true, \"message\": \"Files uploaded successfully\"}\n");
     }
     catch (const std::exception &e)
     {
         Log::error("Error processing upload: " + std::string(e.what()));
-        sendErrorResponse(400, "Error processing upload");
+        ErrorHandler::createErrorResponse(Http::StatusCode::BAD_REQUEST, response_);
     }
 }
 
 void UploadHandler::handleTimeout()
 {
     Log::warning("Upload handler timeout");
-    ErrorHandler::createErrorResponse(504, response_);
+    ErrorHandler::createErrorResponse(Http::StatusCode::GATEWAY_TIMEOUT, response_);
 }
 
 std::string UploadHandler::extractBoundary(const std::string &contentType) const
@@ -127,32 +91,29 @@ std::string UploadHandler::extractBoundary(const std::string &contentType) const
     {
         throw std::runtime_error("No boundary found in Content-Type");
     }
-
-    std::string boundary = contentType.substr(boundaryPos + 9); // "boundary=" is 9 chars
-
+    std::string boundary = contentType.substr(boundaryPos + std::strlen("boundary=")); // "boundary=" is 9 chars
     // Remove quotes if present
     if (!boundary.empty() && boundary[0] == '"')
     {
         boundary = boundary.substr(1);
         size_t endQuote = boundary.find('"');
-        if (endQuote != std::string::npos)
+        if (endQuote == std::string::npos)
         {
-            boundary = boundary.substr(0, endQuote);
+            throw std::runtime_error("Malformed boundary in Content-Type");
         }
+        boundary = boundary.substr(0, endQuote);
     }
-
     // Remove any trailing characters after semicolon or whitespace
     size_t endPos = boundary.find_first_of("; \t\r\n");
     if (endPos != std::string::npos)
     {
         boundary = boundary.substr(0, endPos);
     }
-
     Log::debug("Extracted boundary: " + boundary);
     return boundary;
 }
 
-void UploadHandler::parseMultipartFormData()
+void UploadHandler::parseMultipart()
 {
     Log::trace(LOCATION);
 
@@ -166,16 +127,13 @@ void UploadHandler::parseMultipartFormData()
     std::string fullBoundary = "--" + boundary;
 
     const std::string &body = request_.getBody();
-
     // Find first boundary
     size_t pos = body.find(fullBoundary);
     if (pos == std::string::npos)
     {
         throw std::runtime_error("No boundary found in body");
     }
-
     pos += fullBoundary.length();
-
     // Parse each part
     while (pos < body.length())
     {
@@ -208,7 +166,7 @@ void UploadHandler::parseMultipartFormData()
         // Parse the part
         if (!part.empty())
         {
-            parseMultipartPart(part);
+            decodeSection(part);
         }
 
         // Move to next part
@@ -220,29 +178,28 @@ void UploadHandler::parseMultipartFormData()
             break;
         }
     }
-
     Log::info("Parsed " + std::to_string(uploadedFiles_.size()) + " file(s) from multipart form data");
 }
 
-bool UploadHandler::parseMultipartPart(const std::string &part)
+bool UploadHandler::decodeSection(const std::string &part)
 {
     Log::trace(LOCATION);
 
-    // Find the blank line separating headers from content
-    size_t headerEnd = part.find("\r\n\r\n");
+    size_t headerEnd = part.find(Http::Protocol::DOUBLE_CRLF);
     if (headerEnd == std::string::npos)
     {
         headerEnd = part.find("\n\n");
-        if (headerEnd == std::string::npos)
-        {
-            Log::warning("Malformed multipart part: no header/content separator");
-            return false;
-        }
+    }
+    if (headerEnd == std::string::npos)
+    {
+        Log::warning("Malformed multipart part: no header/content separator");
+        return false;
     }
 
     std::string headers = part.substr(0, headerEnd);
-    size_t contentStart = headerEnd + (part[headerEnd] == '\r' ? 4 : 2);
-
+    size_t contentStart
+        = headerEnd
+          + (part[headerEnd] == '\r' ? 4 : 2); // TODO: DRY, we're also doing this in the http headers i believe
     if (contentStart >= part.length())
     {
         Log::debug("Empty multipart part");
@@ -250,63 +207,50 @@ bool UploadHandler::parseMultipartPart(const std::string &part)
     }
 
     // Extract Content-Disposition header
-    std::string disposition = extractHeaderValue(headers, "Content-Disposition");
+    std::string disposition = getHeaderValue(headers, "Content-Disposition");
     if (disposition.empty())
     {
         Log::warning("Multipart part missing Content-Disposition header");
         return false;
     }
 
-    // Extract filename - if no filename, this is a regular form field, not a file
-    std::string filename = extractFilenameFromContentDisposition(disposition);
+    std::string filename = getFileName(disposition);
     if (filename.empty())
     {
         Log::debug("Multipart part is a form field, not a file");
         return false;
     }
 
-    // Extract field name
-    std::string fieldName = extractFieldNameFromContentDisposition(disposition);
+    std::string fieldName = getFieldName(disposition);
 
     // Extract Content-Type (optional for files)
-    std::string fileContentType = extractHeaderValue(headers, "Content-Type");
+    std::string fileContentType = getHeaderValue(headers, "Content-Type");
     if (fileContentType.empty())
     {
         fileContentType = "application/octet-stream";
     }
-
     // Extract file content
-    std::vector<uint8_t> fileData(part.begin() + static_cast<std::string::difference_type>(contentStart), part.end());
-
-    // Allow zero-length files
-    if (fileData.size() > maxFileSize_)
-    {
-        Log::warning("File " + filename + " exceeds max size: " + std::to_string(fileData.size()));
-        throw std::runtime_error("File too large: " + filename);
-    }
-
+    std::vector<uint8_t> fileData(part.begin() + (long)contentStart, part.end());
     // Save the file
     UploadedFile info;
     info.fieldName = fieldName;
     info.filename = filename;
     info.contentType = fileContentType;
     info.size = fileData.size();
-
-    if (!saveFile(filename, fileData, info))
+    if (!save(info, fileData))
     {
         throw std::runtime_error("Failed to save file: " + filename);
     }
-
     uploadedFiles_.push_back(info);
     Log::info("Successfully uploaded file: " + filename + " (" + std::to_string(info.size) + " bytes)");
 
     return true;
 }
 
-std::string UploadHandler::extractHeaderValue(const std::string &headers, const std::string &headerName) const
+std::string UploadHandler::getHeaderValue(const std::string &headers, const std::string &key) const
 {
-    std::string searchName = headerName;
-    std::transform(searchName.begin(), searchName.end(), searchName.begin(), ::tolower);
+    std::string search = key;
+    std::ranges::transform(search.begin(), search.end(), search.begin(), ::tolower);
 
     std::istringstream stream(headers);
     std::string line;
@@ -325,21 +269,18 @@ std::string UploadHandler::extractHeaderValue(const std::string &headers, const 
             continue;
         }
 
-        std::string name = line.substr(0, colonPos);
-        std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-        name = utils::trim(name);
-
-        if (name == searchName)
+        std::string name = utils::trim(line.substr(0, colonPos));
+        std::ranges::transform(name.begin(), name.end(), name.begin(), ::tolower);
+        if (name == search)
         {
-            std::string value = line.substr(colonPos + 1);
-            return utils::trim(value);
+            return utils::trim(line.substr(colonPos + 1));
         }
     }
 
     return "";
 }
 
-std::string UploadHandler::extractFilenameFromContentDisposition(const std::string &disposition) const
+std::string UploadHandler::getFileName(const std::string &disposition) const
 {
     // Look for filename="..." or filename*=UTF-8''...
     size_t filenamePos = disposition.find("filename=");
@@ -347,10 +288,9 @@ std::string UploadHandler::extractFilenameFromContentDisposition(const std::stri
     {
         return "";
     }
-
-    std::string filename = disposition.substr(filenamePos + 9);
-
-    // Handle quoted filename
+    // TODO: strlen is extra function call, but magic number otherwise
+    std::string filename = disposition.substr(filenamePos + std::strlen("filename="));
+    // TODO: DRY, this is similar to boundary extraction
     if (!filename.empty() && filename[0] == '"')
     {
         filename = filename.substr(1);
@@ -358,6 +298,12 @@ std::string UploadHandler::extractFilenameFromContentDisposition(const std::stri
         if (endQuote != std::string::npos)
         {
             filename = filename.substr(0, endQuote);
+        }
+        else
+        {
+            // Malformed filename
+            Log::warning("Malformed filename in Content-Disposition");
+            return "";
         }
     }
     else
@@ -373,16 +319,14 @@ std::string UploadHandler::extractFilenameFromContentDisposition(const std::stri
     return utils::trim(filename);
 }
 
-std::string UploadHandler::extractFieldNameFromContentDisposition(const std::string &disposition) const
+std::string UploadHandler::getFieldName(const std::string &disposition) const
 {
     size_t namePos = disposition.find("name=");
     if (namePos == std::string::npos)
     {
         return "";
     }
-
     std::string fieldName = disposition.substr(namePos + 5);
-
     // Handle quoted name
     if (!fieldName.empty() && fieldName[0] == '"')
     {
@@ -410,10 +354,8 @@ std::string UploadHandler::sanitizeFilename(const std::string &filename) const
 {
     std::string sanitized;
     sanitized.reserve(filename.length());
-
     for (char c : filename)
     {
-        // Allow alphanumeric, dots, dashes, underscores
         if (std::isalnum(static_cast<unsigned char>(c)) != 0 || c == '.' || c == '-' || c == '_')
         {
             sanitized += c;
@@ -422,28 +364,23 @@ std::string UploadHandler::sanitizeFilename(const std::string &filename) const
         {
             sanitized += '_';
         }
-        // Skip other characters
     }
-
-    // Prevent directory traversal
     if (sanitized.empty() || sanitized == "." || sanitized == "..")
     {
         sanitized = "upload";
     }
-
-    // Limit length
     if (sanitized.length() > 255)
     {
         sanitized = sanitized.substr(0, 255);
     }
-
     return sanitized;
 }
 
-std::string UploadHandler::generateUniqueFilename(const std::string &baseFilename) const
+// TODO
+std::string UploadHandler::generateFilename(const std::string &baseFilename) const
 {
     std::string sanitized = sanitizeFilename(baseFilename);
-    std::string fullPath = uploadDir_ + "/" + sanitized;
+    std::string fullPath = uploadStore_ + "/" + sanitized;
 
     // If file doesn't exist, use it as-is
     struct stat st = {};
@@ -475,13 +412,12 @@ std::string UploadHandler::generateUniqueFilename(const std::string &baseFilenam
     return oss.str();
 }
 
-bool UploadHandler::saveFile(const std::string &filename, const std::vector<uint8_t> &data, UploadedFile &info)
+bool UploadHandler::save(UploadedFile &info, const std::vector<uint8_t> &data)
 {
     Log::trace(LOCATION);
 
-    std::string uniqueFilename = generateUniqueFilename(filename);
-    std::string fullPath = uploadDir_ + "/" + uniqueFilename;
-
+    std::string uniqueFilename = generateFilename(info.filename);
+    std::string fullPath = FileUtils::joinPath(uploadStore_, uniqueFilename);
     Log::debug("Saving file to: " + fullPath);
 
     std::ofstream file(fullPath, std::ios::binary);
@@ -493,7 +429,6 @@ bool UploadHandler::saveFile(const std::string &filename, const std::vector<uint
 
     file.write(reinterpret_cast<const char *>(data.data()), static_cast<std::streamsize>(data.size()));
     file.close();
-
     if (!file.good())
     {
         Log::error("Error writing file: " + fullPath);
@@ -502,58 +437,4 @@ bool UploadHandler::saveFile(const std::string &filename, const std::vector<uint
 
     info.savedPath = fullPath;
     return true;
-}
-
-void UploadHandler::sendSuccessResponse()
-{
-    Log::trace(LOCATION);
-
-    response_.setStatus(201); // Created
-
-    // Build JSON response with uploaded file info
-    std::ostringstream json;
-    json << "{\n";
-    json << "  \"success\": true,\n";
-    json << "  \"message\": \"Files uploaded successfully\",\n";
-    json << "  \"files\": [\n";
-
-    for (size_t i = 0; i < uploadedFiles_.size(); ++i)
-    {
-        const auto &file = uploadedFiles_[i];
-        json << "    {\n";
-        json << "      \"fieldName\": \"" << file.fieldName << "\",\n";
-        json << "      \"filename\": \"" << file.filename << "\",\n";
-        json << "      \"contentType\": \"" << file.contentType << "\",\n";
-        json << "      \"size\": " << file.size << ",\n";
-        json << "      \"path\": \"" << file.savedPath << "\"\n";
-        json << "    }";
-
-        if (i < uploadedFiles_.size() - 1)
-        {
-            json << ",";
-        }
-        json << "\n";
-    }
-
-    json << "  ]\n";
-    json << "}\n";
-
-    response_.addHeader("Content-Type", "application/json");
-    response_.setBody(json.str());
-}
-
-void UploadHandler::sendErrorResponse(uint16_t statusCode, const std::string &message)
-{
-    Log::trace(LOCATION);
-
-    response_.setStatus(statusCode);
-
-    std::ostringstream json;
-    json << "{\n";
-    json << "  \"success\": false,\n";
-    json << "  \"error\": \"" << message << "\"\n";
-    json << "}\n";
-
-    response_.addHeader("Content-Type", "application/json");
-    response_.setBody(json.str());
 }

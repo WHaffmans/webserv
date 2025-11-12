@@ -36,21 +36,23 @@ class UploadHandler : public AHandler
         size_t size;
     };
 
-    std::string uploadDir_;
-    size_t maxFileSize_;
+    std::string uploadStore_;
+    // size_t maxFileSize_;
     std::vector<UploadedFile> uploadedFiles_;
 
-    void parseMultipartFormData();
-    bool saveFile(const std::string &filename, const std::vector<uint8_t> &data, UploadedFile &info);
+    void parseMultipart();
+    bool save(UploadedFile &info, const std::vector<uint8_t> &data);
     std::string sanitizeFilename(const std::string &filename) const;
-    std::string generateUniqueFilename(const std::string &baseFilename) const;
-    void sendSuccessResponse();
-    void sendErrorResponse(uint16_t statusCode, const std::string &message);
+    std::string generateFilename(const std::string &baseFilename) const;
+    // void sendSuccessResponse();
+    // void sendErrorResponse(uint16_t statusCode, const std::string &message);
 
     // Multipart parsing helpers
     std::string extractBoundary(const std::string &contentType) const;
-    bool parseMultipartPart(const std::string &part);
-    std::string extractHeaderValue(const std::string &headers, const std::string &headerName) const;
-    std::string extractFilenameFromContentDisposition(const std::string &disposition) const;
-    std::string extractFieldNameFromContentDisposition(const std::string &disposition) const;
+    bool decodeSection(const std::string &part);
+    std::string getHeaderValue(const std::string &headers, const std::string &headerName) const;
+    std::string getFileName(const std::string &disposition) const;
+    std::string getFieldName(const std::string &disposition) const;
+
+    static const std::string DEFAULT_UPLOAD_STORE;
 };
