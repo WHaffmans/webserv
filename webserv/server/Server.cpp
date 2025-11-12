@@ -77,7 +77,7 @@ void Server::add(ASocket &socket, Client *client)
     event.data.fd = fd;
     if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, fd, &event) == -1)
     {
-        Log::error(socket.toString() + ": epoll_ctl ADD failed with error: " + std::strerror(errno));
+        Log::error(socket.toString() + ": epoll_ctl ADD failed");
         throw std::runtime_error("epoll_ctl ADD failed");
     }
     Log::debug(socket.toString() + ": added to epoll");
@@ -96,7 +96,7 @@ void Server::remove(ASocket &socket)
             Log::debug(socket.toString() + " was already closed or removed from epoll");
             return;
         }
-        Log::error(socket.toString() + ": epoll_ctl DEL failed with error: " + std::string(std::strerror(errno)));
+        Log::error(socket.toString() + ": epoll_ctl DEL failed");
         throw std::runtime_error("epoll_ctl DEL failed");
     }
     socketToClient_.erase(fd);
@@ -156,7 +156,7 @@ ServerSocket &Server::getListener(int fd) const
             return *listener;
         }
     }
-    Log::error("Listener not found for fd: " + std::to_string(fd) + ": " + std::strerror(errno));
+    Log::error("Listener not found for fd: " + std::to_string(fd));
     throw std::runtime_error("Listener not found for fd: " + std::to_string(fd));
 }
 
@@ -190,7 +190,7 @@ void Server::writable(int client_fd) const
     ev.data.fd = client_fd;
     if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, client_fd, &ev) == -1)
     {
-        Log::error(socket.toString() + ": epoll_ctl MOD failed with error: " + std::string(std::strerror(errno)));
+        Log::error(socket.toString() + ": epoll_ctl MOD failed");
         throw std::runtime_error("epoll_ctl MOD failed");
     }
 }
@@ -212,7 +212,7 @@ void Server::update(const ASocket &socket) const
             Log::debug(socket.toString() + ": was already closed or removed from epoll");
             return;
         }
-        Log::error(socket.toString() + ": epoll_ctl MOD failed with error: " + std::string(std::strerror(errno)));
+        Log::error(socket.toString() + ": epoll_ctl MOD failed");
         throw std::runtime_error("epoll_ctl MOD failed");
     }
 }
@@ -237,7 +237,43 @@ void Server::handleEpollHangUp(struct epoll_event *event) const
         socket.callback();
         return;
     }
-    Log::warning(socket.toString() + ": Epoll hang up with error: " + std::string(std::strerror(errno)));
+    Log::warning(socket.toString() + ": Epoll hang up");
+}
+
+void Server::handleEpollError(struct epoll_event *event)
+{
+    int fd = event->data.fd;
+    Log::error("Epoll error on fd " + std::to_string(fd));
+    try
+    {
+        Client &client = getClient(fd);
+        ASocket &socket = client.getSocket(fd);
+        switch (socket.getType())
+        {
+        case ASocket::Type::CLIENT_SOCKET:
+            Log::warning(socket.toString() + ": EPOLLERR disconnecting client");
+            disconnect(client);
+            break;
+        case ASocket::Type::SERVER_SOCKET:
+            Log::warning(socket.toString() + ": EPOLLERR removing server socket");
+            remove(socket);
+            close(fd);
+            listener_fds_.erase(fd);
+            break;
+        case ASocket::Type::TIMER_SOCKET:
+        case ASocket::Type::CGI_SOCKET:
+        default:
+            Log::warning(socket.toString() + ": EPOLLERR removing auxiliary socket");
+            remove(socket);
+            close(fd);
+            break;
+        }
+    }
+    catch (const std::exception &e)
+    {
+        Log::warning(std::string("EPOLLERR on unknown/non-tracked fd, closing: ") + e.what());
+        close(fd);
+    }
 }
 
 void Server::handleEvent(struct epoll_event *event)
@@ -245,56 +281,10 @@ void Server::handleEvent(struct epoll_event *event)
     Log::trace(LOCATION);
     if ((event->events & EPOLLERR) > 0)
     {
-        int fd = event->data.fd;
-        Log::error("Epoll error on fd " + std::to_string(fd) + ": " + std::strerror(errno));
-        // If this is a listener socket, remove just that listener
-        if (listener_fds_.contains(fd))
-        {
-            try
-            {
-                remove(getListener(fd));
-            }
-            catch (const std::exception &e)
-            {
-                Log::warning(std::string("Failed to remove listener on EPOLLERR: ") + e.what());
-            }
-            close(fd);
-            listener_fds_.erase(fd);
-        }
-        else
-        {
-            // Non-listener sockets: resolve to client/socket and handle gracefully
-            try
-            {
-                Client &client = getClient(fd);
-                ASocket &socket = client.getSocket(fd);
-                if (socket.getType() == ASocket::Type::CGI_SOCKET)
-                {
-                    Log::info(socket.toString() + ": EPOLLERR removing socket");
-                    remove(socket);
-                    close(fd);
-                }
-                else if (socket.getType() == ASocket::Type::CLIENT_SOCKET)
-                {
-                    Log::warning(socket.toString() + ": EPOLLERR disconnecting client");
-                    disconnect(client);
-                }
-                else
-                {
-                    Log::warning(socket.toString() + ": EPOLLERR removing auxiliary socket");
-                    remove(socket);
-                    close(fd);
-                }
-            }
-            catch (const std::exception &e)
-            {
-                Log::warning(std::string("EPOLLERR on unknown/non-tracked fd, closing: ") + e.what());
-                close(fd);
-            }
-        }
-        return;
+        handleEpollError(event);
+        // return;
     }
-    if ((event->events & EPOLLHUP) > 0)
+    else if ((event->events & EPOLLHUP) > 0)
     {
         handleEpollHangUp(event);
     }

@@ -58,6 +58,7 @@ class Server
     void pollSockets();
     void handleEpoll(struct epoll_event *events, int max_events);
 
+    void handleEpollError(struct epoll_event *event);
     void handleEpollHangUp(struct epoll_event *event) const;
     void handleEvent(struct epoll_event *event);
     void handleConnection(struct epoll_event *event);
