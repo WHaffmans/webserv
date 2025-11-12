@@ -1,0 +1,71 @@
+services:
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ./mariadb
+      dockerfile: Dockerfile
+      args:
+        HOST_UID: ${HOST_UID:-1000}
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=wp_user
+      - MYSQL_PASSWORD=password
+      - HOST_UID=${HOST_UID:-1000} 
+    networks:
+      - docker-network
+    volumes:
+      - data_mariadb:/var/lib/mysql
+    restart: unless-stopped
+
+  webserv:
+    container_name: webserv
+    build:
+      context: ./webserv
+      dockerfile: Dockerfile
+      args:
+        HOST_UID: ${HOST_UID:-1000}
+    depends_on:
+      - mariadb
+    environment:
+      # - DOMAIN_NAME=${DOMAIN_NAME}
+
+      - DB_HOST=mariadb
+      - DB_PORT=3306
+
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=wp_user
+      - MYSQL_PASSWORD=password
+
+      - WP_TITLE="webserv blog"
+      - WP_DESCRIPTION=""
+      #- WP_THEME=
+
+      - WP_ADMIN=admin
+      - WP_ADMIN_PASSWORD=admin
+      - WP_ADMIN_EMAIL=admin@admin.admin
+    networks:
+      - docker-network
+    volumes:
+      - data_wordpress:/var/www/html
+    restart: unless-stopped
+
+networks:
+  docker-network:
+    name: docker-network
+
+volumes:
+  data_mariadb:
+    name: data_mariadb
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/kali/data/mariadb
+      o: bind
+  data_wordpress:
+    name: data_wordpress
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/kali/data/wordpress
+      o: bind
