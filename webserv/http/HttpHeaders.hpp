@@ -39,4 +39,5 @@ class HttpHeaders
 
   private:
     std::unordered_map<std::string, std::vector<std::string>> headers_;
+    std::unordered_map<std::string, std::string> originalCase_; // Maps lowercase name -> original case
 };

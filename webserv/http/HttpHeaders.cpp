@@ -44,6 +44,11 @@ void HttpHeaders::add(const std::string &name,
 {
     std::string lower = name;
     std::ranges::transform(lower, lower.begin(), ::tolower);
+    // Store original case for the first occurrence (for proper output formatting)
+    if (!originalCase_.contains(lower))
+    {
+        originalCase_[lower] = name;
+    }
     // Append value to allow multiple header instances (e.g., multiple Set-Cookie)
     headers_[lower].push_back(value);
 }
@@ -53,6 +58,7 @@ void HttpHeaders::remove(const std::string &name) noexcept
     std::string lower = name;
     std::ranges::transform(lower, lower.begin(), ::tolower);
     headers_.erase(lower);
+    originalCase_.erase(lower);
 }
 
 const std::string &HttpHeaders::get(const std::string &name) const noexcept
@@ -159,10 +165,15 @@ std::string HttpHeaders::toString() const noexcept
     std::string result;
     for (const auto &pair : headers_)
     {
+        // Use original case for output (looks up from originalCase_ map)
+        const std::string &outputName = originalCase_.contains(pair.first) ? originalCase_.at(pair.first) : pair.first;
         // Emit each value on its own header line
         for (const auto &val : pair.second)
         {
-            result += pair.first + ": " + val + "\r\n";
+            result += outputName;
+            result += ": ";
+            result += val;
+            result += "\r\n";
         }
     }
     result += "\r\n";
