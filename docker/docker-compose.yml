@@ -39,20 +39,22 @@ services:
 
       - WP_TITLE="webserv blog"
       - WP_DESCRIPTION=""
-      #- WP_THEME=
+      - WP_THEME=my-minimalist-blog
 
       - WP_ADMIN=admin
       - WP_ADMIN_PASSWORD=admin
-      - WP_ADMIN_EMAIL=admin@admin.admin
+      - WP_ADMIN_EMAIL=admin@wordpress.com
     networks:
       - docker-network
     ports:
+      - '80:80'
       - '8080:8080'
       - '8081:8081'
       - '8082:8082'
       
     volumes:
-      - data_wordpress:/webserv/htdocs
+      - data_htdocs:/webserv/htdocs
+      - data_wordpress:/var/www/html
     restart: unless-stopped
 
 networks:
@@ -65,12 +67,19 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /home/kali/data/mariadb
+      device: data/mariadb
+      o: bind
+  data_htdocs:
+    name: data_htdocs
+    driver: local
+    driver_opts:
+      type: none
+      device: ../htdocs
       o: bind
   data_wordpress:
     name: data_wordpress
     driver: local
     driver_opts:
       type: none
-      device: /home/kali/webserv/htdocs
+      device: data/wordpress
       o: bind

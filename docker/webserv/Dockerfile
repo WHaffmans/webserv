@@ -61,8 +61,20 @@ FROM ubuntu:22.04
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \ 
-	php \
-	php-cgi \
+    php \
+    php-cgi \
+    curl \
+	php-phar \
+    php-mysqli \
+    php-mbstring \
+    php-json \
+    php-curl \
+    php-xml \
+    php-zip \
+    php-gd \
+    # php-session \
+    php-tokenizer \
+    mariadb-client \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /webserv
@@ -73,10 +85,18 @@ COPY ./conf/default.conf /webserv/.
 
 COPY ./conf/hosts /etc/hosts
 
-# RUN chmod 777 /webserv/default.conf
+# Install WP-CLI
+RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
+    chmod +x wp-cli.phar && \
+    mv wp-cli.phar /usr/local/bin/wp
 
+COPY install-wp.sh /usr/local/bin/.
+
+RUN chmod +x /usr/local/bin/install-wp.sh
 
 WORKDIR /webserv
 RUN mkdir logs && touch logs/webserv.log
+
+ENTRYPOINT ["/usr/local/bin/install-wp.sh"]
 
 CMD ["./webserv", "default.conf"]
