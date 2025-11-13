@@ -10,6 +10,7 @@
 #include <cstring>  // for strcpy, size_t
 #include <optional> // for optional
 #include <utility>  // for pair
+
 #include <sys/stat.h>
 
 CgiEnvironment::CgiEnvironment(const URI &uri, const HttpRequest &request)
@@ -56,12 +57,13 @@ CgiEnvironment::CgiEnvironment(const URI &uri, const HttpRequest &request)
     const HttpHeaders &headers = request.getHeaders();
 
     env_["HTTP_HOST"] = headers.getHost().value_or("localhost:8080"); // TODO: Default value for testing
-    env_["BLALALAL"] = "ASD";
-    env_["HTTP_COOKIE"] = headers.get("Cookie");
-    env_["HTTP_USER_AGENT"] = headers.get("User-Agent");
-    env_["HTTP_ACCEPT"] = headers.get("Accept");
-    env_["HTTP_ACCEPT_LANGUAGE"] = headers.get("Accept-Language");
-    env_["HTTP_ACCEPT_ENCODING"] = headers.get("Accept-Encoding");
+
+    // Map common request headers to CGI environment variables
+    addHttpHeaderToEnv("Cookie", headers, "; ");
+    addHttpHeaderToEnv("User-Agent", headers);
+    addHttpHeaderToEnv("Accept", headers);
+    addHttpHeaderToEnv("Accept-Language", headers);
+    addHttpHeaderToEnv("Accept-Encoding", headers);
 
     env_["UPLOAD_TMP_DIR"] = "./htdocs/tmp"; // Example upload directory, adjust as needed
     env_["TMP_DIR"] = "./htdocs/tmp";        // Example temp directory, adjust as needed
@@ -93,11 +95,43 @@ std::string CgiEnvironment::get(const std::string &key) const
     return "";
 }
 
+void CgiEnvironment::addHttpHeaderToEnv(const std::string &headerName, const HttpHeaders &headers,
+                                        const char *separator)
+{
+    std::string lower = headerName;
+    std::ranges::transform(lower, lower.begin(), ::tolower);
+    auto it = headers.getAll().find(lower);
+    if (it == headers.getAll().end() || it->second.empty())
+    {
+        return;
+    }
+
+    // Build HTTP_ environment variable name (e.g., "Cookie" -> "HTTP_COOKIE")
+    std::string envKey = "HTTP_" + headerName;
+    std::ranges::transform(envKey, envKey.begin(), ::toupper);
+    std::replace(envKey.begin(), envKey.end(), '-', '_');
+
+    // Join multiple header values
+    const std::vector<std::string> &vals = it->second;
+    std::string joined;
+    for (size_t i = 0; i < vals.size(); ++i)
+    {
+        if (i != 0)
+        {
+            joined += separator;
+        }
+        joined += vals[i];
+    }
+
+    env_[envKey] = joined;
+}
+
 void CgiEnvironment::appendCustomHeaders(const HttpHeaders &headers)
 {
     Log::trace(LOCATION);
     for (const auto &header : headers.getAll())
     {
+        // header.first is stored lower-cased by HttpHeaders
         if (!header.first.starts_with("x-"))
         {
             continue;
@@ -105,7 +139,21 @@ void CgiEnvironment::appendCustomHeaders(const HttpHeaders &headers)
         std::string key = "HTTP_" + header.first;
         std::transform(key.begin(), key.end(), key.begin(), ::toupper);
         std::replace(key.begin(), key.end(), '-', '_');
-        env_[key] = header.second;
-        Log::debug("Added custom header with key: " + key + " And value: " + header.second);
+        // Join multiple header values with a comma (RFC: combine field-values where appropriate)
+        std::string joined;
+        for (size_t i = 0; i < header.second.size(); ++i)
+        {
+            if (i != 0)
+            {
+                joined += ", ";
+            }
+            joined += header.second[i];
+        }
+        env_[key] = joined;
+        std::string msg = "Added custom header with key: ";
+        msg += key;
+        msg += " And value: ";
+        msg += joined;
+        Log::debug(msg);
     }
 }

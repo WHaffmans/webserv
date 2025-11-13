@@ -44,12 +44,15 @@ void HttpHeaders::add(const std::string &name,
 {
     std::string lower = name;
     std::ranges::transform(lower, lower.begin(), ::tolower);
-    headers_[lower] = value;
+    // Append value to allow multiple header instances (e.g., multiple Set-Cookie)
+    headers_[lower].push_back(value);
 }
 
 void HttpHeaders::remove(const std::string &name) noexcept
 {
-    headers_.erase(name);
+    std::string lower = name;
+    std::ranges::transform(lower, lower.begin(), ::tolower);
+    headers_.erase(lower);
 }
 
 const std::string &HttpHeaders::get(const std::string &name) const noexcept
@@ -57,9 +60,9 @@ const std::string &HttpHeaders::get(const std::string &name) const noexcept
     std::string lower = name;
     std::ranges::transform(lower, lower.begin(), ::tolower);
     auto it = headers_.find(lower);
-    if (it != headers_.end())
+    if (it != headers_.end() && !it->second.empty())
     {
-        return it->second;
+        return it->second.front();
     }
     static const std::string empty;
     return empty;
@@ -146,7 +149,7 @@ bool HttpHeaders::parse(const std::string &rawHeaders) noexcept
     return true;
 }
 
-const std::unordered_map<std::string, std::string> &HttpHeaders::getAll() const noexcept
+const std::unordered_map<std::string, std::vector<std::string>> &HttpHeaders::getAll() const noexcept
 {
     return headers_;
 }
@@ -156,7 +159,11 @@ std::string HttpHeaders::toString() const noexcept
     std::string result;
     for (const auto &pair : headers_)
     {
-        result += pair.first + ": " + pair.second + "\r\n";
+        // Emit each value on its own header line
+        for (const auto &val : pair.second)
+        {
+            result += pair.first + ": " + val + "\r\n";
+        }
     }
     result += "\r\n";
     return result;
