@@ -43,7 +43,7 @@ ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make
 
     /*Location Directive Rules*/
     engine_->addLocationRule("allowed_methods", std::make_unique<AllowedValuesRule>(
-                                                    std::vector<std::string>{"GET", "POST", "DELETE", "PUT"}, false));
+                                                    std::vector<std::string>{"GET", "POST", "DELETE", "PUT", "HEAD", "OPTIONS"}, false));
     engine_->addLocationRule("error_page", std::make_unique<StatusCodeRule>(false));
     // Folder existence validation disabled - paths are relative to server runtime directory
     // engine_->addLocationRule("root", std::make_unique<FolderExistsRule>(true));
