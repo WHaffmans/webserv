@@ -2,6 +2,7 @@ FROM ubuntu:22.04
 
 # Set environment variables for non-interactive installation
 ENV DEBIAN_FRONTEND=noninteractive
+ARG GIT_COMMIT
 
 # Install development tools in one layer
 RUN apt-get update && apt-get install -y \
@@ -49,7 +50,14 @@ RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-12 100 \
 ENV CC=clang-12
 ENV CXX=clang++-12
 
-RUN git clone https://github.com/WHaffmans/webserv.git
+RUN echo "Using webserv commit: $GIT_COMMIT"
+
+# Clone repo and checkout specific commit
+RUN git clone https://github.com/WHaffmans/webserv.git && \
+    cd webserv && \
+    git checkout $GIT_COMMIT
+
+RUN sed -i 's/static constexpr Log::Level COMPILE_TIME_LOG_LEVEL = Log::Level::Info;/static constexpr Log::Level COMPILE_TIME_LOG_LEVEL = Log::Level::Debug;/' webserv/webserv/log/Log.hpp
 
 RUN cd webserv && make
 
@@ -64,7 +72,7 @@ RUN apt-get update && apt-get install -y \
     php \
     php-cgi \
     curl \
-	php-phar \
+    php-phar \
     php-mysqli \
     php-mbstring \
     php-json \
@@ -75,15 +83,13 @@ RUN apt-get update && apt-get install -y \
     # php-session \
     php-tokenizer \
     mariadb-client \
-	&& rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /webserv
 
 COPY --from=0 /webserv/build/webserv /webserv/.
 
 COPY ./conf/default.conf /webserv/.
-
-COPY ./conf/hosts /etc/hosts
 
 # Install WP-CLI
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \

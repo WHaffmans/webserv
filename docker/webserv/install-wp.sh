@@ -16,7 +16,7 @@ wp config create --allow-root \
 	--dbname="$MYSQL_DATABASE" \
 	--dbuser="$MYSQL_USER" \
 	--dbpass="$MYSQL_PASSWORD" \
-	--dbhost=$DB_HOST \
+	--dbhost="$DB_HOST" \
 	--path=/webserv/htdocs/
 
 echo "wp core install --allow-root"

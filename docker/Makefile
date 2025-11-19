@@ -3,40 +3,44 @@ all: build up
 # URL of the repo to clone inside the webserv builder image
 GIT_URL := https://github.com/WHaffmans/webserv.git
 # Query the remote HEAD commit so builds are invalidated when upstream changes
-GIT_COMMIT := $(shell git rev-parse HEAD)
+GIT_COMMIT ?= $(shell git rev-parse HEAD)
+
+DC := docker-compose
 
 build:
-	@echo "Building images (GIT_COMMIT=$(GIT_COMMIT))"
-	docker compose build --build-arg GIT_COMMIT=$(GIT_COMMIT)
+	$(DC) build --build-arg GIT_COMMIT=$(GIT_COMMIT)
 
 nocache:
-	@echo "Building images without cache (GIT_COMMIT=$(GIT_COMMIT))"
-	docker compose build --no-cache --build-arg GIT_COMMIT=$(GIT_COMMIT)
-
+	$(DC) build --no-cache --build-arg GIT_COMMIT=$(GIT_COMMIT)
 
 up:
-	docker compose up
-
-upd:
-	docker compose up -d
+	$(DC) up
 
 down:
-	docker compose down
+	$(DC) down
 
 logs:
-	docker compose logs -f
+	$(DC) logs -f
 
-ps:
-	docker compose ps
+re: fclean up
 
 clean:
-	docker compose down --rmi all --volumes --remove-orphans
-	@echo "Removing files from host volumes using an ephemeral container (no sudo)..."
-	# remove everything in data/wordpress except .gitignore using a container
-	@docker run --rm -v $(shell pwd)/data/wordpress:/data:rw alpine:3.18 sh -c "if [ -d /data ]; then cd /data && find . -maxdepth 1 ! -name '.' ! -name '.gitignore' -exec rm -rf '{}' +; fi"
+	@echo "$(gub)Cleaning up Docker containers...$(reset)"
+	$(DC) down --rmi local --volumes --remove-orphans
+	@echo "$(gub)Removing Docker networks...$(reset)"
+	@docker network prune -f
+	@echo "$(gub)Removing Docker volumes...$(reset)"
+	@docker volume prune -f
+	@echo "$(gub)Removing Docker images...$(reset)"
+	@docker rmi -f $(shell docker images -q)
 
-rebuild: down build up
+fclean: clean
+	@find data/wordpress -mindepth 1 ! -name '.gitignore' -delete
 
-re: down clean build up
+.PHONY: all build up down re clean fclean logs rebuild
 
-.PHONY: all build up upd down logs ps clean rebuild webserv re nocache
+green:=$(shell tput setaf 2)
+bold:=$(shell tput bold)
+uncerline:=$(shell tput smul)
+gub:=$(green)$(underline)$(bold)
+reset:=$(shell tput sgr0)
