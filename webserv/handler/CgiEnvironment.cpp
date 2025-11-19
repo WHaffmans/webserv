@@ -1,5 +1,6 @@
 #include "webserv/http/HttpRequest.hpp"
 #include "webserv/log/Log.hpp"
+#include "webserv/utils/FileUtils.hpp"
 
 #include <webserv/handler/CgiEnvironment.hpp>
 #include <webserv/handler/URI.hpp>      // for URI
@@ -7,9 +8,10 @@
 
 #include <algorithm>
 #include <cctype>
-#include <cstring>  // for strcpy, size_t
-#include <optional> // for optional
-#include <utility>  // for pair
+#include <cstring>    // for strcpy, size_t
+#include <filesystem> // for absolute, path
+#include <optional>   // for optional
+#include <utility>    // for pair
 
 #include <sys/stat.h>
 
@@ -69,6 +71,7 @@ CgiEnvironment::CgiEnvironment(const URI &uri, const HttpRequest &request)
     env_["TMP_DIR"] = "./htdocs/tmp";        // Example temp directory, adjust as needed
 
     appendCustomHeaders(headers);
+    enhanceCgiCompatibility(uri, request);
 }
 
 char **CgiEnvironment::toEnvp() const
@@ -156,4 +159,37 @@ void CgiEnvironment::appendCustomHeaders(const HttpHeaders &headers)
         msg += joined;
         Log::debug(msg);
     }
+}
+
+//TODO: Remove and add to constructor what's required. (scriptname, phpself!)
+void CgiEnvironment::enhanceCgiCompatibility(const URI &uri, const HttpRequest &request)
+{
+    Log::trace(LOCATION);
+
+    // Fix SCRIPT_NAME to be URI path from document root, not just basename
+    // Construct the script name from directory and basename
+
+    // std::string scriptName = uri.getDir() + uri.getBaseName();
+    std::string scriptName = FileUtils::joinPath(uri.getDir(), uri.getBaseName());
+    env_["SCRIPT_NAME"] = scriptName;
+    // PHP_SELF is critical for PHP applications - should match SCRIPT_NAME
+    env_["PHP_SELF"] = scriptName;
+
+    // Add missing server variables for better CGI/1.1 compliance
+    env_["SERVER_ADMIN"] = "webmaster@localhost";
+    env_["SERVER_SIGNATURE"] = "";
+
+    // Add HTTPS detection (defaults to off, can be enhanced based on request)
+    env_["HTTPS"] = "off";
+
+    // Add ORIG_PATH_INFO for applications that need it
+    env_["ORIG_PATH_INFO"] = uri.getPathInfo();
+
+    // Add AUTH_TYPE if authorization header is present
+    if (request.getHeaders().has("authorization"))
+    {
+        env_["AUTH_TYPE"] = "Basic"; // Could be enhanced to detect Digest, Bearer, etc.
+    }
+
+    Log::debug("Enhanced CGI environment for better compatibility");
 }
