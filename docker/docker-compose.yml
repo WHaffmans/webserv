@@ -26,10 +26,10 @@ services:
       args:
         HOST_UID: ${HOST_UID:-1000}
     depends_on:
-      - mariadb
+      mariadb:
+        condition: service_healthy
     environment:
-      # - DOMAIN_NAME=${DOMAIN_NAME}
-
+      - DOMAIN_NAME=localhost
       - DB_HOST=mariadb
       - DB_PORT=3306
 
@@ -44,17 +44,20 @@ services:
       - WP_ADMIN=admin
       - WP_ADMIN_PASSWORD=admin
       - WP_ADMIN_EMAIL=admin@wordpress.com
+      - WP_USER=author
+      - WP_USER_PASSWORD=author
+      - WP_USER_EMAIL=user@wordpress.com
     networks:
       - docker-network
     ports:
-      - '80:80'
+      # - '80:80'
       - '8080:8080'
       - '8081:8081'
       - '8082:8082'
       
     volumes:
-      - data_htdocs:/webserv/htdocs
-      - data_wordpress:/var/www/html
+      # - data_htdocs:/webserv/htdocs
+      - data_wordpress:/webserv/htdocs
     restart: unless-stopped
 
 networks:
@@ -64,18 +67,18 @@ networks:
 volumes:
   data_mariadb:
     name: data_mariadb
-    driver: local
-    driver_opts:
-      type: none
-      device: data/mariadb
-      o: bind
-  data_htdocs:
-    name: data_htdocs
-    driver: local
-    driver_opts:
-      type: none
-      device: ../htdocs
-      o: bind
+    # driver: local
+    # driver_opts:
+    #   type: none
+    #   device: data/mariadb
+    #   o: bind
+  # data_htdocs:
+  #   name: data_htdocs
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     device: ../htdocs
+  #     o: bind
   data_wordpress:
     name: data_wordpress
     driver: local
