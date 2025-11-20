@@ -21,7 +21,8 @@ CgiEnvironment::CgiEnvironment(const URI &uri, const HttpRequest &request)
     env_["GATEWAY_INTERFACE"] = "CGI/1.1";
     env_["SERVER_PROTOCOL"] = "HTTP/1.1";
     env_["REQUEST_METHOD"] = request.getMethod();
-    env_["SCRIPT_NAME"] = uri.getBaseName();
+    env_["SCRIPT_NAME"] = FileUtils::joinPath(uri.getDir(), uri.getBaseName());
+    env_["PHP_SELF"] = env_["SCRIPT_NAME"];
     env_["SCRIPT_FILENAME"] = uri.getFullPath(); // Full filesystem path to the script (required by PHP)
     env_["QUERY_STRING"] = uri.getQuery();
     env_["REQUEST_URI"] = request.getTarget();
@@ -71,7 +72,7 @@ CgiEnvironment::CgiEnvironment(const URI &uri, const HttpRequest &request)
     env_["TMP_DIR"] = "./htdocs/tmp";        // Example temp directory, adjust as needed
 
     appendCustomHeaders(headers);
-    enhanceCgiCompatibility(uri, request);
+    // enhanceCgiCompatibility(uri, request);
 }
 
 char **CgiEnvironment::toEnvp() const
@@ -165,22 +166,6 @@ void CgiEnvironment::appendCustomHeaders(const HttpHeaders &headers)
 void CgiEnvironment::enhanceCgiCompatibility(const URI &uri, const HttpRequest &request)
 {
     Log::trace(LOCATION);
-
-    // Fix SCRIPT_NAME to be URI path from document root, not just basename
-    // Construct the script name from directory and basename
-
-    // std::string scriptName = uri.getDir() + uri.getBaseName();
-    std::string scriptName = FileUtils::joinPath(uri.getDir(), uri.getBaseName());
-    env_["SCRIPT_NAME"] = scriptName;
-    // PHP_SELF is critical for PHP applications - should match SCRIPT_NAME
-    env_["PHP_SELF"] = scriptName;
-
-    // Add missing server variables for better CGI/1.1 compliance
-    env_["SERVER_ADMIN"] = "webmaster@localhost";
-    env_["SERVER_SIGNATURE"] = "";
-
-    // Add HTTPS detection (defaults to off, can be enhanced based on request)
-    env_["HTTPS"] = "off";
 
     // Add ORIG_PATH_INFO for applications that need it
     env_["ORIG_PATH_INFO"] = uri.getPathInfo();
