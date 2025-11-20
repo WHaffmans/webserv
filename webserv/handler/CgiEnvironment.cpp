@@ -72,7 +72,6 @@ CgiEnvironment::CgiEnvironment(const URI &uri, const HttpRequest &request)
     env_["TMP_DIR"] = "./htdocs/tmp";        // Example temp directory, adjust as needed
 
     appendCustomHeaders(headers);
-    // enhanceCgiCompatibility(uri, request);
 }
 
 char **CgiEnvironment::toEnvp() const
@@ -160,21 +159,4 @@ void CgiEnvironment::appendCustomHeaders(const HttpHeaders &headers)
         msg += joined;
         Log::debug(msg);
     }
-}
-
-//TODO: Remove and add to constructor what's required. (scriptname, phpself!)
-void CgiEnvironment::enhanceCgiCompatibility(const URI &uri, const HttpRequest &request)
-{
-    Log::trace(LOCATION);
-
-    // Add ORIG_PATH_INFO for applications that need it
-    env_["ORIG_PATH_INFO"] = uri.getPathInfo();
-
-    // Add AUTH_TYPE if authorization header is present
-    if (request.getHeaders().has("authorization"))
-    {
-        env_["AUTH_TYPE"] = "Basic"; // Could be enhanced to detect Digest, Bearer, etc.
-    }
-
-    Log::debug("Enhanced CGI environment for better compatibility");
 }
