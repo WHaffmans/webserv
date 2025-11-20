@@ -1,3 +1,6 @@
 [submodule "webserv-tester"]
 	path = webserv-tester
 	url = git@github.com:WHaffmans/webserv-tester.git
+[submodule "docker"]
+	path = docker
+	url = https://github.com/WHaffmans/webserv-docker.git
