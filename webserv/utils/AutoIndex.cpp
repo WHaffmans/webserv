@@ -1,14 +1,27 @@
 #include "webserv/config/AConfig.hpp"
+
+#include <webserv/handler/URI.hpp>
 #include <webserv/utils/AutoIndex.hpp>
 #include <webserv/utils/FileUtils.hpp>
-#include <webserv/handler/URI.hpp>
 
 #include <string>
 #include <vector>
 
+bool deleteAllowed(const URI &uri)
+{
+    auto allowed = uri.getConfig()->get<std::vector<std::string>>("allowed_methods");
+    if (!allowed)
+    {
+        return false;
+    }
+
+    return std::find(allowed->begin(), allowed->end(), "DELETE") != allowed->end();
+}
+
 std::string AutoIndex::generate(const std::string &dir, const URI &uri)
 {
     std::ostringstream html;
+    const auto *config = uri.getConfig();
 
     html << "<!DOCTYPE html>\n"
          << "<html><head>\n"
@@ -26,12 +39,12 @@ std::string AutoIndex::generate(const std::string &dir, const URI &uri)
          << "</head><body>\n"
          << "<h1>Index of " << dir << "</h1>\n"
          << "<table>\n"
-         << "<tr><th>Name</th><th>Last Modified</th><th>Size</th></tr>\n";
+         << "<tr><th>Name</th><th>Last Modified</th><th>Size</th><th></th></tr>\n";
 
     // Add parent directory link if not root
     if (dir != "/")
     {
-        html << "<tr><td><a href=\"../\" class=\"dir\">[Parent Directory]</a></td><td>-</td><td>-</td></tr>\n";
+        html << "<tr><td><a href=\"../\" class=\"dir\">[Parent Directory]</a></td><td>-</td><td>-</td><td></td></tr>\n";
     }
 
     auto entries = FileUtils::listDirectory(dir);
@@ -54,12 +67,32 @@ std::string AutoIndex::generate(const std::string &dir, const URI &uri)
         {
             html << "/";
         }
-        html << "</a></td>" << "<td></td>"; //<< std::format("{:%Y-%m-%d %H:%M:%S}", entry.last_write_time()) << "</td>"
-        html << "<td>" << (entry.is_directory() ? "-" : formatFileSize(entry.file_size())) << "</td></tr>\n";
+        html << "</a>";
+
+        html << "</td>" << "<td></td>"; //<< std::format("{:%Y-%m-%d %H:%M:%S}", entry.last_write_time()) << "</td>"
+        html << "<td>" << (entry.is_directory() ? "-" : formatFileSize(entry.file_size())) << "</td><td>";
+        if (!entry.is_directory() && deleteAllowed(uri))
+        {
+            html << "<span style=\"color:red; font-weight: bold;cursor:pointer\" onclick=\"fetch('" << href
+                 << "', {method: 'DELETE'}).then(response => {if(response.ok) location.reload(); else alert('Delete "
+                    "failed');})\" style=\"cursor: pointer; color: red; margin-left: 10px;\">&#10060;</span>";
+        }
+        html<< "</td></tr>\n";
     }
 
-    html << "</table>\n"
-         << "<hr><p><em>webserv</em></p>\n"
+    html << "</table>\n";
+
+    if (config->get<std::string>("root") == config->get<std::string>("upload_store")
+        && config->get<std::string>("root") == dir)
+    {
+
+        html << "<form method=\"POST\" enctype=\"multipart/form-data\" action=\""
+             << uri.getUriForPath(dir) << "/?autoindex=on\">\n"
+             << "<input type=\"file\" name=\"file\" />\n"
+             << "<input type=\"submit\" value=\"Upload\" />\n"
+             << "</form>\n";
+    }
+    html << "<hr><p><em>webserv</em></p>\n"
          << "</body></html>\n";
 
     return html.str();

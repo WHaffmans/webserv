@@ -8,6 +8,7 @@
 #include <webserv/http/HttpRequest.hpp>
 #include <webserv/http/HttpResponse.hpp>
 #include <webserv/log/Log.hpp>
+#include <webserv/utils/AutoIndex.hpp>
 #include <webserv/utils/utils.hpp>
 
 #include <algorithm>
@@ -65,8 +66,16 @@ void UploadHandler::handle()
         parseMultipart();
 
         response_.setStatus(Http::StatusCode::CREATED);
-        response_.addHeader("Content-Type", "application/json");
-        response_.setBody("{\"success\": true, \"message\": \"Files uploaded successfully\"}\n");
+        // response_.addHeader("Content-Type", "application/json");
+        if (request_.getUri().getQuery().find("autoindex") != std::string::npos)
+        {
+            auto redirectUrl = request_.getUri().getUriForPath(request_.getUri().getDir());
+            response_.setBody(R"(<html><head><meta http-equiv="refresh" content="0; URL=')" + redirectUrl + "'\" /></head><body></body></html>");
+        }
+        else {
+            response_.setBody(R"({"success": true, "message": "Files uploaded successfully"}\n)");
+        }
+        // 
     }
     catch (const std::exception &e)
     {
