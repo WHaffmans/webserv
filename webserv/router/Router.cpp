@@ -1,4 +1,5 @@
 #include "webserv/handler/DeleteHandler.hpp"
+
 #include <webserv/client/Client.hpp>                   // for Client
 #include <webserv/config/AConfig.hpp>                  // for AConfig
 #include <webserv/config/directive/ADirective.hpp>     // for ADirective
@@ -49,7 +50,8 @@ std::unique_ptr<AHandler> Router::handleRequest()
     {
         return std::make_unique<RedirectHandler>(request, response);
     }
-    if (request.getMethod() == "DELETE" && !request.getUri().isCgi())
+    if (request.getMethod() == "DELETE"
+        && (!request.getUri().getConfig()->get<bool>("cgi_enabled").value_or(false) || !request.getUri().isCgi()))
     {
         return std::make_unique<DeleteHandler>(request, response);
     }
@@ -58,7 +60,7 @@ std::unique_ptr<AHandler> Router::handleRequest()
         Log::debug("Handling file upload");
         return std::make_unique<UploadHandler>(request, response);
     }
-    if (request.getUri().isCgi())
+    if (request.getUri().isCgi() && request.getUri().getConfig()->get<bool>("cgi_enabled").value_or(false))
     {
         try
         {
