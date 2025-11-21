@@ -117,6 +117,7 @@ void URI::parseFullpath()
         if (FileUtils::isFile(currentPath) && baseName_.empty())
         {
             baseName_ = segment;
+            isDir_ = false;
         }
         else if (FileUtils::isDirectory(currentPath))
         {
@@ -155,7 +156,14 @@ void URI::parseFullpath()
         }
     }
     Log::debug("URI parseFullpath results", {{"dir", dir_}, {"baseName", baseName_}, {"pathInfo", pathInfo_}});
-    fullPath_ = FileUtils::joinPath(dir_, baseName_);
+    if (baseName_.empty())
+    {
+        fullPath_ = dir_ + "/";
+    }
+    else
+    {
+        fullPath_ = FileUtils::joinPath(dir_, baseName_);
+    }
 }
 
 const AConfig *URI::getConfig() const noexcept
@@ -170,7 +178,7 @@ bool URI::isFile() const noexcept
 
 bool URI::isDirectory() const noexcept
 {
-    return baseName_.empty();
+    return isDir_;
 }
 
 bool URI::isValid() const noexcept
@@ -181,7 +189,7 @@ bool URI::isValid() const noexcept
 bool URI::isCgi() const noexcept
 {
     Log::debug("Check for CGI extension: " + getExtension() + ", with basename " + baseName_);
-    return config_->isCGI(getExtension());
+    return config_->isCGI(getExtension()) && FileUtils::isFile(fullPath_);
 }
 
 bool URI::isRedirect() const noexcept

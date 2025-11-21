@@ -1,6 +1,7 @@
 #include "webserv/http/HttpRequest.hpp"
 #include "webserv/log/Log.hpp"
 #include "webserv/utils/FileUtils.hpp"
+#include "webserv/utils/utils.hpp"
 
 #include <webserv/handler/CgiEnvironment.hpp>
 #include <webserv/handler/URI.hpp>      // for URI
@@ -26,11 +27,11 @@ CgiEnvironment::CgiEnvironment(const URI &uri, const HttpRequest &request)
     env_["GATEWAY_INTERFACE"] = "CGI/1.1";
     env_["SERVER_PROTOCOL"] = "HTTP/1.1";
     env_["REQUEST_METHOD"] = request.getMethod();
-    env_["SCRIPT_NAME"] = FileUtils::joinPath(uri.getDir(), uri.getBaseName());
+    env_["SCRIPT_NAME"] = uri.getFullPath();
     env_["PHP_SELF"] = env_["SCRIPT_NAME"];
     env_["SCRIPT_FILENAME"] = uri.getFullPath(); // Full filesystem path to the script (required by PHP)
     env_["QUERY_STRING"] = uri.getQuery();
-    env_["REQUEST_URI"] = request.getTarget();
+    env_["REQUEST_URI"] = uri.isDirectory() ? utils::ensureTrailingSlash(request.getTarget()) : request.getTarget();
     env_["PATH_INFO"] = uri.getPathInfo();
     env_["SERVER_NAME"] = host;
     env_["SERVER_PORT"] = std::to_string(port);
@@ -131,7 +132,7 @@ void CgiEnvironment::setXHeaders(const HttpHeaders &headers)
         std::string key = "HTTP_" + header.first;
         std::ranges::transform(key.begin(), key.end(), key.begin(), ::toupper);
         std::ranges::replace(key.begin(), key.end(), '-', '_');
-        
+
         // Join multiple header values with a comma (RFC: combine field-values where appropriate)
         std::string joined;
         for (size_t i = 0; i < header.second.size(); ++i)

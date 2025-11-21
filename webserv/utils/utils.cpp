@@ -14,6 +14,16 @@
 
 namespace utils
 {
+
+std::string ensureTrailingSlash(const std::string &path)
+{
+    if (!path.empty() && path.back() != '/')
+    {
+        return path + "/";
+    }
+    return path;
+}
+
 size_t stoul(const std::string &str, int base)
 {
     if (str.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos)

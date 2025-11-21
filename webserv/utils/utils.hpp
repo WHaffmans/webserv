@@ -23,4 +23,6 @@ std::string implode(const std::vector<std::string> &elements, const std::string 
 uint32_t stateToEpoll(const ASocket::IoState &event);
 std::string uriEncode(const std::string &value);
 std::string uriDecode(const std::string &value);
+
+std::string ensureTrailingSlash(const std::string &path);
 } // namespace utils

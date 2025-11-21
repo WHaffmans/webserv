@@ -53,5 +53,7 @@ class URI
     std::string authority_;
     bool valid_ = true;
 
+    bool isDir_ = true;
+
     static const AConfig *matchConfig(const std::string &uri, const ServerConfig &serverConfig);
 };
