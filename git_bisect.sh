@@ -25,7 +25,7 @@ SERVER_PID=$!
 # Wait for port
 for i in {1..10}; do
     kill -0 $SERVER_PID 2>/dev/null || exit 125
-    nc -z localhost 8080 2>/dev/null && break
+    nc -z localhost 8083 2>/dev/null && break
     sleep 0.5
 done
 
