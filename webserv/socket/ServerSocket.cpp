@@ -12,7 +12,8 @@
 #include <sys/socket.h> // for AF_INET, accept, bind, listen, setsockopt, socket, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 #include <unistd.h>     // for close
 
-ServerSocket::ServerSocket() : ASocket(socket(AF_INET, SOCK_STREAM, 0), ASocket::IoState::READ)
+ServerSocket::ServerSocket(const std::string &host, int port)
+    : ASocket(socket(AF_INET, SOCK_STREAM, 0), ASocket::IoState::READ), host_(host), port_(port)
 {
     Log::trace(LOCATION);
     if (getFd() == -1)
@@ -28,12 +29,8 @@ ServerSocket::ServerSocket() : ASocket(socket(AF_INET, SOCK_STREAM, 0), ASocket:
         Log::error("setsockopt failed");
         throw std::runtime_error("setsockopt failed");
     }
-    // setNonBlocking();
-}
-
-ServerSocket::ServerSocket(int fd) : ASocket(fd)
-{
-    Log::trace(LOCATION);
+    bind(host_, port_);
+    listen(SOMAXCONN);
 }
 
 void ServerSocket::listen(int backlog) const
@@ -85,4 +82,14 @@ std::unique_ptr<ClientSocket> ServerSocket::accept() const
 std::string ServerSocket::toString() const
 {
     return "ServerSocket(fd=" + std::to_string(getFd()) + ")";
+}
+
+const std::string &ServerSocket::getHost() const noexcept
+{
+    return host_;
+}
+
+int ServerSocket::getPort() const noexcept
+{
+    return port_;
 }

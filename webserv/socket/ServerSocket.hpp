@@ -9,8 +9,7 @@
 class ServerSocket : public ASocket
 {
   public:
-    ServerSocket();
-    ServerSocket(int fd);
+    ServerSocket(const std::string &host, int port);
 
     void listen(int backlog) const;
     void bind(const std::string &host, int port) const;
@@ -19,4 +18,11 @@ class ServerSocket : public ASocket
     [[nodiscard]] std::unique_ptr<ClientSocket> accept() const;
 
     [[nodiscard]] std::string toString() const override;
+
+    [[nodiscard]] const std::string& getHost() const noexcept;
+    [[nodiscard]] int getPort() const noexcept;
+
+  private:
+    std::string host_;
+    int port_;
 };

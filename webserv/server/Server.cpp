@@ -118,9 +118,16 @@ void Server::setupServerSocket(const ServerConfig &config)
     {
         auto host = config.get<std::string>("host").value_or(std::string()); // TODO should not be a default host
         auto port = config.get<int>("listen").value_or(0);                   // TODO should not be a default port
-        std::unique_ptr<ServerSocket> serverSocket = std::make_unique<ServerSocket>();
-        serverSocket->bind(host, port);
-        serverSocket->listen(SOMAXCONN);
+        for (const auto &listener : listeners_)
+        {
+            if (listener->getPort() == port && listener->getHost() == host)
+            {
+                Log::info("Server socket for " + host + ":" + std::to_string(port)
+                          + " already exists, skipping creation.");
+                return;
+            }
+        }
+        std::unique_ptr<ServerSocket> serverSocket = std::make_unique<ServerSocket>(host, port);
         int server_fd = serverSocket->getFd();
 
         add(*serverSocket);

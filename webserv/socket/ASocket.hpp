@@ -27,7 +27,6 @@ class ASocket
 
     ASocket() = delete;
     explicit ASocket(int fd, IoState state = IoState::NONE);
-
     ASocket(const ASocket &other) = delete;
     ASocket &operator=(const ASocket &other) = delete;
     ASocket(ASocket &&other) noexcept = default;
