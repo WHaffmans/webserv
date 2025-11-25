@@ -25,7 +25,7 @@ class CgiHandler : public AHandler
     CgiHandler(CgiHandler &&other) noexcept = delete;
     CgiHandler &operator=(CgiHandler &&other) noexcept = delete;
 
-    ~CgiHandler() = default;
+    ~CgiHandler() override;
 
     void handle() override;
     void wait() noexcept;

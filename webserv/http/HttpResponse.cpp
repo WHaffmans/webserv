@@ -1,6 +1,7 @@
 #include <webserv/http/HttpConstants.hpp> // for getStatusCodeReason
 #include <webserv/http/HttpResponse.hpp>
 
+#include <iomanip>
 #include <string> // for basic_string, operator+, string, char_traits, to_string
 #include <vector> // for vector
 
@@ -79,14 +80,15 @@ std::string HttpResponse::getContentLengthHeader() const
     return "Content-Length: " + std::to_string(body_.size()) + "\r\n";
 }
 
-std::string HttpResponse::getDateHeader() const
+std::string HttpResponse::getDateHeader()
 {
     time_t now = time(nullptr);
     struct tm *gmt = gmtime(&now);
-    char buffer[100];
-    strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", gmt);
 
-    return "Date: " + std::string(buffer) + "\r\n";
+    std::ostringstream oss;
+    oss << std::put_time(gmt, "%a, %d %b %Y %H:%M:%S GMT");
+
+    return "Date: " + oss.str() + "\r\n";
 }
 
 std::vector<uint8_t> HttpResponse::toBytes(long offset) const

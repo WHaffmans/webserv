@@ -20,6 +20,7 @@
 #include <sstream>
 #include <string>
 
+#include <linux/limits.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -69,7 +70,7 @@ void UploadHandler::handle()
     }
     try
     {
-        parseMultipart();
+        parse();
 
         response_.setStatus(Http::StatusCode::CREATED);
         // response_.addHeader("Content-Type", "application/json");
@@ -98,7 +99,7 @@ void UploadHandler::handleTimeout()
     ErrorHandler::createErrorResponse(Http::StatusCode::GATEWAY_TIMEOUT, response_);
 }
 
-void UploadHandler::parseMultipart()
+void UploadHandler::parse()
 {
     Log::trace(LOCATION);
 
@@ -151,7 +152,7 @@ void UploadHandler::parseMultipart()
         // Parse the part
         if (!part.empty())
         {
-            decodeSection(part);
+            decode(part);
         }
 
         // Move to next part
@@ -187,7 +188,7 @@ std::string UploadHandler::extractBoundary(const std::string &contentType)
     return boundary;
 }
 
-bool UploadHandler::decodeSection(const std::string &part)
+bool UploadHandler::decode(const std::string &part)
 {
     Log::trace(LOCATION);
 
@@ -203,9 +204,7 @@ bool UploadHandler::decodeSection(const std::string &part)
     }
 
     std::string headers = part.substr(0, headerEnd);
-    size_t contentStart
-        = headerEnd
-          + (part[headerEnd] == '\r' ? 4 : 2); // TODO: DRY, we're also doing this in the http headers i believe
+    size_t contentStart = headerEnd + (part[headerEnd] == '\r' ? 4 : 2);
     if (contentStart >= part.length())
     {
         Log::debug("Empty multipart part");
@@ -253,7 +252,8 @@ bool UploadHandler::decodeSection(const std::string &part)
     return true;
 }
 
-std::string UploadHandler::getHeaderValue(const std::string &headers, const std::string &key) const
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+std::string UploadHandler::getHeaderValue(const std::string &headers, const std::string &key)
 {
     std::string search = key;
     std::ranges::transform(search.begin(), search.end(), search.begin(), ::tolower);
@@ -288,7 +288,6 @@ std::string UploadHandler::getHeaderValue(const std::string &headers, const std:
 
 std::string UploadHandler::getFileName(const std::string &disposition)
 {
-    // Look for filename="..." or filename*=UTF-8''...
     size_t filenamePos = disposition.find("filename=");
     if (filenamePos == std::string::npos)
     {
@@ -301,7 +300,6 @@ std::string UploadHandler::getFileName(const std::string &disposition)
         Log::warning("Malformed filename in Content-Disposition");
         return "";
     }
-    // Unquoted - take until semicolon or end
     size_t endPos = filename.find(';');
     if (endPos != std::string::npos)
     {
@@ -311,7 +309,7 @@ std::string UploadHandler::getFileName(const std::string &disposition)
     return utils::trim(filename);
 }
 
-std::string UploadHandler::getFieldName(const std::string &disposition) const
+std::string UploadHandler::getFieldName(const std::string &disposition)
 {
     size_t namePos = disposition.find("name=");
     if (namePos == std::string::npos)
@@ -319,30 +317,17 @@ std::string UploadHandler::getFieldName(const std::string &disposition) const
         return "";
     }
     std::string fieldName = disposition.substr(namePos + 5);
-    // Handle quoted name
-    if (!fieldName.empty() && fieldName[0] == '"')
+    fieldName = utils::extractQuotedValue(fieldName);
+    size_t endPos = fieldName.find(';');
+    if (endPos != std::string::npos)
     {
-        fieldName = fieldName.substr(1);
-        size_t endQuote = fieldName.find('"');
-        if (endQuote != std::string::npos)
-        {
-            fieldName = fieldName.substr(0, endQuote);
-        }
-    }
-    else
-    {
-        // Unquoted - take until semicolon or end
-        size_t endPos = fieldName.find(';');
-        if (endPos != std::string::npos)
-        {
-            fieldName = fieldName.substr(0, endPos);
-        }
+        fieldName = fieldName.substr(0, endPos);
     }
 
     return utils::trim(fieldName);
 }
 
-std::string UploadHandler::sanitizeFilename(const std::string &filename) const
+std::string UploadHandler::sanitize(const std::string &filename)
 {
     std::string sanitized;
     sanitized.reserve(filename.length());
@@ -361,16 +346,16 @@ std::string UploadHandler::sanitizeFilename(const std::string &filename) const
     {
         sanitized = "upload";
     }
-    if (sanitized.length() > 255)
+    if (sanitized.length() > NAME_MAX)
     {
-        sanitized = sanitized.substr(0, 255);
+        sanitized = sanitized.substr(0, NAME_MAX);
     }
     return sanitized;
 }
 
 std::string UploadHandler::generateFilename(const std::string &baseFilename) const
 {
-    std::string sanitized = sanitizeFilename(baseFilename);
+    std::string sanitized = sanitize(baseFilename);
     std::string fullPath = uploadStore_ + "/" + sanitized;
 
     if (!FileUtils::isFile(fullPath))
@@ -415,7 +400,7 @@ bool UploadHandler::save(UploadedFile &info, const std::vector<uint8_t> &data)
         Log::error("Failed to open file for writing: " + fullPath);
         return false;
     }
-
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     file.write(reinterpret_cast<const char *>(data.data()), static_cast<std::streamsize>(data.size()));
     file.close();
     if (!file.good())

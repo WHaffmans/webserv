@@ -1,5 +1,6 @@
 
 #include <webserv/handler/MIMETypes.hpp>
+#include <webserv/http/HttpConstants.hpp>
 
 #include <utility> // for pair
 
@@ -25,18 +26,17 @@ void MIMETypes::setType(const std::string &extension, const std::string &mimeTyp
 
 void MIMETypes::initializeDefaults()
 {
-    mimeMap["html"] = "text/html";
-    mimeMap["htm"] = "text/html";
-    mimeMap["css"] = "text/css";
-    mimeMap["js"] = "application/javascript";
-    mimeMap["json"] = "application/json";
-    mimeMap["png"] = "image/png";
-    mimeMap["jpg"] = "image/jpeg";
-    mimeMap["jpeg"] = "image/jpeg";
-    mimeMap["gif"] = "image/gif";
-    mimeMap["svg"] = "image/svg+xml";
-    mimeMap["txt"] = "text/plain";
-    mimeMap["xml"] = "application/xml";
-    mimeMap["pdf"] = "application/pdf";
-    // Add more default MIME types as needed
+    mimeMap["html"] = Http::MimeType::TEXT_HTML;
+    mimeMap["htm"] = Http::MimeType::TEXT_HTML;
+    mimeMap["css"] = Http::MimeType::TEXT_CSS;
+    mimeMap["js"] = Http::MimeType::APPLICATION_JAVASCRIPT;
+    mimeMap["json"] = Http::MimeType::APPLICATION_JSON;
+    mimeMap["png"] = Http::MimeType::IMAGE_PNG;
+    mimeMap["jpg"] = Http::MimeType::IMAGE_JPEG;
+    mimeMap["jpeg"] = Http::MimeType::IMAGE_JPEG;
+    mimeMap["gif"] = Http::MimeType::IMAGE_GIF;
+    mimeMap["svg"] = Http::MimeType::IMAGE_SVG;
+    mimeMap["txt"] = Http::MimeType::TEXT_PLAIN;
+    mimeMap["xml"] = Http::MimeType::APPLICATION_XML;
+    mimeMap["pdf"] = Http::MimeType::APPLICATION_PDF;
 }

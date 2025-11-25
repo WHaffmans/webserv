@@ -44,7 +44,7 @@ class HttpResponse
   private:
     [[nodiscard]] std::string getStatusLine() const;
     [[nodiscard]] std::string getContentLengthHeader() const;
-    [[nodiscard]] std::string getDateHeader() const;
+    [[nodiscard]] static std::string getDateHeader();
 
     std::vector<uint8_t> body_;
     std::unique_ptr<HttpHeaders> headers_;

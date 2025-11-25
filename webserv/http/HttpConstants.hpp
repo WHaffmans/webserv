@@ -109,7 +109,11 @@ constexpr std::string_view APPLICATION_JSON = "application/json";
 constexpr std::string_view APPLICATION_XML = "application/xml";
 constexpr std::string_view IMAGE_JPEG = "image/jpeg";
 constexpr std::string_view IMAGE_PNG = "image/png";
-constexpr std::string_view OCTET_STREAM = "application/octet-stream";
+constexpr std::string_view TEXT_CSS = "text/css";
+constexpr std::string_view APPLICATION_JAVASCRIPT = "application/javascript";
+constexpr std::string_view IMAGE_GIF = "image/gif";
+constexpr std::string_view IMAGE_SVG = "image/svg+xml";
+constexpr std::string_view APPLICATION_PDF = "application/pdf";
 } // namespace MimeType
 
 // Protocol Constants
@@ -117,11 +121,8 @@ namespace Protocol
 {
 constexpr std::string_view CRLF = "\r\n";
 constexpr std::string_view DOUBLE_CRLF = "\r\n\r\n";
-constexpr std::string_view HEADER_SEPARATOR = ": ";
-constexpr std::string_view SPACE = " ";
 constexpr size_t MAX_HEADER_SIZE = 8192;
 constexpr size_t MAX_HEADER_COUNT = 64;
-constexpr size_t MAX_BODY_SIZE = size_t(1024) * size_t(1024); // 1MB
 constexpr size_t MAX_URI_LENGTH = 2048;
 constexpr std::string_view HTTP_SCHEME = "http";
 } // namespace Protocol

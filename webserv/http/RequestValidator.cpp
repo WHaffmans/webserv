@@ -38,13 +38,13 @@ std::optional<RequestValidator::ValidationError> RequestValidator::validateHostH
 {
     if (!request->getHeaders().has("Host"))
     {
-        return ValidationError{400, "Bad Request: Missing Host header"};
+        return ValidationError{.statusCode = 400, .message = "Bad Request: Missing Host header"};
     }
     std::string hostHeader = request->getHeaders().get("Host");
     // Basic validation: check if host header is not empty
     if (hostHeader.empty())
     {
-        return ValidationError{400, "Bad Request: Empty Host header"};
+        return ValidationError{.statusCode = 400, .message = "Bad Request: Empty Host header"};
     }
     Log::debug("Host header validated: " + hostHeader);
     return std::nullopt;
@@ -55,7 +55,7 @@ std::optional<RequestValidator::ValidationError> RequestValidator::validateHttpV
     std::string httpVersion = request->getHttpVersion();
     if (httpVersion != "HTTP/1.1" && httpVersion != "HTTP/1.0")
     {
-        return ValidationError{505, "HTTP Version Not Supported"};
+        return ValidationError{.statusCode = 505, .message = "HTTP Version Not Supported"};
     }
     return std::nullopt;
 }
@@ -66,7 +66,7 @@ std::optional<RequestValidator::ValidationError> RequestValidator::validateConte
     size_t maxBodySize = config->get<size_t>("client_max_body_size").value_or(1024 * 1024);
     if (bodySize > maxBodySize) // exceed server limit
     {
-        return ValidationError{413, "Payload Too Large"};
+        return ValidationError{.statusCode = 413, .message = "Payload Too Large"};
     }
     // If Content-Length header is present, validate it
     if (request->getHeaders().getContentLength())
@@ -74,7 +74,8 @@ std::optional<RequestValidator::ValidationError> RequestValidator::validateConte
         size_t contentLength = *request->getHeaders().getContentLength();
         if (contentLength != bodySize)
         {
-            return ValidationError{400, "Bad Request: Content-Length does not match body size"};
+            return ValidationError{.statusCode = 400,
+                                   .message = "Bad Request: Content-Length does not match body size"};
         }
     }
     return std::nullopt; // Content-Length is valid
@@ -87,15 +88,15 @@ std::optional<RequestValidator::ValidationError> RequestValidator::validateMetho
 
     if (request->getMethod().empty())
     {
-        return ValidationError{.statusCode=400, .message="Bad Request: Empty or Invalid HTTP Method"};
+        return ValidationError{.statusCode = 400, .message = "Bad Request: Empty or Invalid HTTP Method"};
     }
 
     std::vector<std::string> possibleMethods = {"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"};
     if (std::ranges::find(possibleMethods, request->getMethod()) == possibleMethods.end())
     {
-        return ValidationError{.statusCode=501, .message="Method Not Implemented"};
+        return ValidationError{.statusCode = 501, .message = "Method Not Implemented"};
     }
-    
+
     if (allowedMethodsOpt.has_value())
     {
         allowedMethods = allowedMethodsOpt.value();
@@ -112,7 +113,7 @@ std::optional<RequestValidator::ValidationError> RequestValidator::validateMetho
         }
     }
 
-    return ValidationError{.statusCode=405, .message="Method Not Allowed"};
+    return ValidationError{.statusCode = 405, .message = "Method Not Allowed"};
 }
 
 RequestValidator::ValidationException::ValidationException(int code) : code_(code) {};

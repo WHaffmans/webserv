@@ -37,20 +37,20 @@ class UploadHandler : public AHandler
     };
 
     std::string uploadStore_;
-    // size_t maxFileSize_;
     std::vector<UploadedFile> uploadedFiles_;
 
-    void parseMultipart();
-    bool save(UploadedFile &info, const std::vector<uint8_t> &data);
-    std::string sanitizeFilename(const std::string &filename) const;
-    std::string generateFilename(const std::string &baseFilename) const;
+    void parse();
 
-    // Multipart parsing helpers
+    bool decode(const std::string &part);
+    bool save(UploadedFile &info, const std::vector<uint8_t> &data);
+
+    [[nodiscard]] std::string generateFilename(const std::string &baseFilename) const;
     [[nodiscard]] static std::string extractBoundary(const std::string &contentType);
-    bool decodeSection(const std::string &part);
-    [[nodiscard]] std::string getHeaderValue(const std::string &headers, const std::string &key) const;
-    [[nodiscard]] static std::string getFileName(const std::string &disposition);
-    std::string getFieldName(const std::string &disposition) const;
+
+    static std::string getHeaderValue(const std::string &headers, const std::string &key);
+    static std::string getFileName(const std::string &disposition);
+    static std::string getFieldName(const std::string &disposition);
+    static std::string sanitize(const std::string &filename);
 
     static const std::string DEFAULT_UPLOAD_STORE;
 };

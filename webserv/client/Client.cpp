@@ -14,9 +14,7 @@
 #include <webserv/socket/ASocket.hpp>      // for ASocket
 #include <webserv/socket/ClientSocket.hpp> // for ClientSocket
 
-#include <cstdint>    // for uint8_t
 #include <functional> // for function, ref, reference_wrapper
-#include <map>        // for map
 #include <memory>     // for unique_ptr, make_unique, allocator, operator==, default_delete
 #include <stdexcept>  // for runtime_error
 #include <string>     // for basic_string, to_string, operator+, char_traits, operator<=>
@@ -101,16 +99,6 @@ void Client::request()
     {
         Log::info("Received request: " + httpRequest_->getHttpVersion() + " " + httpRequest_->getMethod() + " "
                   + httpRequest_->getTarget() + " ");
-
-        Log::debug("Request details", {
-                                          {"request_method", httpRequest_->getMethod()},
-                                          {"request_target", httpRequest_->getTarget()},
-                                          {"http_version", httpRequest_->getHttpVersion()},
-                                          {"headers", httpRequest_->getHeaders().toString()},
-                                          //   {"body", httpRequest_->getBody()},
-                                          {"state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
-                                      });
-
         try
         {
             // Thoughts: if a handler isn't returned, this could because of the error handler already setting
@@ -140,10 +128,6 @@ void Client::request()
     else
     {
         Log::debug("Received partial request");
-        //    {
-        //    {"current_state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
-        //    {"buffer_length", std::to_string(bytesRead)},
-        //    });
     }
 }
 
@@ -164,15 +148,12 @@ void Client::poll()
     auto *cgiHandler = dynamic_cast<CgiHandler *>(handler_.get());
     if (cgiHandler != nullptr)
     {
-        // Log::debug("Polling CGI handler for client, fd: " + std::to_string(clientSocket_->getFd()));
-        // CGI handler polling logic if needed
         cgiHandler->wait();
     }
     if (httpResponse_->isComplete() && clientSocket_->getEvent() != ASocket::IoState::WRITE)
     {
         Log::info("Response is ready to be sent to client: " + clientSocket_->toString());
         clientSocket_->setCallback([this]() { respond(); });
-        // server_.writable(clientSocket_->getFd());
         clientSocket_->setIOState(ASocket::IoState::WRITE);
     }
 }

@@ -14,6 +14,7 @@
 #include <webserv/utils/utils.hpp>          // for trim
 
 #include <algorithm>
+#include <array>
 #include <cerrno>
 #include <cstddef>
 #include <cstdlib>
@@ -30,6 +31,8 @@ CgiHandler::CgiHandler(const HttpRequest &request, HttpResponse &response)
 {
     Log::debug("CgiHandler constructed");
 }
+
+CgiHandler::~CgiHandler() = default;
 
 void CgiHandler::handle()
 {
@@ -49,6 +52,7 @@ void CgiHandler::handle()
     Log::info("CGI process started and sockets registered");
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 static inline bool findHeaderEnd(const std::string &s, size_t &pos, long &sepSize)
 {
     Log::trace(LOCATION);
@@ -106,13 +110,11 @@ void CgiHandler::read()
         Log::debug("CGI stdout socket is null in read()");
         return;
     }
-
-    char buffer[Constants::BUFFER_SIZE] = {};
-    ssize_t bytesRead = cgiStdOut_->read(buffer, sizeof(buffer));
-
+    std::array<char, Constants::BUFFER_SIZE> buffer = {};
+    ssize_t bytesRead = cgiStdOut_->read(buffer.data(), buffer.size());
     if (bytesRead > 0)
     {
-        appendToBuffer(buffer, static_cast<size_t>(bytesRead));
+        appendToBuffer(buffer.data(), static_cast<size_t>(bytesRead));
         Log::debug("Read " + std::to_string(bytesRead)
                    + " bytes from CGI stdout (buffer size: " + std::to_string(buffer_.size()) + ")");
 
@@ -197,13 +199,13 @@ void CgiHandler::error()
     }
     while (true)
     {
-        char buffer[Constants::BUFFER_SIZE] = {};
-        ssize_t bytesRead = cgiStdErr_->read(buffer, sizeof(buffer));
+        std::array<char, Constants::BUFFER_SIZE> buffer = {};
+        ssize_t bytesRead = cgiStdErr_->read(buffer.data(), buffer.size());
         if (bytesRead > 0)
         {
-            appendToBuffer(buffer, static_cast<size_t>(bytesRead));
+            appendToBuffer(buffer.data(), static_cast<size_t>(bytesRead));
             Log::error("CGI stderr output (fd: " + std::to_string(cgiStdErr_->getFd())
-                       + "): " + std::string(buffer, static_cast<size_t>(bytesRead)));
+                       + "): " + std::string(buffer.data(), static_cast<size_t>(bytesRead)));
             continue;
         }
         if (bytesRead == 0)
@@ -330,14 +332,13 @@ void CgiHandler::parseCgiHeaders(std::string &headers)
 void CgiHandler::handleTimeout()
 {
     Log::warning("CGI handler timeout occurred for PID: " + std::to_string(pid_));
-    char buffer[9] = {}; // NOLINT(cppcoreguidelines-avoid-c-arrays)
-    ssize_t bytesRead = timerSocket_->read(buffer, sizeof(buffer) - 1);
-    buffer[bytesRead] = '\0';
+    std::array<char, 9> buffer = {};
+    ssize_t bytesRead = timerSocket_->read(buffer.data(), buffer.size() - 1);
     if (bytesRead <= 0)
     {
-        // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
         return;
     }
+
     // Terminate the CGI process if it's still running
     if (cgiProcess_)
     {
@@ -346,7 +347,6 @@ void CgiHandler::handleTimeout()
     }
 
     ErrorHandler::createErrorResponse(Http::StatusCode::GATEWAY_TIMEOUT, response_);
-    // cancelTimer();
 }
 
 void CgiHandler::finalizeCgiResponse()
@@ -370,5 +370,5 @@ void CgiHandler::finalizeCgiResponse()
 void CgiHandler::appendToBuffer(const char *data, size_t length)
 {
     Log::trace(LOCATION);
-    buffer_.insert(buffer_.end(), data, data + length);
+    buffer_.insert(buffer_.end(), data, data + length); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
