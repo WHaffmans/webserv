@@ -19,7 +19,7 @@ template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 // Define all possible directive value types
 using DirectiveValueType = std::variant<int, // listen, error_page status, cgi_timeout
                                         size_t,
-                                        bool,                       // autoindex, upload_enabled
+                                        bool,                       // autoindex
                                         std::string,                // host, server_name, root, cgi_pass, upload_store
                                         std::vector<std::string>,   // index, allowed_methods, cgi_handler
                                         std::pair<int, std::string> // error_page (status, path), redirect

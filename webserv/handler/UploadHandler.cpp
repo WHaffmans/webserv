@@ -45,6 +45,14 @@ void UploadHandler::handle()
         return;
     }
 
+    const auto *locationConfig = dynamic_cast<const LocationConfig *>(request_.getUri().getConfig());
+    if (locationConfig != nullptr && request_.getTarget() != locationConfig->getPath())
+    {
+        Log::warning("Upload request target does not match location path");
+        ErrorHandler::createErrorResponse(Http::StatusCode::FORBIDDEN, response_);
+        return;
+    }
+
     // TODO: Tester expects 200 OK for non-multipart uploads - weird but sure, okay
     if (contentType->find("multipart/form-data") == std::string::npos)
     {
@@ -70,12 +78,14 @@ void UploadHandler::handle()
         if (request_.getUri().getQuery().find("autoindex") != std::string::npos)
         {
             auto redirectUrl = request_.getUri().getUriForPath(request_.getUri().getDir());
-            response_.setBody(R"(<html><head><meta http-equiv="refresh" content="0; URL=')" + redirectUrl + "'\" /></head><body></body></html>");
+            response_.setBody(R"(<html><head><meta http-equiv="refresh" content="0; URL=')" + redirectUrl
+                              + "'\" /></head><body></body></html>");
         }
-        else {
+        else
+        {
             response_.setBody(R"({"success": true, "message": "Files uploaded successfully"}\n)");
         }
-        // 
+        //
     }
     catch (const std::exception &e)
     {

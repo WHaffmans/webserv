@@ -34,7 +34,7 @@ ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make
     engine_->addStructuralRule(std::make_unique<SingleDefaultServerPerPortRule>());
     engine_->addStructuralRule(std::make_unique<UniqueDirectiveRule>(std::vector<std::string>{
         "index", "listen", "host", "server_name", "root", "allowed_methods", "autoindex", "cgi_enabled", "upload_store",
-        "client_max_body_size", "cgi_timeout", "upload_enabled", "redirect", "timeout", "42_tester"}));
+        "client_max_body_size", "cgi_timeout", "redirect", "timeout", "42_tester"}));
 
     /*Global Directive Rules*/
     engine_->addServerRule("error_page", std::make_unique<StatusCodeRule>(false));
