@@ -1,7 +1,6 @@
 #pragma once
 
 #include <filesystem> // for directory_entry
-#include <format>     // for vector
 #include <string>     // for string
 #include <vector>     // for vector
 
