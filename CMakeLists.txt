@@ -18,7 +18,7 @@ endif()
 
 # Add source files
 file(GLOB_RECURSE SOURCES
-    "${PROJECT_SOURCE_DIR}/webserv/*.cpp"
+    "${PROJECT_SOURCE_DIR}/src/webserv/*.cpp"
 )
 
 # Remove main.cpp from sources for library (we'll add it back for the main executable)
@@ -26,7 +26,7 @@ list(FILTER SOURCES EXCLUDE REGEX ".*main\\.cpp$")
 
 # Add include directories
 include_directories(
-    ${PROJECT_SOURCE_DIR}
+    ${PROJECT_SOURCE_DIR}/src
 )
 
 
@@ -118,7 +118,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "ASAN")
 endif()
 
 # Add executable target
-add_executable(webserv ${SOURCES} "${PROJECT_SOURCE_DIR}/webserv/main.cpp")
+add_executable(webserv ${SOURCES} "${PROJECT_SOURCE_DIR}/src/webserv/main.cpp")
 
 # Create a library for testing (without main.cpp)
 add_library(webserv_lib ${SOURCES})

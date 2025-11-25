@@ -10,3 +10,5 @@ iwyu_results/
 build_coverage/
 uploads/
 obj/
+webserv
+!webserv/

@@ -10,14 +10,16 @@
 #                                                                              #
 # **************************************************************************** #
 
+VPATH=src
+
 # Compiler and flags
 CXX			= clang++
 CXXFLAGS	= -Wall -Wextra -Werror -std=c++20 -O2
-INCLUDES	= -I.
+INCLUDES	= -I./src
 MAKEFLAGS	+= -j$(shell nproc)
 
 # Target executable
-NAME		= nginy
+NAME		= webserv
 CONFIG_FILE = config/default.conf
 
 # Source files

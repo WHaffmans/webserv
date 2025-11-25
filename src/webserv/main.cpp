@@ -28,7 +28,7 @@ int main(int argc, char **argv)
         }
         else
         {
-            // std::cerr << "Usage: " + std::string(argv[0]) + " [-c] <config_file_path>"; // NOLINT
+            std::cerr << "Usage: " + std::string(argv[0]) + " [-c] <config_file_path>"; // NOLINT
             return 1;
         }
         // NOLINTEND

@@ -1,19 +1,13 @@
-#include <iostream>
-
 #include <gtest/gtest.h>
 
-/**
- * @file test_main.cpp
- * @brief Main entry point for webserv unit tests
- */
+// Basic test to verify Google Test is working
+TEST(BasicTest, TruthTest) {
+    EXPECT_TRUE(true);
+    EXPECT_FALSE(false);
+    EXPECT_EQ(1 + 1, 2);
+}
 
-int main(int argc, char **argv)
-{
-    std::cout << "Running webserv unit tests...\n";
-
-    // Initialize Google Test
+int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
-
-    // Run all tests
     return RUN_ALL_TESTS();
 }

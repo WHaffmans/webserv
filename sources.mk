@@ -1,8 +1,10 @@
-# Auto-generated source files
 SRCS = \
        webserv/client/Client.cpp \
        webserv/config/AConfig.cpp \
        webserv/config/ConfigManager.cpp \
+       webserv/config/GlobalConfig.cpp \
+       webserv/config/LocationConfig.cpp \
+       webserv/config/ServerConfig.cpp \
        webserv/config/directive/ADirective.cpp \
        webserv/config/directive/BoolDirective.cpp \
        webserv/config/directive/DirectiveFactory.cpp \
@@ -12,12 +14,11 @@ SRCS = \
        webserv/config/directive/SizeDirective.cpp \
        webserv/config/directive/StringDirective.cpp \
        webserv/config/directive/VectorDirective.cpp \
-       webserv/config/GlobalConfig.cpp \
-       webserv/config/LocationConfig.cpp \
-       webserv/config/ServerConfig.cpp \
        webserv/config/validation/ConfigValidator.cpp \
-       webserv/config/validation/directive_rules/AllowedValuesRule.cpp \
+       webserv/config/validation/ValidationEngine.cpp \
+       webserv/config/validation/ValidationResult.cpp \
        webserv/config/validation/directive_rules/AValidationRule.cpp \
+       webserv/config/validation/directive_rules/AllowedValuesRule.cpp \
        webserv/config/validation/directive_rules/CgiExtValidationRule.cpp \
        webserv/config/validation/directive_rules/HostValidationRule.cpp \
        webserv/config/validation/directive_rules/PortValidationRule.cpp \
@@ -29,8 +30,6 @@ SRCS = \
        webserv/config/validation/structural_rules/SingleDefaultServerPerPortRule.cpp \
        webserv/config/validation/structural_rules/UniqueDirectiveRule.cpp \
        webserv/config/validation/structural_rules/UniqueServerNamesRule.cpp \
-       webserv/config/validation/ValidationEngine.cpp \
-       webserv/config/validation/ValidationResult.cpp \
        webserv/handler/AHandler.cpp \
        webserv/handler/CgiEnvironment.cpp \
        webserv/handler/CgiHandler.cpp \
@@ -40,8 +39,8 @@ SRCS = \
        webserv/handler/FileHandler.cpp \
        webserv/handler/MIMETypes.cpp \
        webserv/handler/RedirectHandler.cpp \
-       webserv/handler/UploadHandler.cpp \
        webserv/handler/URI.cpp \
+       webserv/handler/UploadHandler.cpp \
        webserv/http/HttpConstants.cpp \
        webserv/http/HttpHeaders.cpp \
        webserv/http/HttpRequest.cpp \
