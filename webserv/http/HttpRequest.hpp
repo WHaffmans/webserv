@@ -45,7 +45,6 @@ class HttpRequest
 
     void setState(State state);
     void receiveData(const char *data, size_t length);
-    void reset();
 
   private:
     [[nodiscard]] bool parseBufferforRequestLine();

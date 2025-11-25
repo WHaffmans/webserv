@@ -24,25 +24,26 @@ CgiEnvironment::CgiEnvironment(const URI &uri, const HttpRequest &request)
     std::string host = (colonPos != std::string::npos) ? host_port.substr(0, colonPos) : host_port;
     int port = (colonPos != std::string::npos) ? std::stoi(host_port.substr(colonPos + 1)) : 80;
 
+    std::string root = uri.getConfig()->get<std::string>("root").value();
     env_["GATEWAY_INTERFACE"] = "CGI/1.1";
     env_["SERVER_PROTOCOL"] = "HTTP/1.1";
     env_["REQUEST_METHOD"] = request.getMethod();
     env_["SCRIPT_NAME"] = uri.getFullPath();
     env_["PHP_SELF"] = env_["SCRIPT_NAME"];
-    env_["SCRIPT_FILENAME"] = uri.getFullPath(); // Full filesystem path to the script (required by PHP)
+    env_["SCRIPT_FILENAME"] = uri.getFullPath();
     env_["QUERY_STRING"] = uri.getQuery();
     env_["REQUEST_URI"] = uri.isDirectory() ? utils::ensureTrailingSlash(request.getTarget()) : request.getTarget();
     env_["PATH_INFO"] = uri.getPathInfo();
     env_["SERVER_NAME"] = host;
     env_["SERVER_PORT"] = std::to_string(port);
     env_["HTTP_HOST"] = host_port;
-    env_["REMOTE_ADDR"] = request.getClient().getClientAddress(); // Placeholder, should be set to actual remote address
-    env_["REDIRECT_STATUS"] = "200";                              // Required by PHP with force-cgi-redirect enabled
+    env_["REMOTE_ADDR"] = request.getClient().getClientAddress();
+    env_["REDIRECT_STATUS"] = "200";
     env_["SERVER_SOFTWARE"] = "Webserv/1.2";
     env_["REQUEST_SCHEME"] = "HTTP";
     env_["HTTP_VERSION"] = "1.1";
-    env_["UPLOAD_TMP_DIR"] = "./htdocs/tmp"; // TODO: Example upload directory, adjust as needed
-    env_["TMP_DIR"] = "./htdocs/tmp";        // TODO: Example temp directory, adjust as needed
+    env_["UPLOAD_TMP_DIR"] = uri.getConfig()->get<std::string>("cgi_tmp_dir").value_or(root);
+    env_["TMP_DIR"] = env_["UPLOAD_TMP_DIR"];
     env_["CONTENT_TYPE"] = request.getHeaders().getContentType().value_or("");
     env_["CONTENT_LENGTH"] = std::to_string(request.getHeaders().getContentLength().value_or(0));
 

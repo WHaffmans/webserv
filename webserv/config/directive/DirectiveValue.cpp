@@ -6,6 +6,8 @@
 #include <variant> // for visit
 #include <vector>  // for vector
 
+DirectiveValue::DirectiveValue(DirectiveValueType value) : value_(std::move(value)) {}
+
 std::string DirectiveValue::toString() const
 {
     return std::visit(overloaded{[](int val) { return std::to_string(val); },

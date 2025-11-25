@@ -120,7 +120,9 @@ constexpr std::string_view DOUBLE_CRLF = "\r\n\r\n";
 constexpr std::string_view HEADER_SEPARATOR = ": ";
 constexpr std::string_view SPACE = " ";
 constexpr size_t MAX_HEADER_SIZE = 8192;
+constexpr size_t MAX_HEADER_COUNT = 64;
 constexpr size_t MAX_BODY_SIZE = size_t(1024) * size_t(1024); // 1MB
 constexpr size_t MAX_URI_LENGTH = 2048;
+constexpr std::string_view HTTP_SCHEME = "http";
 } // namespace Protocol
 } // namespace Http

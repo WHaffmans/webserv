@@ -42,11 +42,9 @@ class AConfig
         return directive->getValue().try_get<T>();
     }
 
-    // Path resolution helpers
-    //TODO move to cpp file
-    [[nodiscard]] std::string getBaseDir() const { return baseDir_; }
+    [[nodiscard]] const std::string &getBaseDir() const; // todo: maybe no
 
-    void setBaseDir(const std::string &dir) { baseDir_ = dir; }
+    void setBaseDir(const std::string &dir);
 
     [[nodiscard]] std::string resolvePath(const std::string &path) const;
 

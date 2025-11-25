@@ -39,9 +39,6 @@ void CgiProcess::spawn()
     const URI &uri = request_.getUri();
     auto cgiPath = uri.getCgiPath();
 
-    // pipes
-    // TODO pipe can handle flags O_CLOEXEC | O_NONBLOCK as open we should use this everywhere, then we dont need to set
-    // non blocking and the fd will be closed when exec is run
     // NOLINTBEGIN
     int pipeStdin[2];
     int pipeStdout[2];
@@ -80,33 +77,21 @@ void CgiProcess::spawn()
         dup2(pipeStdout[1], STDOUT_FILENO);
         dup2(pipeStderr[1], STDERR_FILENO);
 
-        // close(pipeStdin[0]);
-        // close(pipeStdin[1]);
-        // close(pipeStdout[0]);
-        // close(pipeStdout[1]);
-        // close(pipeStderr[0]);
-        // close(pipeStderr[1]);
-
-        // Log::debug("Executing CGI: " + cgiPath);
-        // std::cerr << "Executing CGI: " << cgiPath << std::endl;
         Log::clearChannels();
 
         // Prepare arguments
         std::string fullPath = uri.getFullPath();
-        char *args[3] = {nullptr, nullptr, nullptr};
+        char *args[3] = {nullptr, nullptr, nullptr}; // NOLINT(cppcoreguidelines-avoid-c-arrays)
         if (!cgiPath.empty())
         {
-            args[0] = const_cast<char *>(cgiPath.c_str());
-            args[1] = const_cast<char *>(fullPath.c_str());
+            args[0] = const_cast<char *>(cgiPath.c_str());  // NOLINT(cppcoreguidelines-pro-type-const-cast)
+            args[1] = const_cast<char *>(fullPath.c_str()); // NOLINT(cppcoreguidelines-pro-type-const-cast)
         }
         else
         {
-            args[0] = const_cast<char *>(fullPath.c_str());
+            args[0] = const_cast<char *>(fullPath.c_str()); // NOLINT(cppcoreguidelines-pro-type-const-cast)
         }
-        // Log::debug("With args:", {args[0], args[1]});
-
-        // TODO: Close all FDs
-        execve(args[0], args, cgiEnv.toEnvp());
+        execve(args[0], args, cgiEnv.toEnvp()); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
         exit(1);
     }
     else
@@ -141,7 +126,7 @@ void CgiProcess::wait() noexcept
 {
     if (pid_ > 0)
     {
-        int status;
+        int status = 0;
         int waitResult = ::waitpid(pid_, &status, WNOHANG);
         if (waitResult == -1)
         {

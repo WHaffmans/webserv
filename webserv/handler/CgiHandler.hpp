@@ -37,10 +37,7 @@ class CgiHandler : public AHandler
     void handleTimeout() override;
 
   private:
-    constexpr static size_t CHUNK_SIZE = 65536; // 64kb
-    constexpr static size_t bufferSize_ = 8192; // TODO: remove duplicate definition and move to configmanager
     std::vector<uint8_t> buffer_;
-
     std::unique_ptr<CgiProcess> cgiProcess_;
     std::unique_ptr<CgiSocket> cgiStdIn_;
     std::unique_ptr<CgiSocket> cgiStdOut_;

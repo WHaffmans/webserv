@@ -15,10 +15,7 @@ class AStructuralValidationRule
     std::string description_;
 
   protected:
-    AStructuralValidationRule(const std::string &ruleName, const std::string &description)
-        : ruleName_(ruleName), description_(description)
-    {
-    }
+    AStructuralValidationRule(const std::string &ruleName, const std::string &description);
 
   public:
     virtual ~AStructuralValidationRule() = default;

@@ -302,17 +302,6 @@ bool HttpRequest::parseBufferforBody()
     return true;
 }
 
-void HttpRequest::reset()
-{
-    Log::trace(LOCATION);
-    state_ = State::RequestLine;
-    buffer_.clear();
-    // requestLine_.clear();
-    // headers_.clear();
-    body_.clear();
-    // contentLength_ = 0;
-}
-
 ServerConfig *HttpRequest::getServerConfig() const
 {
     std::string hostHeader = getHeaders().getHost().value_or("");

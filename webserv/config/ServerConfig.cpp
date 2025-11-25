@@ -33,9 +33,10 @@ void ServerConfig::parseBlock(const std::string &block)
     std::string directives;
 
     size_t pos = 0;
+    std::string location = "location";
     while (true)
     {
-        size_t locationPos = block.find("location", pos);
+        size_t locationPos = block.find(location, pos);
 
         size_t bracePos = block.find('{', locationPos);
         if (locationPos == std::string::npos || bracePos == std::string::npos)
@@ -44,8 +45,8 @@ void ServerConfig::parseBlock(const std::string &block)
             directives += block.substr(pos);
             break;
         }
-        std::string locationPath
-            = utils::trim(block.substr(locationPos + 9, bracePos - (locationPos + 9))); // TODO magic numbers
+        std::string locationPath = utils::trim(block.substr(
+            locationPos + location.size() + 1, bracePos - (locationPos + location.size() + 1)));
         // Add global declarations before this server block
 
         if (locationPath.front() != '/')

@@ -20,14 +20,13 @@ class GlobalConfig : public AConfig
 
     ~GlobalConfig() override = default;
 
-    // [[nodiscard]] std::string getName() const override;
     [[nodiscard]] std::string getType() const override;
 
     [[nodiscard]] std::vector<ServerConfig *> getServerConfigs() const;
 
   private:
-    // AConfig *parent_;
     std::vector<std::unique_ptr<ServerConfig>> servers_;
 
     void parseBlock(const std::string &block) override;
+    void setDefaults();
 };

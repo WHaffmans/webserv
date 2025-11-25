@@ -42,7 +42,6 @@ void AConfig::addDirective(const std::string &line)
     std::string trimmedLine = utils::trim(line, " \n\r\t;");
 
     // Reject unescaped quotes in directive values (quotes not supported by our parser)
-    //TODO should we support escaped quotes?
     if (trimmedLine.find('"') != std::string::npos)
     {
         throw std::runtime_error("Syntax error: unescaped quote in directive: " + trimmedLine);
@@ -129,7 +128,6 @@ void AConfig::parseDirectives(const std::string &declarations)
 
 std::string AConfig::getErrorPage(int statusCode) const
 {
-    // TODO
     Log::trace(LOCATION);
     for (const auto &directive : directives_)
     {
@@ -229,4 +227,14 @@ bool AConfig::isCGI(const std::string &extension) const
         return parent_->isCGI(extension);
     }
     return false; // Return false if not found
+}
+
+void AConfig::setBaseDir(const std::string &baseDir)
+{
+    baseDir_ = baseDir;
+}
+
+const std::string &AConfig::getBaseDir() const
+{
+    return baseDir_;
 }

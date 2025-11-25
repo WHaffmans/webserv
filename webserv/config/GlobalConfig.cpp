@@ -7,16 +7,12 @@
 
 #include <stddef.h> // for size_t
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 GlobalConfig::GlobalConfig(const std::string &baseDir, const std::string &block)
 {
     setBaseDir(baseDir);
     parseBlock(block);
 }
-
-// std::string GlobalConfig::getName() const
-// {
-//     return "global";
-// }
 
 std::string GlobalConfig::getType() const
 {

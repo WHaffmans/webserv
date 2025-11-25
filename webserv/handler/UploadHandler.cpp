@@ -53,7 +53,6 @@ void UploadHandler::handle()
         return;
     }
 
-    // TODO: Tester expects 200 OK for non-multipart uploads - weird but sure, okay
     if (contentType->find("multipart/form-data") == std::string::npos)
     {
         Log::debug("Upload request with non-multipart Content-Type: " + *contentType);
@@ -65,8 +64,7 @@ void UploadHandler::handle()
 
     if (!FileUtils::isDirectory(uploadStore_))
     {
-        ErrorHandler::createErrorResponse(Http::StatusCode::FORBIDDEN,
-                                          response_); // TODO: Not sure if 403 is appropriate
+        ErrorHandler::createErrorResponse(Http::StatusCode::FORBIDDEN, response_);
         return;
     }
     try
@@ -296,7 +294,6 @@ std::string UploadHandler::getFileName(const std::string &disposition)
     {
         return "";
     }
-    // TODO: strlen is extra function call, but magic number otherwise
     std::string filename = disposition.substr(filenamePos + std::strlen("filename="));
     filename = utils::extractQuotedValue(filename);
     if (filename.empty())
@@ -371,15 +368,12 @@ std::string UploadHandler::sanitizeFilename(const std::string &filename) const
     return sanitized;
 }
 
-// TODO
 std::string UploadHandler::generateFilename(const std::string &baseFilename) const
 {
     std::string sanitized = sanitizeFilename(baseFilename);
     std::string fullPath = uploadStore_ + "/" + sanitized;
 
-    // If file doesn't exist, use it as-is
-    struct stat st = {};
-    if (stat(fullPath.c_str(), &st) != 0)
+    if (!FileUtils::isFile(fullPath))
     {
         return sanitized;
     }

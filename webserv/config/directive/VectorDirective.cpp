@@ -4,6 +4,7 @@
 #include <webserv/config/directive/DirectiveValue.hpp>  // for DirectiveValueType
 
 #include <sstream> // for basic_stringstream, stringstream
+#include <linux/limits.h>
 
 VectorDirective::VectorDirective(const std::string &name, const std::string &value)
     : ADirective(name) // NOLINT(bugprone-easily-swappable-parameters)
@@ -20,7 +21,7 @@ void VectorDirective::parse(const std::string &value)
         std::getline(ss, item, ' '); // index    indx.html
         if (!item.empty())
         {
-            if (item.size() > 4096) //TODO: use PATH_MAX or NAME_MAX where appropriate 
+            if (item.size() > PATH_MAX)
             {
                 throw std::invalid_argument("VectorDirective: string value exceeds maximum length");
             }

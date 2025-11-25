@@ -116,8 +116,9 @@ void Server::setupServerSocket(const ServerConfig &config)
     Log::trace(LOCATION);
     try
     {
-        auto host = config.get<std::string>("host").value_or(std::string()); // TODO should not be a default host
-        auto port = config.get<int>("listen").value_or(0);                   // TODO should not be a default port
+        // These are required fields
+        auto host = config.get<std::string>("host").value();
+        auto port = config.get<int>("listen").value();
         for (const auto &listener : listeners_)
         {
             if (listener->getPort() == port && listener->getHost() == host)

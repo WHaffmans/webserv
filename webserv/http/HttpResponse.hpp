@@ -20,7 +20,7 @@ class HttpResponse
     HttpResponse(HttpResponse &&other) noexcept = default;            // Move constructor
     HttpResponse &operator=(HttpResponse &&other) noexcept = default; // Move assignment
 
-    ~HttpResponse() { Log::trace(LOCATION); };
+    ~HttpResponse() = default;
 
     void addHeader(const std::string &key, const std::string &value);
 

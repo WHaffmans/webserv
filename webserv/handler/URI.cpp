@@ -141,7 +141,7 @@ void URI::parseFullpath()
             valid_ = false;
             if (config_->get<bool>("42_tester").value_or(false))
             {
-                baseName_ = segment; // TODO: is this correct? works for tester but seems odd
+                baseName_ = segment;
             }
             Log::warning("Invalid path segment encountered: " + currentPath);
             return;
@@ -265,7 +265,8 @@ std::string URI::getUriForPath(const std::string &path) const
     Log::debug(
         "Generating URI for path",
         {{"path", path}, {"trimmedDir", trimmedLocation}, {"trimmedPath", trimmedPath}, {"Authority", authority_}});
-    std::string result = "http://" + authority_; // TODO this should not be hardcoded...
+
+    std::string result = std::string(Http::Protocol::HTTP_SCHEME) + "://" + authority_;
     result = FileUtils::joinPath(result, trimmedLocation);
     return FileUtils::joinPath(result, trimmedPath);
 }

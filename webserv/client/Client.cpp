@@ -1,3 +1,5 @@
+#include "webserv/main.hpp"
+
 #include <webserv/client/Client.hpp>
 #include <webserv/handler/CgiHandler.hpp>   // for CgiHandler
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
@@ -64,7 +66,7 @@ ASocket &Client::getSocket(int fd) const
 void Client::request()
 {
     Log::trace(LOCATION);
-    char buffer[bufferSize_] = {}; // NOLINT(cppcoreguidelines-avoid-c-arrays)
+    char buffer[Constants::BUFFER_SIZE] = {}; // NOLINT(cppcoreguidelines-avoid-c-arrays)
     ssize_t bytesRead = clientSocket_->read(
         buffer, sizeof(buffer) - 1); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
     if (bytesRead < 0)
@@ -138,10 +140,10 @@ void Client::request()
     else
     {
         Log::debug("Received partial request");
-                //    {
-                    //    {"current_state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
-                    //    {"buffer_length", std::to_string(bytesRead)},
-                //    });
+        //    {
+        //    {"current_state", std::to_string(static_cast<uint8_t>(httpRequest_->getState()))},
+        //    {"buffer_length", std::to_string(bytesRead)},
+        //    });
     }
 }
 
@@ -186,8 +188,8 @@ void Client::respond()
     else
     {
         writeOffset_ += bytesSent;
-        Log::debug("Sent " + std::to_string(bytesSent) + " bytes out of " + std::to_string(writeOffset_ + payload.size())
-                   + " to: " + clientSocket_->toString());
+        Log::debug("Sent " + std::to_string(bytesSent) + " bytes out of "
+                   + std::to_string(writeOffset_ + payload.size()) + " to: " + clientSocket_->toString());
     }
     if (payload.empty())
     {

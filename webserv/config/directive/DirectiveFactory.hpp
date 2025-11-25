@@ -20,25 +20,25 @@ class DirectiveFactory
         std::string_view context;
     };
 
-    constexpr static std::array<DirectiveInfo, 18> supportedDirectives = {{
-        {.name = "listen", .type = "IntDirective", .context = "S"},
-        {.name = "host", .type = "StringDirective", .context = "S"},
-        {.name = "server_name", .type = "VectorDirective", .context = "S"},
-        {.name = "root", .type = "StringDirective", .context = "Sl"},
-        {.name = "index", .type = "StringDirective", .context = "sl"},
-        {.name = "error_page", .type = "IntStringDirective", .context = "gsl"},
-        {.name = "client_max_body_size", .type = "SizeDirective", .context = "gsl"},
-        {.name = "autoindex", .type = "BoolDirective", .context = "gsl"},
-        {.name = "allowed_methods", .type = "VectorDirective", .context = "gsl"},
-        {.name = "cgi_enabled", .type = "BoolDirective", .context = "gsl"},
-        {.name = "cgi_handler", .type = "VectorDirective", .context = "gsl"},
-        {.name = "cgi_timeout", .type = "IntDirective", .context = "gsl"},
-        {.name = "upload_store", .type = "StringDirective", .context = "l"},
-        {.name = "redirect", .type = "IntStringDirective", .context = "l"},
-        {.name = "timeout", .type = "IntDirective", .context = "gsl"},
-        {.name = "default", .type = "BoolDirective", .context = "S"},
-        {.name = "42_tester", .type = "BoolDirective", .context = "s"}
-    }};
+    constexpr static std::array<DirectiveInfo, 18> supportedDirectives
+        = {{{.name = "listen", .type = "IntDirective", .context = "S"},
+            {.name = "host", .type = "StringDirective", .context = "S"},
+            {.name = "server_name", .type = "VectorDirective", .context = "S"},
+            {.name = "root", .type = "StringDirective", .context = "Sl"},
+            {.name = "index", .type = "StringDirective", .context = "sl"},
+            {.name = "error_page", .type = "IntStringDirective", .context = "gsl"},
+            {.name = "client_max_body_size", .type = "SizeDirective", .context = "gsl"},
+            {.name = "autoindex", .type = "BoolDirective", .context = "gsl"},
+            {.name = "allowed_methods", .type = "VectorDirective", .context = "gsl"},
+            {.name = "cgi_enabled", .type = "BoolDirective", .context = "gsl"},
+            {.name = "cgi_handler", .type = "VectorDirective", .context = "gsl"},
+            {.name = "cgi_timeout", .type = "IntDirective", .context = "gsl"},
+            {.name = "cgi_tmp_dir", .type = "StringDirective", .context = "gsl"},
+            {.name = "upload_store", .type = "StringDirective", .context = "l"},
+            {.name = "redirect", .type = "IntStringDirective", .context = "l"},
+            {.name = "timeout", .type = "IntDirective", .context = "gsl"},
+            {.name = "default", .type = "BoolDirective", .context = "s"},
+            {.name = "42_tester", .type = "BoolDirective", .context = "s"}}};
 
   private:
     using CreatorFunc = std::function<std::unique_ptr<ADirective>(const std::string &, const std::string &arg)>;

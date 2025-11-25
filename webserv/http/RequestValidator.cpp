@@ -87,18 +87,18 @@ std::optional<RequestValidator::ValidationError> RequestValidator::validateMetho
 
     if (request->getMethod().empty())
     {
-        return ValidationError{400, "Bad Request: Empty or Invalid HTTP Method"};
+        return ValidationError{.statusCode=400, .message="Bad Request: Empty or Invalid HTTP Method"};
     }
 
     std::vector<std::string> possibleMethods = {"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH"};
     if (std::ranges::find(possibleMethods, request->getMethod()) == possibleMethods.end())
     {
-        return ValidationError{501, "Method Not Implemented"};
+        return ValidationError{.statusCode=501, .message="Method Not Implemented"};
     }
-
+    
     if (allowedMethodsOpt.has_value())
     {
-        allowedMethods = std::move(*allowedMethodsOpt);
+        allowedMethods = allowedMethodsOpt.value();
     }
     else
     {
@@ -112,7 +112,7 @@ std::optional<RequestValidator::ValidationError> RequestValidator::validateMetho
         }
     }
 
-    return ValidationError{405, "Method Not Allowed"};
+    return ValidationError{.statusCode=405, .message="Method Not Allowed"};
 }
 
 RequestValidator::ValidationException::ValidationException(int code) : code_(code) {};

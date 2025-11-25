@@ -39,17 +39,15 @@ std::optional<std::string> HttpHeaders::getHost() const noexcept
     return value;
 }
 
-void HttpHeaders::add(const std::string &name,
-                      const std::string &value) noexcept // NOLINT(bugprone-easily-swappable-parameters)
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+void HttpHeaders::add(const std::string &name, const std::string &value) noexcept
 {
     std::string lower = name;
     std::ranges::transform(lower, lower.begin(), ::tolower);
-    // Store original case for the first occurrence (for proper output formatting)
     if (!originalCase_.contains(lower))
     {
         originalCase_[lower] = name;
     }
-    // Append value to allow multiple header instances (e.g., multiple Set-Cookie)
     headers_[lower].push_back(value);
 }
 
@@ -127,7 +125,7 @@ bool HttpHeaders::parse(const std::string &rawHeaders) noexcept
             }
 
             // Enforce per-header value size limit
-            if (value.size() > HttpHeaders::MAX_SINGLE_HEADER_SIZE)
+            if (value.size() > Http::Protocol::MAX_HEADER_SIZE)
             {
                 Log::warning("Header value exceeds maximum size (" + std::to_string(value.size()) + ") for: " + name);
                 return false;
@@ -135,7 +133,7 @@ bool HttpHeaders::parse(const std::string &rawHeaders) noexcept
 
             // Enforce maximum number of headers
             ++headerCount;
-            if (headerCount > HttpHeaders::MAX_HEADER_COUNT)
+            if (headerCount > Http::Protocol::MAX_HEADER_COUNT)
             {
                 Log::warning("Too many headers: " + std::to_string(headerCount));
                 return false;

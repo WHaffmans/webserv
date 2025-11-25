@@ -1,4 +1,6 @@
 #include "webserv/http/HttpConstants.hpp"
+#include "webserv/main.hpp"
+
 #include <webserv/client/Client.hpp> // for Client
 #include <webserv/handler/CgiHandler.hpp>
 #include <webserv/handler/CgiProcess.hpp>   // for CgiProcess
@@ -78,7 +80,7 @@ void CgiHandler::write()
     {
         const char *data = body.data() + writeOffset_; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         size_t remaining = body.size() - writeOffset_;
-        size_t chunk = remaining > CHUNK_SIZE ? CHUNK_SIZE : remaining;
+        size_t chunk = remaining > Constants::CHUNK_SIZE ? Constants::CHUNK_SIZE : remaining;
         ssize_t bytesWritten = cgiStdIn_->write(data, chunk);
         if (bytesWritten > 0)
         {
@@ -105,7 +107,7 @@ void CgiHandler::read()
         return;
     }
 
-    char buffer[bufferSize_] = {};
+    char buffer[Constants::BUFFER_SIZE] = {};
     ssize_t bytesRead = cgiStdOut_->read(buffer, sizeof(buffer));
 
     if (bytesRead > 0)
@@ -180,7 +182,7 @@ void CgiHandler::read()
 
     if (bytesRead < 0)
     {
-        
+
         Log::error("Error reading from CGI stdout: " + std::string(strerror(errno)));
         finalizeCgiResponse();
     }
@@ -195,7 +197,7 @@ void CgiHandler::error()
     }
     while (true)
     {
-        char buffer[bufferSize_] = {};
+        char buffer[Constants::BUFFER_SIZE] = {};
         ssize_t bytesRead = cgiStdErr_->read(buffer, sizeof(buffer));
         if (bytesRead > 0)
         {
