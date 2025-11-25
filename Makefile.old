@@ -1,0 +1,57 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile.old                                       :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: webserv                                    +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2025/11/25                           #+#    #+#              #
+#    Updated: 2025/11/25                          ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+# Compiler and flags
+CXX			= clang++
+CXXFLAGS	= -Wall -Wextra -Werror -std=c++20 -O2
+INCLUDES	= -I.
+MAKEFLAGS	+= -j$(shell nproc)
+
+# Target executable
+NAME		= nginy
+CONFIG_FILE = config/default.conf
+
+# Source files
+include sources.mk
+
+# Object files
+OBJDIR		= obj
+OBJS		= $(SRCS:%.cpp=$(OBJDIR)/%.o)
+
+# Dependency files
+DEPS		= $(OBJS:.o=.d)
+
+# Rules
+all: $(NAME)
+
+$(NAME): $(OBJS)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
+
+$(OBJDIR)/%.o: %.cpp
+	mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -MMD -MP -c $< -o $@
+
+clean:
+	rm -rf $(OBJDIR)
+
+fclean: clean
+	rm -f $(NAME)
+
+re: fclean all
+
+run: all
+	./$(NAME) $(CONFIG_FILE)
+
+# Include dependencies
+-include $(DEPS)
+
+.PHONY: all clean fclean re
