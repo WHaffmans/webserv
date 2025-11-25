@@ -358,7 +358,37 @@ void Server::run()
     struct epoll_event events[MAX_EVENTS]; // NOLINT
     while (signum_ != SIGINT && signum_ != SIGTERM)
     {
-        std::string status = "Active connections: " + std::to_string(clients_.size());
+        int serverCount = 0, clientCount = 0, timerCount = 0, cgiCount = 0, otherCount = 0;
+        for (auto *s : sockets_)
+        {
+            switch (s->getType())
+            {
+            case ASocket::Type::SERVER_SOCKET: ++serverCount; break;
+            case ASocket::Type::CLIENT_SOCKET: ++clientCount; break;
+            case ASocket::Type::TIMER_SOCKET: ++timerCount; break;
+            case ASocket::Type::CGI_SOCKET: ++cgiCount; break;
+            default: ++otherCount; break;
+            }
+        }
+
+        std::string socketsInfo;
+        std::vector<std::string> parts;
+        if (serverCount) parts.emplace_back("Server(" + std::to_string(serverCount) + ")");
+        if (clientCount) parts.emplace_back("Clients(" + std::to_string(clientCount) + ")");
+        if (timerCount) parts.emplace_back("Timers(" + std::to_string(timerCount) + ")");
+        if (cgiCount) parts.emplace_back("CGI(" + std::to_string(cgiCount) + ")");
+        if (otherCount) parts.emplace_back("Other(" + std::to_string(otherCount) + ")");
+
+        if (!parts.empty())
+        {
+            socketsInfo = parts.front();
+            for (size_t i = 1; i < parts.size(); ++i)
+            {
+                socketsInfo += ", " + parts[i];
+            }
+        }
+
+        std::string status = "Sockets: " + (socketsInfo.empty() ? "none" : socketsInfo);
         Log::status(status);
         pollSockets();
         pollClients();
