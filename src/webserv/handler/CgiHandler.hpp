@@ -35,6 +35,11 @@ class CgiHandler : public AHandler
                        std::unique_ptr<CgiSocket> cgiStdErr);
     void setPid(int pid);
 
+    [[nodiscard]] CgiProcess *getCgiProcess() const noexcept;
+    [[nodiscard]] CgiSocket *getCgiStdIn() const noexcept;
+    [[nodiscard]] CgiSocket *getCgiStdOut() const noexcept;
+    [[nodiscard]] CgiSocket *getCgiStdErr() const noexcept;
+
   protected:
     void handleTimeout() override;
 

@@ -40,3 +40,8 @@ void AHandler::cancelTimer()
     //     timerSocket_ = nullptr;
     // }
 }
+
+TimerSocket *AHandler::getTimerSocket() const noexcept
+{
+    return timerSocket_.get();
+}

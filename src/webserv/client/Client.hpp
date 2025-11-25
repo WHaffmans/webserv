@@ -46,6 +46,7 @@ class Client
 
     void addSocket(ASocket *socket);
     void removeSocket(ASocket *socket);
+    void cleanHandler(AHandler *handler);
 
     [[nodiscard]] HttpRequest &getHttpRequest() const noexcept;
     [[nodiscard]] HttpResponse &getHttpResponse() const noexcept;

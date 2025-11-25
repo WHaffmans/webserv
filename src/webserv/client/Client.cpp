@@ -1,5 +1,4 @@
 #include <webserv/client/Client.hpp>
-
 #include <webserv/handler/CgiHandler.hpp>    // for CgiHandler
 #include <webserv/handler/ErrorHandler.hpp>  // for ErrorHandler
 #include <webserv/handler/URI.hpp>           // for URI
@@ -62,6 +61,42 @@ ASocket &Client::getSocket(int fd) const
     throw std::runtime_error("Socket not found for fd: " + std::to_string(fd));
 }
 
+void Client::cleanHandler(AHandler *handler)
+{
+    if (handler == nullptr)
+    {
+        return;
+    }
+    Log::debug("Cleaning up handler for client, fd: " + std::to_string(clientSocket_->getFd()));
+    // Extract timer socket if it exists and remove from tracking
+    auto *timerSocket = handler->getTimerSocket();
+    if (timerSocket != nullptr)
+    {
+        removeSocket(timerSocket);
+    }
+    // Extract CGI sockets if this was a CgiHandler
+    auto *cgiHandler = dynamic_cast<CgiHandler *>(handler);
+    if (cgiHandler != nullptr)
+    {
+        auto *cgiProcess = cgiHandler->getCgiProcess();
+        if (cgiProcess != nullptr)
+        {
+            if (auto *stdinSocket = cgiHandler->getCgiStdIn())
+            {
+                removeSocket(stdinSocket);
+            }
+            if (auto *stdoutSocket = cgiHandler->getCgiStdOut())
+            {
+                removeSocket(stdoutSocket);
+            }
+            if (auto *stderrSocket = cgiHandler->getCgiStdErr())
+            {
+                removeSocket(stderrSocket);
+            }
+        }
+    }
+}
+
 void Client::request()
 {
     Log::trace(LOCATION);
@@ -106,6 +141,10 @@ void Client::request()
             // up the response so, maybe we don't need to throw a 500 when no handler. Because that would
             // override the actual error response. How about the router, or a handler, throws an exception if
             // something goes wrong, and we catch it here to make a 500 response?
+            if (handler_ != nullptr)
+            {
+                cleanHandler(handler_.get());
+            }
             handler_ = router_->handleRequest();
             if (handler_ != nullptr)
             {

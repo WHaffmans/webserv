@@ -373,3 +373,23 @@ void CgiHandler::appendToBuffer(const char *data, size_t length)
     Log::trace(LOCATION);
     buffer_.insert(buffer_.end(), data, data + length); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
+
+CgiProcess *CgiHandler::getCgiProcess() const noexcept
+{
+    return cgiProcess_.get();
+}
+
+CgiSocket *CgiHandler::getCgiStdIn() const noexcept
+{
+    return cgiStdIn_.get();
+}
+
+CgiSocket *CgiHandler::getCgiStdOut() const noexcept
+{
+    return cgiStdOut_.get();
+}
+
+CgiSocket *CgiHandler::getCgiStdErr() const noexcept
+{
+    return cgiStdErr_.get();
+}

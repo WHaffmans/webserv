@@ -24,6 +24,7 @@ class AHandler
     void startTimer();
     void cancelTimer();
 
+    [[nodiscard]] TimerSocket *getTimerSocket() const noexcept;
   protected:
     virtual void handleTimeout() = 0;
 
