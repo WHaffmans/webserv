@@ -106,6 +106,10 @@ void URI::parseUri()
 void URI::parseFullpath()
 {
     auto uriSegments = utils::split(fullPath_, '/');
+    if (fullPath_.front() == '/')
+    {
+        dir_ = "/";
+    }
     for (const auto &segment : uriSegments)
     {
         std::string currentPath = FileUtils::joinPath(dir_, segment);
@@ -145,14 +149,11 @@ void URI::parseFullpath()
     }
     if (baseName_.empty() && FileUtils::isDirectory(fullPath_))
     {
-        for (const auto &index : config_->get<std::vector<std::string>>("index").value_or(std::vector<std::string>()))
+        std::string index = config_->get<std::string>("index").value_or("");
+        std::string indexPath = FileUtils::joinPath(fullPath_, index);
+        if (FileUtils::isFile(indexPath))
         {
-            std::string indexPath = FileUtils::joinPath(fullPath_, index);
-            if (FileUtils::isFile(indexPath))
-            {
-                baseName_ = index;
-                break;
-            }
+            baseName_ = index;
         }
     }
     Log::debug("URI parseFullpath results", {{"dir", dir_}, {"baseName", baseName_}, {"pathInfo", pathInfo_}});

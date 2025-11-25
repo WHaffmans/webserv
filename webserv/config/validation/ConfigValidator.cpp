@@ -1,4 +1,5 @@
 #include "webserv/config/validation/directive_rules/StatusCodeRule.hpp"
+#include "webserv/config/validation/structural_rules/UniqueDirectiveRule.hpp"
 
 #include <webserv/config/validation/ConfigValidator.hpp>
 #include <webserv/config/validation/ValidationEngine.hpp>                            // for ValidationEngine
@@ -31,6 +32,9 @@ ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make
     engine_->addStructuralRule(std::make_unique<UniqueServerNamesRule>());
     engine_->addStructuralRule(std::make_unique<RequiredDirectivesRule>());
     engine_->addStructuralRule(std::make_unique<SingleDefaultServerPerPortRule>());
+    engine_->addStructuralRule(std::make_unique<UniqueDirectiveRule>(std::vector<std::string>{
+        "index", "listen", "host", "server_name", "root", "allowed_methods", "autoindex", "cgi_enabled", "upload_store",
+        "client_max_body_size", "cgi_timeout", "upload_enabled", "redirect", "timeout", "42_tester"}));
 
     /*Global Directive Rules*/
     engine_->addServerRule("error_page", std::make_unique<StatusCodeRule>(false));
@@ -42,8 +46,9 @@ ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make
     // engine_->addServerRule("root", std::make_unique<FolderExistsRule>(false));
 
     /*Location Directive Rules*/
-    engine_->addLocationRule("allowed_methods", std::make_unique<AllowedValuesRule>(
-                                                    std::vector<std::string>{"GET", "POST", "DELETE", "PUT", "HEAD", "OPTIONS"}, false));
+    engine_->addLocationRule("allowed_methods",
+                             std::make_unique<AllowedValuesRule>(
+                                 std::vector<std::string>{"GET", "POST", "DELETE", "PUT", "HEAD", "OPTIONS"}, false));
     engine_->addLocationRule("error_page", std::make_unique<StatusCodeRule>(false));
     // Folder existence validation disabled - paths are relative to server runtime directory
     // engine_->addLocationRule("root", std::make_unique<FolderExistsRule>(true));

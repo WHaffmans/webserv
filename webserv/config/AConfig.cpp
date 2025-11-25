@@ -47,7 +47,7 @@ void AConfig::addDirective(const std::string &line)
     {
         throw std::runtime_error("Syntax error: unescaped quote in directive: " + trimmedLine);
     }
-    Log::debug(" Adding directive: |" + trimmedLine + "| to config");
+    Log::debug("Adding directive: |" + trimmedLine + "| to config");
     auto directive = DirectiveFactory::createDirective(trimmedLine);
     if (directive)
     {
@@ -122,7 +122,7 @@ void AConfig::parseDirectives(const std::string &declarations)
         {
             continue;
         }
-        Log::debug("Global Declaration: " + line);
+        Log::debug("Parsing Declaration: " + line);
         addDirective(line);
     }
 }

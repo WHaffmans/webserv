@@ -25,7 +25,7 @@ class DirectiveFactory
         {.name = "host", .type = "StringDirective", .context = "S"},
         {.name = "server_name", .type = "VectorDirective", .context = "S"},
         {.name = "root", .type = "StringDirective", .context = "Sl"},
-        {.name = "index", .type = "VectorDirective", .context = "sl"},
+        {.name = "index", .type = "StringDirective", .context = "sl"},
         {.name = "error_page", .type = "IntStringDirective", .context = "gsl"},
         {.name = "client_max_body_size", .type = "SizeDirective", .context = "gsl"},
         {.name = "autoindex", .type = "BoolDirective", .context = "gsl"},

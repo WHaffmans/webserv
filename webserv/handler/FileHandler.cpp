@@ -57,16 +57,15 @@ void FileHandler::handleDirectory(const std::string &dirpath, ResourceType type)
     Log::debug("Requested path is a directory: " + dirpath);
     if (type == DIRECTORY_INDEX)
     {
-        auto possible_indexes = config_->get<std::vector<std::string>>("index").value();
-        auto first_matching = std::ranges::find_if(possible_indexes, [&](const std::string &index) {
-            return FileUtils::isFile(FileUtils::joinPath(dirpath, index));
-        });
-        if (first_matching == possible_indexes.end())
+        auto possibleIndex = config_->get<std::string>("index");
+        auto match = possibleIndex.has_value() ? FileUtils::isFile(FileUtils::joinPath(dirpath, possibleIndex.value())) : false;
+        if (! match)
         {
             ErrorHandler::createErrorResponse(Http::StatusCode::NOT_FOUND, response_, config_);
             return;
         }
-        handleFile(FileUtils::joinPath(dirpath, *first_matching));
+        auto fullPath = FileUtils::joinPath(dirpath, possibleIndex.value());
+        handleFile(fullPath);
         return;
     }
     if (type == DIRECTORY_AUTOINDEX)
@@ -115,10 +114,6 @@ FileHandler::ResourceType FileHandler::getResourceType(const std::string &path) 
     }
     if (uri_.isDirectory())
     {
-        // if (config_->get<std::vector<std::string>>("index").has_value())
-        // {
-        //     return DIRECTORY_INDEX;
-        // }
         if (config_->get<bool>("autoindex").value_or(false))
         {
             return DIRECTORY_AUTOINDEX;
