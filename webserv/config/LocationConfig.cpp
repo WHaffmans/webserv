@@ -27,3 +27,8 @@ void LocationConfig::parseBlock(const std::string &block)
     }
     parseDirectives(block);
 }
+
+const std::string &LocationConfig::getPath() const noexcept
+{
+    return _path;
+}
