@@ -19,7 +19,7 @@ class ServerSocket : public ASocket
 
     [[nodiscard]] std::string toString() const override;
 
-    [[nodiscard]] const std::string& getHost() const noexcept;
+    [[nodiscard]] const std::string &getHost() const noexcept;
     [[nodiscard]] int getPort() const noexcept;
 
   private:

@@ -1,6 +1,7 @@
+#include <webserv/config/ServerConfig.hpp>
+
 #include <webserv/config/AConfig.hpp>        // for AConfig
 #include <webserv/config/LocationConfig.hpp> // for LocationConfig
-#include <webserv/config/ServerConfig.hpp>
 #include <webserv/log/Log.hpp>     // for Log, LOCATION
 #include <webserv/utils/utils.hpp> // for findCorrespondingClosingBrace, trim
 
@@ -45,8 +46,8 @@ void ServerConfig::parseBlock(const std::string &block)
             directives += block.substr(pos);
             break;
         }
-        std::string locationPath = utils::trim(block.substr(
-            locationPos + location.size() + 1, bracePos - (locationPos + location.size() + 1)));
+        std::string locationPath = utils::trim(
+            block.substr(locationPos + location.size() + 1, bracePos - (locationPos + location.size() + 1)));
         // Add global declarations before this server block
 
         if (locationPath.front() != '/')

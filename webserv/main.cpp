@@ -18,7 +18,7 @@ int main(int argc, char **argv)
         std::string configPath;
 
         // NOLINTBEGIN
-        if ((argc == 3 || argc == 4)  && std::string(argv[1]) == "-c")
+        if ((argc == 3 || argc == 4) && std::string(argv[1]) == "-c")
         {
             configPath = argv[2];
         }

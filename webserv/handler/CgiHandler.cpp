@@ -1,30 +1,31 @@
-#include "webserv/http/HttpConstants.hpp"
-#include "webserv/main.hpp"
+#include <webserv/handler/CgiHandler.hpp>
 
 #include <webserv/client/Client.hpp> // for Client
-#include <webserv/handler/CgiHandler.hpp>
 #include <webserv/handler/CgiProcess.hpp>   // for CgiProcess
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
 #include <webserv/handler/URI.hpp>          // for URI
+#include <webserv/http/HttpConstants.hpp>   // for GATEWAY_TIMEOUT
+#include <webserv/http/HttpHeaders.hpp>     // for HttpHeaders
 #include <webserv/http/HttpRequest.hpp>     // for HttpRequest
 #include <webserv/http/HttpResponse.hpp>    // for HttpResponse
 #include <webserv/log/Log.hpp>              // for Log, LOCATION
+#include <webserv/main.hpp>                 // for BUFFER_SIZE, CHUNK_SIZE
 #include <webserv/socket/CgiSocket.hpp>     // for CgiSocket
 #include <webserv/socket/TimerSocket.hpp>   // for TimerSocket
 #include <webserv/utils/utils.hpp>          // for trim
 
-#include <algorithm>
-#include <array>
-#include <cerrno>
-#include <cstddef>
-#include <cstdlib>
-#include <cstring>
+#include <algorithm>  // for min
+#include <array>      // for array
+#include <cerrno>     // for errno
+#include <cstdlib>    // for atoi
+#include <cstring>    // for strerror
 #include <functional> // for function
-#include <optional>
-#include <string>
-#include <utility> // for move
+#include <optional>   // for optional
+#include <string>     // for basic_string, operator+, char_traits, to_string, string
+#include <utility>    // for move
 
 #include <sys/types.h> // for ssize_t
+#include <unistd.h>    // for access, X_OK
 
 CgiHandler::CgiHandler(const HttpRequest &request, HttpResponse &response)
     : AHandler(request, response), cgiProcess_(nullptr), cgiStdIn_(nullptr), cgiStdOut_(nullptr)

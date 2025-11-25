@@ -5,7 +5,7 @@
 
 #include <memory>   // for unique_ptr
 #include <optional> // for nullopt, optional
-#include <string>   // for string
+#include <string>   // for string, basic_string
 #include <vector>   // for vector
 
 class AConfig

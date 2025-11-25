@@ -1,18 +1,17 @@
-#include "webserv/utils/AutoIndex.hpp"
+#include <webserv/handler/FileHandler.hpp>
 
 #include <webserv/config/AConfig.hpp>       // for AConfig
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
-#include <webserv/handler/FileHandler.hpp>
 #include <webserv/handler/MIMETypes.hpp>  // for MIMETypes
 #include <webserv/handler/URI.hpp>        // for URI
-#include <webserv/http/HttpConstants.hpp> // for NOT_FOUND, FORBIDDEN, OK
+#include <webserv/http/HttpConstants.hpp> // for NOT_FOUND, OK, GATEWAY_TIMEOUT
 #include <webserv/http/HttpResponse.hpp>  // for HttpResponse
 #include <webserv/log/Log.hpp>            // for Log, LOCATION
+#include <webserv/utils/AutoIndex.hpp>    // for AutoIndex
 #include <webserv/utils/FileUtils.hpp>    // for joinPath, getExtension, isFile, readBinaryFile
 
 #include <optional> // for optional
-#include <ranges>   // for __find_if_fn, find_if
-#include <string>   // for basic_string, allocator, operator+, string, char_traits
+#include <string>   // for basic_string, allocator, operator+, char_traits, string
 #include <vector>   // for vector
 
 FileHandler::FileHandler(const HttpRequest &request, HttpResponse &response)
@@ -50,8 +49,9 @@ void FileHandler::handleDirectory(const std::string &dirpath, ResourceType type)
     if (type == DIRECTORY_INDEX)
     {
         auto possibleIndex = config_->get<std::string>("index");
-        auto match = possibleIndex.has_value() ? FileUtils::isFile(FileUtils::joinPath(dirpath, possibleIndex.value())) : false;
-        if (! match)
+        auto match = possibleIndex.has_value() ? FileUtils::isFile(FileUtils::joinPath(dirpath, possibleIndex.value()))
+                                               : false;
+        if (!match)
         {
             ErrorHandler::createErrorResponse(Http::StatusCode::NOT_FOUND, response_, config_);
             return;

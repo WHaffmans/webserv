@@ -1,5 +1,6 @@
-#include <webserv/config/AConfig.hpp> // for AConfig
 #include <webserv/config/LocationConfig.hpp>
+
+#include <webserv/config/AConfig.hpp> // for AConfig
 
 LocationConfig::LocationConfig(const std::string &block, const std::string &path, const AConfig *parent)
     : AConfig(parent), _path(path)

@@ -7,12 +7,10 @@ class RedirectHandler : public AHandler
   public:
     RedirectHandler(const HttpRequest &request, HttpResponse &response);
 
-
     void handle() override;
 
-    protected:
+  protected:
     void handleTimeout() override;
 
   private:
-
 };

@@ -1,6 +1,7 @@
+#include <webserv/log/Log.hpp>
+
 #include <webserv/log/Channel.hpp>     // for Channel
 #include <webserv/log/FileChannel.hpp> // for FileChannel
-#include <webserv/log/Log.hpp>
 #include <webserv/log/StdoutChannel.hpp> // for StdoutChannel
 
 #include <chrono>    // for duration_cast, operator-, steady_clock, duration, seconds
@@ -196,10 +197,10 @@ void Log::status(const std::string &message)
     _statusActive = true;
 
     // Save cursor position, move to bottom, clear line, print status, restore cursor
-    std::cout << "\033[s"      // Save cursor position
-              << "\033[999;0H" // Move to bottom row
-              << "\033[2K"     // Clear entire line
-              << "\033[34m"    // Set text color to blue
+    std::cout << "\033[s"             // Save cursor position
+              << "\033[999;0H"        // Move to bottom row
+              << "\033[2K"            // Clear entire line
+              << "\033[34m"           // Set text color to blue
               << "\033[7m"            // Reverse video (inverted colors)
               << message << "\033[0m" // Reset formatting
               << "\033[u"             // Restore cursor position

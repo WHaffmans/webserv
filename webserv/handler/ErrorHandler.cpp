@@ -3,14 +3,16 @@
 #include <webserv/config/AConfig.hpp>       // for AConfig
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/GlobalConfig.hpp>  // for GlobalConfig
-#include <webserv/http/HttpConstants.hpp>   // for getStatusCodeReason, INTERNAL_SERVER_ERROR
+#include <webserv/http/HttpConstants.hpp>   // for getStatusCodeReason, INTERNAL_SERVER_ERROR, METHOD_NOT_ALLOWED
 #include <webserv/http/HttpResponse.hpp>    // for HttpResponse
 #include <webserv/log/Log.hpp>              // for Log, LOCATION
-#include <webserv/utils/utils.hpp>          // for join
+#include <webserv/utils/utils.hpp>          // for implode
 
-#include <fstream> // for basic_ifstream, basic_filebuf, basic_ostream::operator<<, ifstream, stringstream
-#include <sstream> // for basic_stringstream
-#include <string>  // for allocator, basic_string, char_traits, operator+, string, to_string
+#include <fstream>  // for basic_ifstream, basic_filebuf, basic_ostream::operator<<, ifstream, stringstream
+#include <optional> // for optional
+#include <sstream>  // for basic_stringstream
+#include <string>   // for basic_string, allocator, char_traits, operator+, string, to_string
+#include <vector>   // for vector
 
 void ErrorHandler::createErrorResponse(uint16_t statusCode, HttpResponse &response, const AConfig *config)
 {
@@ -23,8 +25,7 @@ void ErrorHandler::createErrorResponse(uint16_t statusCode, HttpResponse &respon
     if (statusCode == Http::StatusCode::METHOD_NOT_ALLOWED && config != nullptr)
     {
         auto allowedMethods = config->get<std::vector<std::string>>("allowed_methods");
-        if (allowedMethods.has_value())
-            response.addHeader("Allow", utils::implode(allowedMethods.value(), ", "));
+        if (allowedMethods.has_value()) response.addHeader("Allow", utils::implode(allowedMethods.value(), ", "));
     }
     response.appendBody(generateErrorPage(statusCode, config));
     response.setComplete();

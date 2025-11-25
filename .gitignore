@@ -4,7 +4,9 @@ build
 build-*
 .cache
 webserv.log
+nginy
 compile_commands.json
 iwyu_results/
 build_coverage/
 uploads/
+obj/

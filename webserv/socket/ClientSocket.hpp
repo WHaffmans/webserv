@@ -2,7 +2,9 @@
 
 #include <webserv/socket/ASocket.hpp> // for ASocket
 
-#include <sys/socket.h>
+#include <string> // for string
+
+#include <sys/socket.h> // for sockaddr
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -15,6 +17,7 @@ class ClientSocket : public ASocket
     [[nodiscard]] const struct sockaddr *getAddress() const noexcept;
 
     [[nodiscard]] std::string toString() const override;
+
   private:
     struct sockaddr address_;
 };

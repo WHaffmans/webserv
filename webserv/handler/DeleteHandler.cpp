@@ -1,12 +1,14 @@
-#include "webserv/handler/ErrorHandler.hpp"
-#include "webserv/http/HttpConstants.hpp"
-
 #include <webserv/handler/DeleteHandler.hpp>
-#include <webserv/handler/URI.hpp>     // for HttpRequest
-#include <webserv/log/Log.hpp>         // for Log, LOCATION
-#include <webserv/utils/FileUtils.hpp> // for isValidPath
 
-#include <unistd.h>
+#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
+#include <webserv/handler/URI.hpp>          // for URI
+#include <webserv/http/HttpConstants.hpp>   // for FORBIDDEN, NO_CONTENT, BAD_REQUEST, GATEWAY_TIMEOUT, NOT_FOUND
+#include <webserv/http/HttpResponse.hpp>    // for HttpResponse
+#include <webserv/log/Log.hpp>              // for Log, LOCATION
+#include <webserv/utils/FileUtils.hpp>      // for isDirectory, isFile, isValidPath
+
+#include <stdio.h>  // for remove
+#include <unistd.h> // for rmdir
 
 DeleteHandler::DeleteHandler(const HttpRequest &request, HttpResponse &response) : AHandler(request, response) {}
 

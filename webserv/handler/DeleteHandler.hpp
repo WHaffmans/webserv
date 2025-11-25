@@ -1,7 +1,11 @@
 #pragma once
 
 #include <webserv/handler/AHandler.hpp> // for AHandler
-#include <string>
+#include <webserv/http/HttpRequest.hpp> // for HttpRequest
+
+#include <string> // for string
+
+class HttpResponse;
 
 class DeleteHandler : public AHandler
 {

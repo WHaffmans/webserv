@@ -1,10 +1,9 @@
 #pragma once
 
-#include "webserv/config/AConfig.hpp"
-#include "webserv/config/GlobalConfig.hpp"
-#include "webserv/config/LocationConfig.hpp"
-#include "webserv/config/validation/ValidationResult.hpp"
-
+#include <webserv/config/AConfig.hpp>
+#include <webserv/config/GlobalConfig.hpp>
+#include <webserv/config/LocationConfig.hpp>
+#include <webserv/config/validation/ValidationResult.hpp>
 #include <webserv/config/validation/structural_rules/AStructuralValidationRule.hpp> // for AStructuralValidationRule
 
 #include <cstddef> // for size_t

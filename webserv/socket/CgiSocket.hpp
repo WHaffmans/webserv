@@ -1,7 +1,8 @@
 #pragma once
 
 #include <webserv/socket/ASocket.hpp> // for ASocket
-#include <string>
+
+#include <string> // for string, basic_string
 
 #include <stddef.h> // for size_t
 #include <sys/socket.h>
@@ -19,6 +20,7 @@ class CgiSocket : public ASocket
     ssize_t write(const void *buf, size_t len) const override;
 
     [[nodiscard]] std::string toString() const override;
+
   private:
     std::string stream_;
 };

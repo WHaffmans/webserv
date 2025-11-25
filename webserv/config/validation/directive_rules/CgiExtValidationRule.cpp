@@ -40,12 +40,12 @@ ValidationResult CgiExtValidationRule::validateValue(const AConfig *config, cons
     if (extension.empty() || extension[0] != '.')
     {
         return ValidationResult::error("Directive '" + directive->getName() + "' has invalid extension '" + extension
-        + "'");
+                                       + "'");
     }
     if (!isAllowedCGIExtension(extension))
     {
         return ValidationResult::error("Directive '" + directive->getName() + "' has unsupported extension '"
-        + extension + "'");
+                                       + extension + "'");
     }
 
     if (cgiExt.size() == 2)

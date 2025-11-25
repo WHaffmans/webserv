@@ -1,11 +1,15 @@
-#include "webserv/config/AConfig.hpp"
-
-#include <webserv/handler/URI.hpp>
 #include <webserv/utils/AutoIndex.hpp>
-#include <webserv/utils/FileUtils.hpp>
 
-#include <string>
-#include <vector>
+#include <webserv/config/AConfig.hpp> // for AConfig
+#include <webserv/handler/URI.hpp>    // for URI
+#include <webserv/utils/FileUtils.hpp> // for listDirectory
+
+#include <algorithm>  // for find
+#include <filesystem> // for directory_entry, path
+#include <optional>   // for optional, operator==
+#include <sstream>    // for operator<<, basic_ostringstream, basic_ostream, ostringstream, fixed
+#include <string>     // for basic_string, char_traits, operator<<, allocator, operator==, string
+#include <vector>     // for vector
 
 bool deleteAllowed(const URI &uri)
 {
@@ -77,7 +81,7 @@ std::string AutoIndex::generate(const std::string &dir, const URI &uri)
                  << "', {method: 'DELETE'}).then(response => {if(response.ok) location.reload(); else alert('Delete "
                     "failed');})\" style=\"cursor: pointer; color: red; margin-left: 10px;\">&#10060;</span>";
         }
-        html<< "</td></tr>\n";
+        html << "</td></tr>\n";
     }
 
     html << "</table>\n";
@@ -86,8 +90,8 @@ std::string AutoIndex::generate(const std::string &dir, const URI &uri)
         && config->get<std::string>("root") == dir)
     {
 
-        html << "<form method=\"POST\" enctype=\"multipart/form-data\" action=\""
-             << uri.getUriForPath(dir) << "/?autoindex=on\">\n"
+        html << "<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" << uri.getUriForPath(dir)
+             << "/?autoindex=on\">\n"
              << "<input type=\"file\" name=\"file\" />\n"
              << "<input type=\"submit\" value=\"Upload\" />\n"
              << "</form>\n";

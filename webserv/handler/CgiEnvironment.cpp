@@ -1,19 +1,19 @@
-#include "webserv/http/HttpRequest.hpp"
-#include "webserv/log/Log.hpp"
-#include "webserv/utils/FileUtils.hpp"
-#include "webserv/utils/utils.hpp"
-
 #include <webserv/handler/CgiEnvironment.hpp>
+
+#include <webserv/client/Client.hpp>  // for Client
+#include <webserv/config/AConfig.hpp> // for AConfig
 #include <webserv/handler/URI.hpp>      // for URI
 #include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
+#include <webserv/log/Log.hpp>          // for Log, LOCATION
+#include <webserv/utils/utils.hpp>      // for ensureTrailingSlash
 
-#include <algorithm>
-#include <cctype>
-#include <cstring>  // for strcpy, size_t
-#include <optional> // for optional
-#include <utility>  // for pair
-
-#include <sys/stat.h>
+#include <algorithm>     // for __transform_fn, replace, transform, __replace_fn
+#include <cctype>        // for toupper, tolower
+#include <cstring>       // for size_t, strcpy
+#include <optional>      // for optional
+#include <unordered_map> // for unordered_map, operator==
+#include <utility>       // for pair
+#include <vector>        // for vector
 
 CgiEnvironment::CgiEnvironment(const URI &uri, const HttpRequest &request)
 {

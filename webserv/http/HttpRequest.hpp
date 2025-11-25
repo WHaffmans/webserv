@@ -1,8 +1,8 @@
 #pragma once
 
-#include "webserv/http/HttpResponse.hpp"
 #include <webserv/config/ServerConfig.hpp>
 #include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
+#include <webserv/http/HttpResponse.hpp>
 
 #include <cstddef> // for size_t
 #include <cstdint> // for uint8_t
@@ -56,7 +56,7 @@ class HttpRequest
     void parseBuffer();
     void parseContentLength();
 
-    ServerConfig * getServerConfig() const;
+    ServerConfig *getServerConfig() const;
 
     Client *client_;
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <webserv/config/AConfig.hpp>
-
 #include <webserv/config/ServerConfig.hpp>
 #include <webserv/http/HttpRequest.hpp>
 

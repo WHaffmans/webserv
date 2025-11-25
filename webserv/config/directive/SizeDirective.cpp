@@ -60,7 +60,7 @@ void SizeDirective::parse(const std::string &value)
 
     if (value_ > 1000000000UL) // 1 GB limit for sanity should be a constant
     {
-        throw std::invalid_argument("Size directive too large: " + value + " in " + name_); 
+        throw std::invalid_argument("Size directive too large: " + value + " in " + name_);
     }
 }
 

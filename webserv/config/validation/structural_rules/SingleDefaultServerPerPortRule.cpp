@@ -1,7 +1,8 @@
+#include <webserv/config/validation/structural_rules/SingleDefaultServerPerPortRule.hpp>
+
 #include <webserv/config/GlobalConfig.hpp>
 #include <webserv/config/ServerConfig.hpp>
 #include <webserv/config/validation/ValidationResult.hpp>
-#include <webserv/config/validation/structural_rules/SingleDefaultServerPerPortRule.hpp>
 #include <webserv/log/Log.hpp>
 
 #include <map>

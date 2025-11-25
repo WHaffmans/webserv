@@ -95,7 +95,7 @@ void ASocket::setNonBlocking() const
     }
     flagStr += ")";
 
-    Log::debug(this->toString()  + " configured. Flags: " + flagStr);
+    Log::debug(this->toString() + " configured. Flags: " + flagStr);
 }
 
 int ASocket::getFd() const noexcept

@@ -48,8 +48,7 @@ ValidationResult UniqueServerNamesRule::validateGlobal(const GlobalConfig *confi
                 if (serverNames.contains(uniqueKey))
                 {
                     return ValidationResult::error("Duplicate server name '" + name
-                                                   + "' found in configuration on port "
-                                                   + std::to_string(listenPort));
+                                                   + "' found in configuration on port " + std::to_string(listenPort));
                 }
                 serverNames.insert(uniqueKey);
             }

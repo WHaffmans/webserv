@@ -2,8 +2,10 @@
 
 #include <webserv/handler/URI.hpp> // for URI
 
-#include <cstdint>
-#include <string>
+#include <cstdint> // for uintmax_t
+#include <string>  // for string
+
+class URI;
 
 class AutoIndex
 {

@@ -1,29 +1,30 @@
-#include "webserv/main.hpp"
-
 #include <webserv/client/Client.hpp>
-#include <webserv/handler/CgiHandler.hpp>   // for CgiHandler
-#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
-#include <webserv/handler/URI.hpp>
-#include <webserv/http/HttpHeaders.hpp>  // for HttpHeaders
-#include <webserv/http/HttpRequest.hpp>  // for HttpRequest
-#include <webserv/http/HttpResponse.hpp> // for HttpResponse
-#include <webserv/http/RequestValidator.hpp>
-#include <webserv/log/Log.hpp>             // for Log, LOCATION
-#include <webserv/router/Router.hpp>       // for Router
-#include <webserv/server/Server.hpp>       // for Server
-#include <webserv/socket/ASocket.hpp>      // for ASocket
-#include <webserv/socket/ClientSocket.hpp> // for ClientSocket
 
+#include <webserv/handler/CgiHandler.hpp>    // for CgiHandler
+#include <webserv/handler/ErrorHandler.hpp>  // for ErrorHandler
+#include <webserv/handler/URI.hpp>           // for URI
+#include <webserv/http/HttpRequest.hpp>      // for HttpRequest
+#include <webserv/http/HttpResponse.hpp>     // for HttpResponse
+#include <webserv/http/RequestValidator.hpp> // for RequestValidator
+#include <webserv/log/Log.hpp>               // for Log, LOCATION
+#include <webserv/main.hpp>                  // for BUFFER_SIZE
+#include <webserv/router/Router.hpp>         // for Router
+#include <webserv/server/Server.hpp>         // for Server
+#include <webserv/socket/ASocket.hpp>        // for ASocket
+#include <webserv/socket/ClientSocket.hpp>   // for ClientSocket
+
+#include <exception>  // for exception
 #include <functional> // for function, ref, reference_wrapper
-#include <memory>     // for unique_ptr, make_unique, allocator, operator==, default_delete
+#include <memory>     // for unique_ptr, allocator, make_unique, operator==, default_delete
 #include <stdexcept>  // for runtime_error
-#include <string>     // for basic_string, to_string, operator+, char_traits, operator<=>
+#include <string>     // for operator+, basic_string, to_string, char_traits, string
 #include <utility>    // for move, pair
 #include <vector>     // for vector
 
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h> // for send
+#include <arpa/inet.h>  // for inet_ntoa
+#include <netinet/in.h> // for in_addr, sockaddr_in
+#include <stddef.h>     // for size_t
+#include <sys/socket.h> // for send, AF_INET, sockaddr
 #include <sys/types.h>  // for ssize_t
 
 Client::Client(std::unique_ptr<ClientSocket> socket, Server &server)

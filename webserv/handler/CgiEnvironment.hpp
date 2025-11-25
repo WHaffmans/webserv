@@ -9,6 +9,7 @@
 #include <string> // for basic_string, string
 
 class URI;
+class HttpHeaders;
 
 class CgiEnvironment
 {

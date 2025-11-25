@@ -1,5 +1,6 @@
-#include <webserv/log/Log.hpp> // for Log, LOCATION
 #include <webserv/utils/FileUtils.hpp>
+
+#include <webserv/log/Log.hpp> // for Log, LOCATION
 
 #include <cstring> // for size_t
 #include <filesystem>
@@ -14,9 +15,7 @@ namespace FileUtils
 {
 bool isDirectory(const std::string &path)
 {
-    struct stat pathStat
-    {
-    };
+    struct stat pathStat{};
 
     if (stat(path.c_str(), &pathStat) != 0)
     {
@@ -27,9 +26,7 @@ bool isDirectory(const std::string &path)
 
 bool isFile(const std::string &path)
 {
-    struct stat pathStat
-    {
-    };
+    struct stat pathStat{};
 
     if (stat(path.c_str(), &pathStat) != 0)
     {
@@ -40,9 +37,7 @@ bool isFile(const std::string &path)
 
 bool isValidPath(const std::string &path)
 {
-    struct stat pathStat
-    {
-    };
+    struct stat pathStat{};
 
     return stat(path.c_str(), &pathStat) == 0;
 }

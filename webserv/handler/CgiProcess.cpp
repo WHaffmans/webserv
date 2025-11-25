@@ -1,6 +1,6 @@
-#include <webserv/handler/CgiEnvironment.hpp> // for CgiEnvironment
-#include <webserv/handler/CgiHandler.hpp>     // for CgiHandler
 #include <webserv/handler/CgiProcess.hpp>
+
+#include <webserv/handler/CgiEnvironment.hpp> // for CgiEnvironment
 #include <webserv/handler/URI.hpp>      // for URI
 #include <webserv/http/HttpRequest.hpp> // for HttpRequest
 #include <webserv/log/Log.hpp>          // for Log
@@ -8,13 +8,13 @@
 #include <webserv/socket/CgiSocket.hpp> // for CgiSocket
 
 #include <csignal>   // for kill, SIGKILL
-#include <cstdlib>   // for exit
+#include <cstdlib>   // for WEXITSTATUS, exit
 #include <memory>    // for allocator, make_unique, unique_ptr
 #include <stdexcept> // for runtime_error
-#include <string>    // for basic_string, operator+, to_string, char_traits, string
+#include <string>    // for char_traits, basic_string, operator+, to_string, string
 #include <utility>   // for move
 
-#include <fcntl.h>    // for O_CLOEXEC, O_NONBLOCK
+#include <fcntl.h>    // for fcntl, O_NONBLOCK, F_GETFL, F_SETFL, O_CLOEXEC
 #include <sys/wait.h> // for waitpid, WNOHANG
 #include <unistd.h>   // for close, dup2, pipe2, execve, fork, STDERR_FILENO, STDIN_FILENO, STDOUT_FILENO
 

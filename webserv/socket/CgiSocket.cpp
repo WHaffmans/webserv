@@ -3,13 +3,13 @@
 #include <webserv/log/Log.hpp>        // for LOCATION, Log
 #include <webserv/socket/ASocket.hpp> // for ASocket
 
-#include <string>
-#include <system_error> // for generic_category, system_error
+#include <string>  // for operator+, allocator, basic_string, char_traits, string, to_string
+#include <utility> // for move
 
-#include <errno.h>  // for errno
 #include <unistd.h> // for read, write
 
-CgiSocket::CgiSocket(int fd, ASocket::IoState event, std::string stream) : ASocket(fd, event), stream_(std::move(stream))
+CgiSocket::CgiSocket(int fd, ASocket::IoState event, std::string stream)
+    : ASocket(fd, event), stream_(std::move(stream))
 {
     Log::trace(LOCATION);
 }

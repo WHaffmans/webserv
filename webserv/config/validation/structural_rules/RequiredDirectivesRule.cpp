@@ -1,3 +1,5 @@
+#include <webserv/config/validation/structural_rules/RequiredDirectivesRule.hpp>
+
 #include <webserv/config/AConfig.hpp>                                               // for AConfig
 #include <webserv/config/GlobalConfig.hpp>                                          // for GlobalConfig
 #include <webserv/config/LocationConfig.hpp>                                        // for LocationConfig
@@ -5,7 +7,6 @@
 #include <webserv/config/directive/DirectiveFactory.hpp>                            // for DirectiveFactory
 #include <webserv/config/validation/ValidationResult.hpp>                           // for ValidationResult
 #include <webserv/config/validation/structural_rules/AStructuralValidationRule.hpp> // for AStructuralValidationRule
-#include <webserv/config/validation/structural_rules/RequiredDirectivesRule.hpp>
 #include <webserv/utils/utils.hpp> // for implode
 
 #include <array>  // for array
@@ -103,7 +104,7 @@ ValidationResult RequiredDirectivesRule::validateServer(const ServerConfig *conf
 {
     std::vector<std::string> missing;
     std::vector<std::string> prohibited;
- 
+
     for (const auto &info : DirectiveFactory::supportedDirectives)
     {
         bool required = info.context.find('S') != std::string::npos;

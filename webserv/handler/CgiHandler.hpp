@@ -5,15 +5,17 @@
 #include <webserv/socket/CgiSocket.hpp> // for CgiSocket
 
 #include <cstddef>
-#include <memory> // for unique_ptr
-#include <string> // for string
-#include <vector> // for vector
+#include <memory>   // for unique_ptr
+#include <optional> // for optional
+#include <string>   // for string
+#include <vector>   // for vector
 
 #include <stddef.h> // for size_t
 #include <stdint.h> // for uint8_t
 
 class CgiProcess;
 class HttpResponse;
+class CgiSocket;
 
 class CgiHandler : public AHandler
 {

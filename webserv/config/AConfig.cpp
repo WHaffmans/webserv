@@ -1,4 +1,5 @@
 #include <webserv/config/AConfig.hpp>                    // for AConfig
+
 #include <webserv/config/directive/ADirective.hpp>       // for ADirective
 #include <webserv/config/directive/DirectiveFactory.hpp> // for DirectiveFactory
 #include <webserv/config/directive/DirectiveValue.hpp>   // for DirectiveValue
@@ -6,9 +7,11 @@
 #include <webserv/utils/FileUtils.hpp>                   // for joinPath
 #include <webserv/utils/utils.hpp>                       // for trim
 
-#include <ranges>  // for filter
-#include <sstream> // for basic_stringstream, stringstream
-#include <utility> // for pair, move
+#include <cstddef>   // for size_t
+#include <ranges>    // for __find_fn, find
+#include <sstream>   // for basic_stringstream, stringstream
+#include <stdexcept> // for runtime_error
+#include <utility>   // for pair, move
 
 AConfig::AConfig(const AConfig *parent) : parent_(parent)
 {

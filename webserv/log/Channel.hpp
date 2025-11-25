@@ -19,6 +19,7 @@ class Channel
         = 0;
 
     [[nodiscard]] virtual bool isStdOut() const;
+
   protected:
     [[nodiscard]] static std::string printContext(const std::map<std::string, std::string> &context);
 

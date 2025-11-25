@@ -1,5 +1,7 @@
 #include <webserv/config/validation/structural_rules/AStructuralValidationRule.hpp>
 
+#include <webserv/config/validation/ValidationResult.hpp> // for ValidationResult
+
 AStructuralValidationRule::AStructuralValidationRule(const std::string &ruleName, const std::string &description)
     : ruleName_(ruleName), description_(description)
 {

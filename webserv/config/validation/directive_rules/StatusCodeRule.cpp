@@ -20,15 +20,16 @@ ValidationResult StatusCodeRule::validateValue(const AConfig *config, const std:
     const ADirective *directive = config->getDirective(directiveName);
     if (!directive->getValue().holds<std::pair<int, std::string>>())
     {
-        return ValidationResult::error("Directive '" + directive->getName() + "' does not hold a int-string pair value");
+        return ValidationResult::error("Directive '" + directive->getName()
+                                       + "' does not hold a int-string pair value");
     }
 
     auto value = directive->getValue().get<std::pair<int, std::string>>();
     int statusCode = value.first;
     if (statusCode < 100 || statusCode > 599)
     {
-        return ValidationResult::error("Directive '" + directive->getName() + "' has invalid status code: " +
-                                       std::to_string(statusCode));
+        return ValidationResult::error("Directive '" + directive->getName()
+                                       + "' has invalid status code: " + std::to_string(statusCode));
     }
 
     return ValidationResult::success();
