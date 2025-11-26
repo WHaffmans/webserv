@@ -8,6 +8,8 @@
 
 #define DEFAULT_TIMEOUT 30
 
+#define CLIENT_TIMEOUT 30
+
 namespace Constants
 {
 constexpr static size_t BUFFER_SIZE = 8192; // 8kb

@@ -62,7 +62,7 @@ struct StatusCodeInfo
     std::string_view reason;
 };
 
-static constexpr std::array<StatusCodeInfo, 19> statusCodeInfos
+static constexpr std::array<StatusCodeInfo, 20> statusCodeInfos
     = {{{.code = StatusCode::OK, .reason = "OK"},
         {.code = StatusCode::CREATED, .reason = "Created"},
         {.code = StatusCode::NO_CONTENT, .reason = "No Content"},
@@ -81,7 +81,8 @@ static constexpr std::array<StatusCodeInfo, 19> statusCodeInfos
         {.code = StatusCode::INTERNAL_SERVER_ERROR, .reason = "Internal Server Error"},
         {.code = StatusCode::NOT_IMPLEMENTED, .reason = "Not Implemented"},
         {.code = StatusCode::BAD_GATEWAY, .reason = "Bad Gateway"},
-        {.code = StatusCode::SERVICE_UNAVAILABLE, .reason = "Service Unavailable"}}};
+        {.code = StatusCode::SERVICE_UNAVAILABLE, .reason = "Service Unavailable"},
+        {.code = StatusCode::GATEWAY_TIMEOUT, .reason = "Gateway Timeout"}}};
 
 std::string getStatusCodeReason(uint16_t statusCode) noexcept;
 

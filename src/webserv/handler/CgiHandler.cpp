@@ -183,7 +183,7 @@ void CgiHandler::read()
     if (bytesRead < 0)
     {
 
-        Log::error("Error reading from CGI stdout: " + std::string(strerror(errno)));
+        Log::error("Error reading from CGI stdout");
         finalizeCgiResponse();
     }
 }

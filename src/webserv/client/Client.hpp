@@ -47,6 +47,8 @@ class Client
     void addSocket(ASocket *socket);
     void removeSocket(ASocket *socket);
 
+  
+
     [[nodiscard]] ClientSocket *getClientSocket() const noexcept;
     [[nodiscard]] HttpRequest &getHttpRequest() const noexcept;
     [[nodiscard]] HttpResponse &getHttpResponse() const noexcept;
@@ -58,11 +60,15 @@ class Client
     std::unique_ptr<HttpResponse> httpResponse_;
     std::unique_ptr<Router> router_;
     std::unique_ptr<ClientSocket> clientSocket_;
+    std::unique_ptr<TimerSocket> timerSocket_;
     std::unique_ptr<AHandler> handler_ = nullptr;
     std::unordered_map<int, ASocket *> sockets_;
 
     Server &server_;
     long writeOffset_ = 0;
+    void startTimer();
+    void resetTimer();
+    void handleTimeout();
     // void writeToCgi();
     // void readFromCgi();
 };

@@ -36,6 +36,8 @@ Client::Client(std::unique_ptr<ClientSocket> socket, Server &server)
     Log::info(clientSocket_->toString() + ": connected");
     clientSocket_->setCallback([this]() { request(); });
     sockets_[clientSocket_->getFd()] = clientSocket_.get();
+
+    startTimer();
 }
 
 Client::~Client()
@@ -81,6 +83,7 @@ void Client::request()
         return;
     }
 
+    resetTimer();
     buffer[bytesRead] = '\0'; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
     if (httpRequest_->getState() == HttpRequest::State::Complete)
     {
@@ -110,6 +113,7 @@ void Client::request()
             handler_ = router_->handleRequest();
             if (handler_ != nullptr)
             {
+                handler_->startTimer();
                 handler_->handle();
             }
         }
@@ -170,18 +174,46 @@ void Client::respond()
     if (bytesSent < 0)
     {
         Log::error(clientSocket_->toString() + ": send failed");
+        server_.disconnect(*this); // ! CRITICAL: RETURN IMMEDIATELY
+        return;
     }
-    else
-    {
-        Log::debug(clientSocket_->toString() + ": sent " + std::to_string(bytesSent) + " bytes out of "
-                   + std::to_string(writeOffset_ + payload.size()) + "(offset: " + std::to_string(writeOffset_) + ")");
-        writeOffset_ += bytesSent;
-    }
+
+    Log::debug(clientSocket_->toString() + ": sent " + std::to_string(bytesSent) + " bytes out of "
+               + std::to_string(writeOffset_ + payload.size()) + "(offset: " + std::to_string(writeOffset_) + ")");
+    writeOffset_ += bytesSent;
+
+    resetTimer();
+    
     if (payload.empty())
     {
         Log::debug(clientSocket_->toString() + ": closing connection to client");
         server_.disconnect(*this); // ! CRITICAL: RETURN IMMEDIATELY
     }
+}
+
+void Client::startTimer()
+{
+    timerSocket_ = std::make_unique<TimerSocket>(std::chrono::milliseconds(CLIENT_TIMEOUT) * 1000);
+    timerSocket_->setCallback([this]() { handleTimeout(); });
+    timerSocket_->activate();
+
+    addSocket(timerSocket_.get());
+    Log::debug(clientSocket_->toString() + ": Timer started");
+}
+
+void Client::resetTimer()
+{
+    if (timerSocket_)
+    {
+        timerSocket_->activate();
+        Log::debug(clientSocket_->toString() + ": Timer reset");
+    }
+}
+
+void Client::handleTimeout()
+{
+    Log::info(clientSocket_->toString() + ": client timeout reached; disconnecting");
+    server_.disconnect(*this);
 }
 
 HttpRequest &Client::getHttpRequest() const noexcept

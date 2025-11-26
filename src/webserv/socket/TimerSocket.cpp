@@ -20,7 +20,7 @@ TimerSocket::TimerSocket(std::chrono::milliseconds timeout)
 void TimerSocket::activate()
 {
     Log::trace(LOCATION);
-    struct itimerspec timerSpec;
+    struct itimerspec timerSpec{};
 
     auto seconds = std::chrono::duration_cast<std::chrono::seconds>(timeout_);
     auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(timeout_ - seconds);

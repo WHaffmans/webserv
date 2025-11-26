@@ -15,7 +15,6 @@
 
 AHandler::AHandler(const HttpRequest &request, HttpResponse &response) : request_(request), response_(response)
 {
-    startTimer();
 }
 
 AHandler::~AHandler() = default;
