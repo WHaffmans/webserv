@@ -47,8 +47,6 @@ void CgiHandler::handle()
     // Initialize CGI process
     cgiProcess_ = std::make_unique<CgiProcess>(request_, *this);
 
-    startTimer();
-
     Log::info(request_.getClient().getClientSocket()->toString() + ": CGI started");
 }
 
@@ -247,6 +245,18 @@ void CgiHandler::wait() noexcept
     {
         cgiProcess_->wait();
     }
+}
+
+void CgiHandler::startTimer()
+{
+    timerSocket_ = std::make_unique<TimerSocket>(
+        std::chrono::milliseconds(request_.getUri().getConfig()->get<int>("cgi_timeout").value_or(CGI_TIMEOUT)) * 1000);
+
+    timerSocket_->setCallback([this]() { handleTimeout(); });
+    timerSocket_->activate();
+
+    request_.getClient().addSocket(timerSocket_.get());
+    Log::debug("Timer started for handler: " + std::to_string(timerSocket_->getFd()));
 }
 
 void CgiHandler::setPid(int pid)

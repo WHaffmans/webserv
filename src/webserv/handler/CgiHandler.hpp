@@ -31,6 +31,9 @@ class CgiHandler : public AHandler
 
     void handle() override;
     void wait() noexcept;
+
+    void startTimer() override;
+    
     void setCgiSockets(std::unique_ptr<CgiSocket> cgiStdIn, std::unique_ptr<CgiSocket> cgiStdOut,
                        std::unique_ptr<CgiSocket> cgiStdErr);
     void setPid(int pid);
