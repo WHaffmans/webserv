@@ -1,8 +1,7 @@
-#include <webserv/config/validation/structural_rules/SingleDefaultServerPerPortRule.hpp>
-
 #include <webserv/config/GlobalConfig.hpp>
 #include <webserv/config/ServerConfig.hpp>
 #include <webserv/config/validation/ValidationResult.hpp>
+#include <webserv/config/validation/structural_rules/SingleDefaultServerPerPortRule.hpp>
 #include <webserv/log/Log.hpp>
 
 #include <map>
@@ -26,8 +25,11 @@ ValidationResult SingleDefaultServerPerPortRule::validateGlobal(const GlobalConf
 
     for (const auto *server : config->getServerConfigs())
     {
-        if (server == nullptr) continue;
-        auto listenPort = server->get<int>("listen").value_or(80);
+        if (server == nullptr)
+        {
+            continue;
+        }
+        auto listenPort = server->get<int>("listen").value_or(0);
         auto def = server->get<bool>("default");
         if (def.has_value() && def.value())
         {

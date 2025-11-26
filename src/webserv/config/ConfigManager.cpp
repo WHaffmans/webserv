@@ -140,7 +140,7 @@ ServerConfig *ConfigManager::getMatchingServerConfig(const std::string &host, in
     {
         auto serverNames
             = serverConfig->get<std::vector<std::string>>("server_name").value_or(std::vector<std::string>());
-        auto listenPorts = serverConfig->get<int>("listen").value_or(80);
+        auto listenPorts = serverConfig->get<int>("listen").value_or(0);
 
         // Track first server for this port as default
         if (listenPorts == port && defaultServerForPort == nullptr)
