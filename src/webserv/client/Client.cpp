@@ -46,7 +46,6 @@ Client::~Client()
     {
         server_.remove(*(it.second));
     }
-    // server_.remove(*clientSocket_);
 };
 
 ASocket &Client::getSocket(int fd) const
@@ -63,42 +62,6 @@ ASocket &Client::getSocket(int fd) const
     throw std::runtime_error("Socket not found for fd: " + std::to_string(fd));
 }
 
-void Client::cleanHandler(AHandler *handler)
-{
-    if (handler == nullptr)
-    {
-        return;
-    }
-    Log::debug(clientSocket_->toString() + ": cleaning up handler");
-    // Extract timer socket if it exists and remove from tracking
-    auto *timerSocket = handler->getTimerSocket();
-    if (timerSocket != nullptr)
-    {
-        removeSocket(timerSocket);
-    }
-    // Extract CGI sockets if this was a CgiHandler
-    auto *cgiHandler = dynamic_cast<CgiHandler *>(handler);
-    if (cgiHandler != nullptr)
-    {
-        auto *cgiProcess = cgiHandler->getCgiProcess();
-        if (cgiProcess != nullptr)
-        {
-            if (auto *stdinSocket = cgiHandler->getCgiStdIn())
-            {
-                removeSocket(stdinSocket);
-            }
-            if (auto *stdoutSocket = cgiHandler->getCgiStdOut())
-            {
-                removeSocket(stdoutSocket);
-            }
-            if (auto *stderrSocket = cgiHandler->getCgiStdErr())
-            {
-                removeSocket(stderrSocket);
-            }
-        }
-    }
-}
-
 void Client::request()
 {
     Log::trace(LOCATION);
@@ -107,13 +70,14 @@ void Client::request()
         buffer, sizeof(buffer) - 1); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
     if (bytesRead < 0)
     {
-        Log::error("Read error");
-        throw std::runtime_error("Read error");
+        Log::error(clientSocket_->toString() + ": read error");
+        server_.disconnect(*this);
+        return;
     }
     if (bytesRead == 0)
     {
         Log::info(clientSocket_->toString() + ": closed connection");
-        server_.disconnect(*this); // CRITICAL: RETURN IMMEDIATELY
+        server_.disconnect(*this);
         return;
     }
 
@@ -143,10 +107,6 @@ void Client::request()
         Log::info(clientSocket_->toString() + ": " + httpRequest_->getMethod() + " " + httpRequest_->getTarget());
         try
         {
-            // if (handler_ != nullptr)
-            // {
-            //     cleanHandler(handler_.get());
-            // }
             handler_ = router_->handleRequest();
             if (handler_ != nullptr)
             {
