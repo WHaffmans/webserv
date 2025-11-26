@@ -1,9 +1,8 @@
-#include <webserv/server/Server.hpp>
-
 #include <webserv/client/Client.hpp>        // for Client
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/ServerConfig.hpp>  // for ServerConfig
 #include <webserv/log/Log.hpp>              // for Log, LOCATION
+#include <webserv/server/Server.hpp>
 #include <webserv/socket/ASocket.hpp>      // for ASocket
 #include <webserv/socket/ClientSocket.hpp> // for ClientSocket
 #include <webserv/socket/ServerSocket.hpp> // for ServerSocket
@@ -125,7 +124,7 @@ void Server::setupServerSocket(const ServerConfig &config)
             if (listener->getPort() == port && listener->getHost() == host)
             {
                 Log::debug("Server socket for " + host + ":" + std::to_string(port)
-                          + " already exists, skipping creation.");
+                           + " already exists, skipping creation.");
                 return;
             }
         }
@@ -367,38 +366,7 @@ void Server::run()
     struct epoll_event events[MAX_EVENTS]; // NOLINT
     while (signum_ != SIGINT && signum_ != SIGTERM)
     {
-        int serverCount = 0, clientCount = 0, timerCount = 0, cgiCount = 0, otherCount = 0;
-        for (auto *s : sockets_)
-        {
-            switch (s->getType())
-            {
-            case ASocket::Type::SERVER_SOCKET: ++serverCount; break;
-            case ASocket::Type::CLIENT_SOCKET: ++clientCount; break;
-            case ASocket::Type::TIMER_SOCKET: ++timerCount; break;
-            case ASocket::Type::CGI_SOCKET: ++cgiCount; break;
-            default: ++otherCount; break;
-            }
-        }
-
-        std::string socketsInfo;
-        std::vector<std::string> parts;
-        if (serverCount) parts.emplace_back("Server(" + std::to_string(serverCount) + ")");
-        if (clientCount) parts.emplace_back("Clients(" + std::to_string(clientCount) + ")");
-        if (timerCount) parts.emplace_back("Timers(" + std::to_string(timerCount) + ")");
-        if (cgiCount) parts.emplace_back("CGI(" + std::to_string(cgiCount) + ")");
-        if (otherCount) parts.emplace_back("Other(" + std::to_string(otherCount) + ")");
-
-        if (!parts.empty())
-        {
-            socketsInfo = parts.front();
-            for (size_t i = 1; i < parts.size(); ++i)
-            {
-                socketsInfo += ", " + parts[i];
-            }
-        }
-
-        std::string status = "Sockets: " + (socketsInfo.empty() ? "none" : socketsInfo);
-        Log::status(status);
+        connectionInfo();
         pollSockets();
         pollClients();
         handleEpoll(events, MAX_EVENTS); // NOLINT (cppcoreguidelines-pro-bounds-pointer-arithmetic)
@@ -412,4 +380,52 @@ void Server::signalHandler(int signum)
     {
         signum_ = signum;
     }
+}
+
+void Server::connectionInfo() const
+{
+    int serverCount = 0;
+    int clientCount = 0;
+    int timerCount = 0;
+    int cgiCount = 0;
+    int otherCount = 0;
+    for (auto *s : sockets_)
+    {
+        switch (s->getType())
+        {
+        case ASocket::Type::SERVER_SOCKET: ++serverCount; break;
+        case ASocket::Type::CLIENT_SOCKET: ++clientCount; break;
+        case ASocket::Type::TIMER_SOCKET: ++timerCount; break;
+        case ASocket::Type::CGI_SOCKET: ++cgiCount; break;
+        default: ++otherCount; break;
+        }
+    }
+
+    std::string socketsInfo;
+    std::vector<std::string> parts;
+    if (serverCount > 0)
+    {
+        parts.emplace_back("Server(" + std::to_string(serverCount) + ")");
+    }
+    if (clientCount > 0)
+    {
+        parts.emplace_back("Clients(" + std::to_string(clientCount) + ")");
+    }
+    if (timerCount > 0)
+    {
+        parts.emplace_back("Timers(" + std::to_string(timerCount) + ")");
+    }
+    if (cgiCount > 0)
+    {
+        parts.emplace_back("CGI(" + std::to_string(cgiCount) + ")");
+    }
+    if (otherCount > 0)
+    {
+        parts.emplace_back("Other(" + std::to_string(otherCount) + ")");
+    }
+    
+    socketsInfo = utils::implode(parts, ", ");
+
+    std::string status = "Sockets: " + (socketsInfo.empty() ? "none" : socketsInfo);
+    Log::status(status);
 }

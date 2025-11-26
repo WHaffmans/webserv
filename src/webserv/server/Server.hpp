@@ -66,4 +66,6 @@ class Server
     void handleResponse(struct epoll_event *event) const;
 
     void setupServerSocket(const ServerConfig &config);
+
+    void connectionInfo() const;
 };
