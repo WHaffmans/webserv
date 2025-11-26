@@ -121,6 +121,7 @@ namespace Protocol
 {
 constexpr std::string_view CRLF = "\r\n";
 constexpr std::string_view DOUBLE_CRLF = "\r\n\r\n";
+constexpr size_t MAX_BODY_SIZE = 1048576; // 1 MB
 constexpr size_t MAX_HEADER_SIZE = 8192;
 constexpr size_t MAX_HEADER_COUNT = 64;
 constexpr size_t MAX_URI_LENGTH = 2048;

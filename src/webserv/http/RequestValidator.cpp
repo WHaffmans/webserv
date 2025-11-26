@@ -1,6 +1,7 @@
-#include <webserv/http/RequestValidator.hpp>
+#include "webserv/http/HttpConstants.hpp"
 
 #include <webserv/config/AConfig.hpp>
+#include <webserv/http/RequestValidator.hpp>
 #include <webserv/log/Log.hpp>
 
 #include <algorithm>
@@ -63,7 +64,7 @@ std::optional<RequestValidator::ValidationError> RequestValidator::validateHttpV
 std::optional<RequestValidator::ValidationError> RequestValidator::validateContentLength() const
 {
     size_t bodySize = request->getBody().size();
-    size_t maxBodySize = config->get<size_t>("client_max_body_size").value_or(1024 * 1024);
+    size_t maxBodySize = config->get<size_t>("client_max_body_size").value_or(Http::Protocol::MAX_BODY_SIZE);
     if (bodySize > maxBodySize) // exceed server limit
     {
         return ValidationError{.statusCode = 413, .message = "Payload Too Large"};
