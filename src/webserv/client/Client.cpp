@@ -1,3 +1,5 @@
+#include "webserv/http/HttpConstants.hpp"
+
 #include <webserv/client/Client.hpp>
 #include <webserv/handler/CgiHandler.hpp>    // for CgiHandler
 #include <webserv/handler/ErrorHandler.hpp>  // for ErrorHandler
@@ -31,7 +33,7 @@ Client::Client(std::unique_ptr<ClientSocket> socket, Server &server)
       router_(std::make_unique<Router>(this)), clientSocket_(std::move(socket)), server_(std::ref(server))
 {
     Log::trace(LOCATION);
-    Log::info(clientSocket_->toString() + ": new client connected");
+    Log::info(clientSocket_->toString() + ": connected");
     clientSocket_->setCallback([this]() { request(); });
     sockets_[clientSocket_->getFd()] = clientSocket_.get();
 }
@@ -39,7 +41,7 @@ Client::Client(std::unique_ptr<ClientSocket> socket, Server &server)
 Client::~Client()
 {
     Log::trace(LOCATION);
-    Log::info(clientSocket_->toString() + ": client disconnected");
+    Log::info(clientSocket_->toString() + ": disconnected");
     for (auto it : sockets_)
     {
         server_.remove(*(it.second));
@@ -110,7 +112,7 @@ void Client::request()
     }
     if (bytesRead == 0)
     {
-        Log::info(clientSocket_->toString() + ": client closed connection");
+        Log::info(clientSocket_->toString() + ": closed connection");
         server_.disconnect(*this); // CRITICAL: RETURN IMMEDIATELY
         return;
     }
@@ -133,14 +135,9 @@ void Client::request()
 
     if (httpRequest_->getState() == HttpRequest::State::Complete)
     {
-        Log::info(clientSocket_->toString() + ": received request (" + httpRequest_->getHttpVersion() + " "
-                  + httpRequest_->getMethod() + " " + httpRequest_->getTarget() + ")");
+        Log::info(clientSocket_->toString() + ": " + httpRequest_->getMethod() + " " + httpRequest_->getTarget());
         try
         {
-            // Thoughts: if a handler isn't returned, this could because of the error handler already setting
-            // up the response so, maybe we don't need to throw a 500 when no handler. Because that would
-            // override the actual error response. How about the router, or a handler, throws an exception if
-            // something goes wrong, and we catch it here to make a 500 response?
             if (handler_ != nullptr)
             {
                 cleanHandler(handler_.get());
@@ -153,7 +150,8 @@ void Client::request()
         }
         catch (const RequestValidator::ValidationException &e)
         {
-            Log::debug(clientSocket_->toString() + ": validation exception during request handling: " + std::string(e.what()));
+            Log::debug(clientSocket_->toString()
+                       + ": validation exception during request handling: " + std::string(e.what()));
             const auto &config = httpRequest_->getUri().getConfig();
             ErrorHandler::createErrorResponse(e.code(), *httpResponse_, config);
             return;
@@ -192,8 +190,9 @@ void Client::poll()
     }
     if (httpResponse_->isComplete() && clientSocket_->getEvent() != ASocket::IoState::WRITE)
     {
-        Log::info(clientSocket_->toString() + ": response (" + std::to_string(httpResponse_->getStatusCode())
-                  + ") is ready to be sent to client");
+        auto statusCode = httpResponse_->getStatusCode();
+        Log::info(clientSocket_->toString() + ": " + std::to_string(statusCode) + " "
+                  + Http::getStatusCodeReason(statusCode));
         clientSocket_->setCallback([this]() { respond(); });
         clientSocket_->setIOState(ASocket::IoState::WRITE);
     }
@@ -206,12 +205,12 @@ void Client::respond()
     if (bytesSent < 0)
     {
         Log::error(clientSocket_->toString() + ": send failed");
-    }   
+    }
     else
     {
-        writeOffset_ += bytesSent;
         Log::debug(clientSocket_->toString() + ": sent " + std::to_string(bytesSent) + " bytes out of "
-                   + std::to_string(writeOffset_ + payload.size()));
+                   + std::to_string(writeOffset_ + payload.size()) + "(offset: " + std::to_string(writeOffset_) + ")");
+        writeOffset_ += bytesSent;
     }
     if (payload.empty())
     {

@@ -252,7 +252,16 @@ void Server::handleEpollHangUp(struct epoll_event *event) const
 void Server::handleEpollError(struct epoll_event *event)
 {
     int fd = event->data.fd;
-    Log::error("Epoll error on fd " + std::to_string(fd));
+    int socket_error = 0;
+    socklen_t error_len = sizeof(socket_error);
+    if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &socket_error, &error_len) == 0 && socket_error != 0)
+    {
+        Log::error("Epoll error on fd " + std::to_string(fd) + ": " + std::strerror(socket_error));
+    }
+    else
+    {
+        Log::error("Epoll error on fd " + std::to_string(fd) + ": socket error or connection reset");
+    }
     try
     {
         Client &client = getClient(fd);

@@ -49,7 +49,7 @@ void CgiHandler::handle()
 
     startTimer();
 
-    Log::info(request_.getClient().getClientSocket()->toString() + ": CGI process started and sockets registered");
+    Log::info(request_.getClient().getClientSocket()->toString() + ": CGI started");
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)

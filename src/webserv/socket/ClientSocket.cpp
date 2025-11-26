@@ -20,5 +20,5 @@ const struct sockaddr *ClientSocket::getAddress() const noexcept
 
 std::string ClientSocket::toString() const
 {
-    return "ClientSocket(fd=" + std::to_string(getFd()) + ")";
+    return "(Client FD=" + std::to_string(getFd()) + ")";
 }
