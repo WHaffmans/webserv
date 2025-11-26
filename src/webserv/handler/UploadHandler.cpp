@@ -1,8 +1,7 @@
-#include <webserv/handler/UploadHandler.hpp>
-
 #include <webserv/config/AConfig.hpp>
 #include <webserv/handler/ErrorHandler.hpp>
 #include <webserv/handler/URI.hpp>
+#include <webserv/handler/UploadHandler.hpp>
 #include <webserv/http/HttpConstants.hpp>
 #include <webserv/http/HttpRequest.hpp>
 #include <webserv/http/HttpResponse.hpp>
@@ -24,18 +23,27 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-const std::string UploadHandler::DEFAULT_UPLOAD_STORE = "data/uploads";
-
 UploadHandler::UploadHandler(const HttpRequest &request, HttpResponse &response)
     : AHandler(request, response),
-      uploadStore_(request.getUri().getConfig()->get<std::string>("upload_store").value_or(DEFAULT_UPLOAD_STORE))
+      uploadStore_(request.getUri().getConfig()->get<std::string>("upload_store").value_or(""))
 {
     Log::trace(LOCATION);
+
+    if (uploadStore_.empty())
+    {
+        throw std::runtime_error("Upload store directory not configured");
+    }
 }
 
 void UploadHandler::handle()
 {
     Log::trace(LOCATION);
+
+    if (!FileUtils::isDirectory(uploadStore_))
+    {
+        ErrorHandler::createErrorResponse(Http::StatusCode::FORBIDDEN, response_);
+        return;
+    }
 
     // Check Content-Type header
     auto contentType = request_.getHeaders().getContentType();
@@ -63,11 +71,6 @@ void UploadHandler::handle()
         return;
     }
 
-    if (!FileUtils::isDirectory(uploadStore_))
-    {
-        ErrorHandler::createErrorResponse(Http::StatusCode::FORBIDDEN, response_);
-        return;
-    }
     try
     {
         parse();

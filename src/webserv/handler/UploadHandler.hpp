@@ -51,6 +51,4 @@ class UploadHandler : public AHandler
     static std::string getFileName(const std::string &disposition);
     static std::string getFieldName(const std::string &disposition);
     static std::string sanitize(const std::string &filename);
-
-    static const std::string DEFAULT_UPLOAD_STORE;
 };
