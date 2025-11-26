@@ -35,5 +35,5 @@ ssize_t CgiSocket::write(const void *buf, size_t len) const
 
 std::string CgiSocket::toString() const
 {
-    return "CgiSocket(fd=" + std::to_string(getFd()) + "), stream (" + stream_ + ")";
+    return "(Cgi FD=" + std::to_string(getFd()) + "), stream (" + stream_ + ")";
 }

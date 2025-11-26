@@ -48,9 +48,9 @@ class Client
     void removeSocket(ASocket *socket);
     void cleanHandler(AHandler *handler);
 
+    [[nodiscard]] ClientSocket *getClientSocket() const noexcept;
     [[nodiscard]] HttpRequest &getHttpRequest() const noexcept;
     [[nodiscard]] HttpResponse &getHttpResponse() const noexcept;
-
     [[nodiscard]] std::string getClientAddress() const noexcept;
 
   private:

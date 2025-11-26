@@ -1,6 +1,5 @@
-#include <webserv/handler/CgiHandler.hpp>
-
 #include <webserv/client/Client.hpp> // for Client
+#include <webserv/handler/CgiHandler.hpp>
 #include <webserv/handler/CgiProcess.hpp>   // for CgiProcess
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
 #include <webserv/handler/URI.hpp>          // for URI
@@ -37,7 +36,7 @@ CgiHandler::~CgiHandler() = default;
 
 void CgiHandler::handle()
 {
-    Log::info("CgiHandler handling request");
+    Log::debug("CgiHandler handling request");
 
     if (request_.getUri().isCgi() && request_.getUri().getCgiPath().empty()
         && access(request_.getUri().getFullPath().c_str(), X_OK) != 0)
@@ -50,7 +49,7 @@ void CgiHandler::handle()
 
     startTimer();
 
-    Log::info("CGI process started and sockets registered");
+    Log::info(request_.getClient().getClientSocket()->toString() + ": CGI process started and sockets registered");
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
@@ -159,7 +158,7 @@ void CgiHandler::read()
     if (bytesRead == 0)
     {
         // EOF from CGI process
-        Log::info("CGI process closed stdout, fd: " + std::to_string(cgiStdOut_->getFd()));
+        Log::debug("CGI process closed stdout, fd: " + std::to_string(cgiStdOut_->getFd()));
         request_.getClient().removeSocket(cgiStdOut_.get());
         cgiStdOut_.reset();
 
@@ -211,7 +210,7 @@ void CgiHandler::error()
         }
         if (bytesRead == 0)
         {
-            Log::info("CGI process closed stderr, fd: " + std::to_string(cgiStdErr_->getFd()));
+            Log::debug("CGI process closed stderr, fd: " + std::to_string(cgiStdErr_->getFd()));
             request_.getClient().removeSocket(cgiStdErr_.get());
             cgiStdErr_.reset();
             break;

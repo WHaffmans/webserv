@@ -31,7 +31,7 @@ Client::Client(std::unique_ptr<ClientSocket> socket, Server &server)
       router_(std::make_unique<Router>(this)), clientSocket_(std::move(socket)), server_(std::ref(server))
 {
     Log::trace(LOCATION);
-    Log::info("New client connected, fd: " + std::to_string(clientSocket_->getFd()));
+    Log::info(clientSocket_->toString() + ": new client connected");
     clientSocket_->setCallback([this]() { request(); });
     sockets_[clientSocket_->getFd()] = clientSocket_.get();
 }
@@ -39,7 +39,7 @@ Client::Client(std::unique_ptr<ClientSocket> socket, Server &server)
 Client::~Client()
 {
     Log::trace(LOCATION);
-    Log::info("Client disconnected, fd: " + std::to_string(clientSocket_->getFd()));
+    Log::info(clientSocket_->toString() + ": client disconnected");
     for (auto it : sockets_)
     {
         server_.remove(*(it.second));
@@ -67,7 +67,7 @@ void Client::cleanHandler(AHandler *handler)
     {
         return;
     }
-    Log::debug("Cleaning up handler for client, fd: " + std::to_string(clientSocket_->getFd()));
+    Log::debug(clientSocket_->toString() + ": cleaning up handler");
     // Extract timer socket if it exists and remove from tracking
     auto *timerSocket = handler->getTimerSocket();
     if (timerSocket != nullptr)
@@ -110,7 +110,7 @@ void Client::request()
     }
     if (bytesRead == 0)
     {
-        Log::info("Client closed connection: " + clientSocket_->toString());
+        Log::info(clientSocket_->toString() + ": client closed connection");
         server_.disconnect(*this); // CRITICAL: RETURN IMMEDIATELY
         return;
     }
@@ -121,7 +121,7 @@ void Client::request()
     // If parsing failed, proactively send an error response (avoid timeouts on malformed requests)
     if (httpRequest_->getState() == HttpRequest::State::ParseError)
     {
-        Log::warning("Request parsing failed; preparing error response");
+        Log::warning(clientSocket_->toString() + ": request parsing failed; preparing error response");
         if (!httpResponse_->isComplete())
         {
             ErrorHandler::createErrorResponse(400, *httpResponse_);
@@ -133,8 +133,8 @@ void Client::request()
 
     if (httpRequest_->getState() == HttpRequest::State::Complete)
     {
-        Log::info("Received request: " + httpRequest_->getHttpVersion() + " " + httpRequest_->getMethod() + " "
-                  + httpRequest_->getTarget() + " ");
+        Log::info(clientSocket_->toString() + ": received request (" + httpRequest_->getHttpVersion() + " "
+                  + httpRequest_->getMethod() + " " + httpRequest_->getTarget() + ")");
         try
         {
             // Thoughts: if a handler isn't returned, this could because of the error handler already setting
@@ -153,14 +153,14 @@ void Client::request()
         }
         catch (const RequestValidator::ValidationException &e)
         {
-            Log::error("Validation Exception during request handling: " + std::string(e.what()));
+            Log::debug(clientSocket_->toString() + ": validation exception during request handling: " + std::string(e.what()));
             const auto &config = httpRequest_->getUri().getConfig();
             ErrorHandler::createErrorResponse(e.code(), *httpResponse_, config);
             return;
         }
         catch (const std::exception &e)
         {
-            Log::error("Exception during request handling: " + std::string(e.what()));
+            Log::error(clientSocket_->toString() + ": exception during request handling: " + std::string(e.what()));
             ErrorHandler::createErrorResponse(500, *httpResponse_);
             return;
         }
@@ -192,7 +192,8 @@ void Client::poll()
     }
     if (httpResponse_->isComplete() && clientSocket_->getEvent() != ASocket::IoState::WRITE)
     {
-        Log::info("Response is ready to be sent to client: " + clientSocket_->toString());
+        Log::info(clientSocket_->toString() + ": response (" + std::to_string(httpResponse_->getStatusCode())
+                  + ") is ready to be sent to client");
         clientSocket_->setCallback([this]() { respond(); });
         clientSocket_->setIOState(ASocket::IoState::WRITE);
     }
@@ -204,17 +205,17 @@ void Client::respond()
     ssize_t bytesSent = send(clientSocket_->getFd(), payload.data(), payload.size(), 0);
     if (bytesSent < 0)
     {
-        Log::error("Send failed for: " + clientSocket_->toString());
-    }
+        Log::error(clientSocket_->toString() + ": send failed");
+    }   
     else
     {
         writeOffset_ += bytesSent;
-        Log::debug("Sent " + std::to_string(bytesSent) + " bytes out of "
-                   + std::to_string(writeOffset_ + payload.size()) + " to: " + clientSocket_->toString());
+        Log::debug(clientSocket_->toString() + ": sent " + std::to_string(bytesSent) + " bytes out of "
+                   + std::to_string(writeOffset_ + payload.size()));
     }
     if (payload.empty())
     {
-        Log::info("Closing connection to client: " + clientSocket_->toString());
+        Log::debug(clientSocket_->toString() + ": closing connection to client");
         server_.disconnect(*this); // ! CRITICAL: RETURN IMMEDIATELY
     }
 }
@@ -241,6 +242,11 @@ std::string Client::getClientAddress() const noexcept
     }
 
     return "";
+}
+
+ClientSocket *Client::getClientSocket() const noexcept
+{
+    return clientSocket_.get();
 }
 
 // NOLINTEND

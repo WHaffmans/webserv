@@ -164,7 +164,7 @@ void UploadHandler::parse()
             break;
         }
     }
-    Log::info("Parsed " + std::to_string(uploadedFiles_.size()) + " file(s) from multipart form data");
+    Log::debug("Parsed " + std::to_string(uploadedFiles_.size()) + " file(s) from multipart form data");
 }
 
 std::string UploadHandler::extractBoundary(const std::string &contentType)

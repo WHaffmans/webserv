@@ -144,7 +144,7 @@ void URI::parseFullpath()
             {
                 baseName_ = segment;
             }
-            Log::warning("Invalid path segment encountered: " + currentPath);
+            Log::debug("Invalid path segment encountered: " + currentPath);
             return;
         }
     }

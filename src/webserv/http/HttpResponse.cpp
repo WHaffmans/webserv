@@ -81,6 +81,11 @@ std::string HttpResponse::getContentLengthHeader() const
     return "Content-Length: " + std::to_string(body_.size()) + "\r\n";
 }
 
+uint16_t HttpResponse::getStatusCode() const noexcept
+{
+    return statusCode_;
+}
+
 std::string HttpResponse::getDateHeader()
 {
     time_t now = time(nullptr);

@@ -124,7 +124,7 @@ void Server::setupServerSocket(const ServerConfig &config)
         {
             if (listener->getPort() == port && listener->getHost() == host)
             {
-                Log::info("Server socket for " + host + ":" + std::to_string(port)
+                Log::debug("Server socket for " + host + ":" + std::to_string(port)
                           + " already exists, skipping creation.");
                 return;
             }
@@ -242,7 +242,7 @@ void Server::handleEpollHangUp(struct epoll_event *event) const
     ASocket &socket = client.getSocket(event->data.fd);
     if (socket.getType() == ASocket::Type::CGI_SOCKET)
     {
-        Log::info(socket.toString() + ": CGI socket hang up");
+        Log::debug(socket.toString() + ": CGI socket hang up");
         socket.callback();
         return;
     }

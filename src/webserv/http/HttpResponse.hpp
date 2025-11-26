@@ -37,6 +37,8 @@ class HttpResponse
 
     [[nodiscard]] bool isComplete() const noexcept;
 
+    [[nodiscard]] uint16_t getStatusCode() const noexcept;
+
     [[nodiscard]] const HttpHeaders &getHeaders() const noexcept;
 
     [[nodiscard]] std::vector<uint8_t> toBytes(long offset = 0) const;

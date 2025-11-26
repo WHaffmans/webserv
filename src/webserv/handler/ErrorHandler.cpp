@@ -1,8 +1,7 @@
-#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
-
 #include <webserv/config/AConfig.hpp>       // for AConfig
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/GlobalConfig.hpp>  // for GlobalConfig
+#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
 #include <webserv/http/HttpConstants.hpp>   // for getStatusCodeReason, INTERNAL_SERVER_ERROR, METHOD_NOT_ALLOWED
 #include <webserv/http/HttpResponse.hpp>    // for HttpResponse
 #include <webserv/log/Log.hpp>              // for Log, LOCATION
@@ -17,7 +16,7 @@
 void ErrorHandler::createErrorResponse(uint16_t statusCode, HttpResponse &response, const AConfig *config)
 {
     std::string statusMessage = Http::getStatusCodeReason(statusCode);
-    Log::warning("Generating error response: " + std::to_string(statusCode) + " " + statusMessage);
+    Log::debug("Generating error response: " + std::to_string(statusCode) + " " + statusMessage);
 
     response.setStatus(statusCode);
     response.addHeader("Content-Type", "text/html");
@@ -25,7 +24,10 @@ void ErrorHandler::createErrorResponse(uint16_t statusCode, HttpResponse &respon
     if (statusCode == Http::StatusCode::METHOD_NOT_ALLOWED && config != nullptr)
     {
         auto allowedMethods = config->get<std::vector<std::string>>("allowed_methods");
-        if (allowedMethods.has_value()) response.addHeader("Allow", utils::implode(allowedMethods.value(), ", "));
+        if (allowedMethods.has_value())
+        {
+            response.addHeader("Allow", utils::implode(allowedMethods.value(), ", "));
+        }
     }
     response.appendBody(generateErrorPage(statusCode, config));
     response.setComplete();
@@ -41,7 +43,7 @@ std::string ErrorHandler::generateErrorPage(uint16_t statusCode, const AConfig *
     }
     if (config != nullptr)
     {
-        Log::info("Checking for custom error page");
+        Log::debug("Checking for custom error page");
         std::string customPage = config->getErrorPage(statusCode);
         if (!customPage.empty())
         {
@@ -54,7 +56,7 @@ std::string ErrorHandler::generateErrorPage(uint16_t statusCode, const AConfig *
 
 std::string ErrorHandler::generateDefaultErrorPage(uint16_t statusCode)
 {
-    Log::info("Generating default error page");
+    Log::debug("Generating default error page");
     std::string statusMessage = Http::getStatusCodeReason(statusCode);
     std::string html = "<html><head><title>" + std::to_string(statusCode) + " " + statusMessage
                        + "</title></head><body><h1>" + std::to_string(statusCode) + " " + statusMessage

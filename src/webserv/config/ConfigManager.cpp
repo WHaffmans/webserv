@@ -123,14 +123,14 @@ ServerConfig *ConfigManager::getMatchingServerConfig(const std::string &host, in
             // Check for exact host match (port not considered)
             if (std::find(serverNames.begin(), serverNames.end(), host) != serverNames.end())
             {
-                Log::info("Found matching server config for host: " + host + " (any port)");
+                Log::debug("Found matching server config for host: " + host + " (any port)");
                 return serverConfig;
             }
         }
         // No host match found, return default server
         if (defaultServer != nullptr)
         {
-            Log::info("Using default server (no Host match, port not specified)");
+            Log::debug("Using default server (no Host match, port not specified)");
             return defaultServer;
         }
     }
@@ -149,9 +149,9 @@ ServerConfig *ConfigManager::getMatchingServerConfig(const std::string &host, in
         }
 
         // Check for exact match (host + port)
-        if ((std::find(serverNames.begin(), serverNames.end(), host) != serverNames.end()) && (listenPorts == port))
+        if ((std::ranges::find(serverNames.begin(), serverNames.end(), host) != serverNames.end()) && (listenPorts == port))
         {
-            Log::info("Found matching server config for host: " + host + " and port: " + std::to_string(port));
+            Log::debug("Found matching server config for host: " + host + " and port: " + std::to_string(port));
             return serverConfig;
         }
     }
@@ -159,14 +159,14 @@ ServerConfig *ConfigManager::getMatchingServerConfig(const std::string &host, in
     // If no exact match found, use the default server for the port (first server block with matching port)
     if (defaultServerForPort != nullptr)
     {
-        Log::info("Using default server for port: " + std::to_string(port));
+        Log::debug("Using default server for port: " + std::to_string(port));
         return defaultServerForPort;
     }
 
     // Last resort: return the first server (overall default)
     if (defaultServer != nullptr)
     {
-        Log::info("Using overall default server");
+        Log::debug("Using overall default server");
         return defaultServer;
     }
 
