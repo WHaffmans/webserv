@@ -4,7 +4,7 @@
 
 #include <utility> // for move
 
-ADirective::ADirective(std::string name) : name_(std::move(name)) // TODO: Do we want this
+ADirective::ADirective(std::string name) : name_(std::move(name))
 {
 }
 
