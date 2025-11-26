@@ -107,7 +107,7 @@ $_SESSION['request_count']++;
 
     <div class="container">
         <h2>📝 Form Processing Demo</h2>
-        <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+        <form method="post" action="/">
             <p>
                 <label for="name">Name:</label>
                 <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>">
