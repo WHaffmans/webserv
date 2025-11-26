@@ -2,6 +2,8 @@
 
 #include <cstddef>
 
+#define LOG_LEVEL_DEFINE Info
+
 namespace Constants
 {
 constexpr static size_t BUFFER_SIZE = 8192; // 8kb
