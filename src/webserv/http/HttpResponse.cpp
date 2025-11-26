@@ -1,6 +1,7 @@
-#include <webserv/http/HttpResponse.hpp>
+#include "webserv/log/Log.hpp"
 
 #include <webserv/http/HttpConstants.hpp> // for getStatusCodeReason
+#include <webserv/http/HttpResponse.hpp>
 
 #include <iomanip>
 #include <string> // for basic_string, operator+, string, char_traits, to_string
@@ -105,7 +106,10 @@ std::vector<uint8_t> HttpResponse::toBytes(long offset) const
     reason = Http::getStatusCodeReason(statusCode_);
 
     headerStr = "HTTP/1.1 " + std::to_string(statusCode_) + " " + reason + "\r\n"; // todo: status line
-    headerStr += getContentLengthHeader();
+    if (headers_->get("Content-Length").empty())
+    {
+        headers_->add("Content-Length", std::to_string(body_.size()));
+    }
     headerStr += getDateHeader();
     headerStr += "Connection: close\r\n";
     headerStr += "Server: Webserv/1.0\r\n";
@@ -114,6 +118,5 @@ std::vector<uint8_t> HttpResponse::toBytes(long offset) const
 
     std::vector<uint8_t> responseData(headerStr.begin(), headerStr.end());
     responseData.insert(responseData.end(), body_.begin(), body_.end());
-
     return {responseData.begin() + offset, responseData.end()};
 }
