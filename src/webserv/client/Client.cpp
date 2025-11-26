@@ -118,6 +118,11 @@ void Client::request()
     }
 
     buffer[bytesRead] = '\0'; // NOLINT(cppcoreguidelines-pro-bounds-constant-array-index)
+    if (httpRequest_->getState() == HttpRequest::State::Complete)
+    {
+        Log::warning(clientSocket_->toString() + ": received data after request was already complete; ignoring");
+        return;
+    }
     httpRequest_->receiveData(static_cast<const char *>(buffer), static_cast<size_t>(bytesRead));
 
     // If parsing failed, proactively send an error response (avoid timeouts on malformed requests)
@@ -138,10 +143,10 @@ void Client::request()
         Log::info(clientSocket_->toString() + ": " + httpRequest_->getMethod() + " " + httpRequest_->getTarget());
         try
         {
-            if (handler_ != nullptr)
-            {
-                cleanHandler(handler_.get());
-            }
+            // if (handler_ != nullptr)
+            // {
+            //     cleanHandler(handler_.get());
+            // }
             handler_ = router_->handleRequest();
             if (handler_ != nullptr)
             {
