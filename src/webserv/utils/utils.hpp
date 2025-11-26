@@ -25,4 +25,6 @@ std::string uriEncode(const std::string &value);
 std::string uriDecode(const std::string &value);
 
 std::string ensureTrailingSlash(const std::string &path);
+
+std::string readEPollError(int fd);
 } // namespace utils

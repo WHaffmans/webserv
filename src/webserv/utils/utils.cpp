@@ -1,9 +1,9 @@
 
+#include <webserv/socket/ASocket.hpp>
 #include <webserv/utils/utils.hpp>
 
-#include <webserv/socket/ASocket.hpp>
-
 #include <cstdint>
+#include <cstring>
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
@@ -11,7 +11,10 @@
 #include <type_traits>
 #include <vector>
 
+#include <asm-generic/socket.h>
 #include <sys/epoll.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 namespace utils
 {
@@ -248,4 +251,14 @@ std::string uriDecode(const std::string &value)
     return unescaped.str();
 }
 
+std::string readEPollError(int fd)
+{
+    int socket_error = 0;
+    socklen_t error_len = sizeof(socket_error);
+    if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &socket_error, &error_len) == 0 && socket_error != 0)
+    {
+        return std::strerror(socket_error);
+    }
+    return "Unknown socket error or connection reset";
+}
 } // namespace utils
