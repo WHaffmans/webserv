@@ -21,7 +21,7 @@ int main(int argc, char **argv)
         std::span<char *> args(argv, argc);
         if (argc < 2 || argc > 4)
         {
-            std::cerr << "Usage: " + std::string(args[0]) + " [-c] <config_file_path>"; 
+            std::cerr << "Usage: " + std::string(args[0]) + " [-c] <config_file_path>";
             return 1;
         }
         if ((argc == 3 || argc == 4) && std::string(args[1]) == "-c")

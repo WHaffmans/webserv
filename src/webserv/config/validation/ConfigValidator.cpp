@@ -1,4 +1,5 @@
 #include <webserv/config/validation/ConfigValidator.hpp>
+
 #include <webserv/config/validation/ValidationEngine.hpp>                     // for ValidationEngine
 #include <webserv/config/validation/directive_rules/AValidationRule.hpp>      // for AValidationRule
 #include <webserv/config/validation/directive_rules/AllowedValuesRule.hpp>    // for AllowedValuesRule
@@ -23,7 +24,8 @@ class ValidationResult;
 ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make_unique<ValidationEngine>(config))
 {
     Log::trace(LOCATION);
-    // TODO seems weird that errorpages are only checked globally and per location, not per server block? check the rest aswell
+    // TODO seems weird that errorpages are only checked globally and per location, not per server block? check the rest
+    // aswell
 
     /*Structural Rules*/
     engine_->addStructuralRule(std::make_unique<MinimumServerBlocksRule>(1));

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <webserv/main.hpp>
+
 #include <array>         // for array
 #include <chrono>        // for steady_clock
 #include <cstdint>       // for uint8_t
@@ -9,8 +11,6 @@
 #include <string>        // for string, basic_string, hash
 #include <string_view>   // for string_view
 #include <unordered_map> // for unordered_map
-
-#include "webserv/main.hpp"
 
 class Channel; // Forward declaration
 

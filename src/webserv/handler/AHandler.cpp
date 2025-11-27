@@ -1,10 +1,11 @@
-#include "webserv/main.hpp"
-#include <webserv/client/Client.hpp>      // for Client
-#include <webserv/config/AConfig.hpp>     // for AConfig
-#include <webserv/handler/AHandler.hpp>   // for AHandler
-#include <webserv/handler/URI.hpp>        // for URI
-#include <webserv/http/HttpRequest.hpp>   // for HttpRequest
-#include <webserv/log/Log.hpp>            // for Log
+#include <webserv/handler/AHandler.hpp> // for AHandler
+
+#include <webserv/client/Client.hpp>    // for Client
+#include <webserv/config/AConfig.hpp>   // for AConfig
+#include <webserv/handler/URI.hpp>      // for URI
+#include <webserv/http/HttpRequest.hpp> // for HttpRequest
+#include <webserv/log/Log.hpp>          // for Log
+#include <webserv/main.hpp>
 #include <webserv/socket/TimerSocket.hpp> // for TimerSocket
 
 #include <chrono>     // for operator*, milliseconds
@@ -13,9 +14,7 @@
 #include <optional>   // for optional
 #include <string>     // for basic_string, operator+, to_string
 
-AHandler::AHandler(const HttpRequest &request, HttpResponse &response) : request_(request), response_(response)
-{
-}
+AHandler::AHandler(const HttpRequest &request, HttpResponse &response) : request_(request), response_(response) {}
 
 AHandler::~AHandler() = default;
 

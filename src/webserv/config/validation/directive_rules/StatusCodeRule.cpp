@@ -1,9 +1,10 @@
+#include <webserv/config/validation/directive_rules/StatusCodeRule.hpp>
+
 #include <webserv/config/AConfig.hpp>                                    // for AConfig
 #include <webserv/config/directive/ADirective.hpp>                       // for ADirective
 #include <webserv/config/directive/DirectiveValue.hpp>                   // for DirectiveValue
 #include <webserv/config/validation/ValidationResult.hpp>                // for ValidationResult
 #include <webserv/config/validation/directive_rules/AValidationRule.hpp> // for AValidationRule
-#include <webserv/config/validation/directive_rules/StatusCodeRule.hpp>
 #include <webserv/utils/FileUtils.hpp> // for isFile
 
 #include <string>

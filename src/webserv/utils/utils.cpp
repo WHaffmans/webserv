@@ -1,6 +1,7 @@
 
-#include <webserv/socket/ASocket.hpp>
 #include <webserv/utils/utils.hpp>
+
+#include <webserv/socket/ASocket.hpp>
 
 #include <cstdint>
 #include <cstring>

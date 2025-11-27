@@ -72,13 +72,11 @@ std::vector<ValidationResult> ValidationEngine::getWarnings() const
     }
     return warnings;
 }
+
 bool ValidationEngine::hasErrors() const noexcept
 {
-    return std::ranges::any_of(results_, [](const ValidationResult &result) {
-        return !result.isValidResult();
-    });
+    return std::ranges::any_of(results_, [](const ValidationResult &result) { return !result.isValidResult(); });
 }
-
 
 void ValidationEngine::validateConfig(RuleMap const &rulesMap, const AConfig *config)
 {

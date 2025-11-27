@@ -7,7 +7,9 @@
 #include <algorithm>  // for find
 #include <filesystem> // for path
 #include <fstream>    // for basic_ifstream, basic_filebuf, basic_ostream::operator<<, ifstream, stringstream
+#include <functional> // for identity
 #include <optional>   // for optional
+#include <ranges>     // for __find_fn, find
 #include <sstream>    // for basic_stringstream
 #include <stdexcept>  // for runtime_error
 #include <string>     // for basic_string, char_traits, operator+, string, to_string, operator==, stoi
@@ -149,7 +151,8 @@ ServerConfig *ConfigManager::getMatchingServerConfig(const std::string &host, in
         }
 
         // Check for exact match (host + port)
-        if ((std::ranges::find(serverNames.begin(), serverNames.end(), host) != serverNames.end()) && (listenPorts == port))
+        if ((std::ranges::find(serverNames.begin(), serverNames.end(), host) != serverNames.end())
+            && (listenPorts == port))
         {
             Log::debug("Found matching server config for host: " + host + " and port: " + std::to_string(port));
             return serverConfig;

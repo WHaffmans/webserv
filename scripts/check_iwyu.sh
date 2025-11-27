@@ -101,7 +101,7 @@ run_iwyu_on_file() {
     
     # Run IWYU with compile commands and mapping file
     if "$IWYU_CMD" \
-        -I"$PROJECT_ROOT" \
+        -I"$PROJECT_ROOT/src" \
         -std=c++20 \
         -Xiwyu --verbose=3 \
         -Xiwyu --quoted_includes_first \
@@ -131,10 +131,10 @@ echo -e "\n${BLUE}Finding C++ source files...${NC}"
 cpp_files=()
 while IFS= read -r -d '' file; do
     cpp_files+=("$file")
-done < <(find "$PROJECT_ROOT/webserv" -name "*.cpp" -print0 2>/dev/null)
+done < <(find "$PROJECT_ROOT/src/webserv" -name "*.cpp" -print0 2>/dev/null)
 
 if [ ${#cpp_files[@]} -eq 0 ]; then
-    echo -e "${RED}❌ No .cpp files found in webserv directory${NC}"
+    echo -e "${RED}❌ No .cpp files found in src/webserv directory${NC}"
     exit 1
 fi
 

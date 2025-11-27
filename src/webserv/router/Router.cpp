@@ -1,3 +1,5 @@
+#include <webserv/router/Router.hpp> // for Router
+
 #include <webserv/client/Client.hpp>                   // for Client
 #include <webserv/config/AConfig.hpp>                  // for AConfig
 #include <webserv/config/directive/ADirective.hpp>     // for ADirective
@@ -13,7 +15,6 @@
 #include <webserv/http/HttpRequest.hpp>        // for HttpRequest
 #include <webserv/http/RequestValidator.hpp>
 #include <webserv/log/Log.hpp>       // for Log, LOCATION
-#include <webserv/router/Router.hpp> // for Router
 
 #include <exception> // for exception
 #include <memory>    // for unique_ptr, make_unique

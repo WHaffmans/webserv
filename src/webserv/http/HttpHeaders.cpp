@@ -1,5 +1,6 @@
-#include <webserv/http/HttpConstants.hpp> // for CRLF
 #include <webserv/http/HttpHeaders.hpp>   // for HttpHeaders
+
+#include <webserv/http/HttpConstants.hpp> // for CRLF
 #include <webserv/log/Log.hpp>
 #include <webserv/utils/utils.hpp> // for trim
 

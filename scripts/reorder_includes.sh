@@ -7,7 +7,7 @@
 # Change to project root directory
 cd "$(dirname "$0")/.." || exit 1
 
-find webserv -name "*.cpp" | while read -r cpp_file; do
+find src/webserv -name "*.cpp" | while read -r cpp_file; do
     # Get the base name without extension (e.g., "Client" from "Client.cpp")
     base_name=$(basename "$cpp_file" .cpp)
     

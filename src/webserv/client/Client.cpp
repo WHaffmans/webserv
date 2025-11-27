@@ -1,24 +1,27 @@
-#include "webserv/http/HttpConstants.hpp"
-
 #include <webserv/client/Client.hpp>
+
 #include <webserv/handler/CgiHandler.hpp>    // for CgiHandler
 #include <webserv/handler/ErrorHandler.hpp>  // for ErrorHandler
 #include <webserv/handler/URI.hpp>           // for URI
+#include <webserv/http/HttpConstants.hpp>    // for getStatusCodeReason
 #include <webserv/http/HttpRequest.hpp>      // for HttpRequest
 #include <webserv/http/HttpResponse.hpp>     // for HttpResponse
 #include <webserv/http/RequestValidator.hpp> // for RequestValidator
 #include <webserv/log/Log.hpp>               // for Log, LOCATION
-#include <webserv/main.hpp>                  // for BUFFER_SIZE
+#include <webserv/main.hpp>                  // for BUFFER_SIZE, CLIENT_TIMEOUT
 #include <webserv/router/Router.hpp>         // for Router
 #include <webserv/server/Server.hpp>         // for Server
 #include <webserv/socket/ASocket.hpp>        // for ASocket
 #include <webserv/socket/ClientSocket.hpp>   // for ClientSocket
+#include <webserv/socket/TimerSocket.hpp>    // for TimerSocket
 
+#include <array>      // for array
+#include <chrono>     // for operator*, milliseconds
 #include <exception>  // for exception
 #include <functional> // for function, ref, reference_wrapper
 #include <memory>     // for unique_ptr, allocator, make_unique, operator==, default_delete
 #include <stdexcept>  // for runtime_error
-#include <string>     // for operator+, basic_string, to_string, char_traits, string
+#include <string>     // for operator+, basic_string, char_traits, to_string, string
 #include <utility>    // for move, pair
 #include <vector>     // for vector
 
@@ -232,7 +235,6 @@ HttpResponse &Client::getHttpResponse() const noexcept
     return *httpResponse_;
 }
 
-
 std::string Client::getClientAddress() const noexcept
 {
     const struct sockaddr *addr = clientSocket_->getAddress();
@@ -251,4 +253,3 @@ ClientSocket *Client::getClientSocket() const noexcept
 {
     return clientSocket_.get();
 }
-

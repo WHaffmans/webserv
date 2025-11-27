@@ -1,5 +1,7 @@
-#include <webserv/client/Client.hpp> // for Client
 #include <webserv/handler/CgiHandler.hpp>
+
+#include <webserv/client/Client.hpp>  // for Client
+#include <webserv/config/AConfig.hpp> // for AConfig
 #include <webserv/handler/CgiProcess.hpp>   // for CgiProcess
 #include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
 #include <webserv/handler/URI.hpp>          // for URI
@@ -8,16 +10,16 @@
 #include <webserv/http/HttpRequest.hpp>     // for HttpRequest
 #include <webserv/http/HttpResponse.hpp>    // for HttpResponse
 #include <webserv/log/Log.hpp>              // for Log, LOCATION
-#include <webserv/main.hpp>                 // for BUFFER_SIZE, CHUNK_SIZE
+#include <webserv/main.hpp>                 // for BUFFER_SIZE, CHUNK_SIZE, CGI_TIMEOUT
 #include <webserv/socket/CgiSocket.hpp>     // for CgiSocket
+#include <webserv/socket/ClientSocket.hpp>  // for ClientSocket
 #include <webserv/socket/TimerSocket.hpp>   // for TimerSocket
 #include <webserv/utils/utils.hpp>          // for trim
 
 #include <algorithm>  // for min
 #include <array>      // for array
-#include <cerrno>     // for errno
+#include <chrono>     // for operator*, milliseconds
 #include <cstdlib>    // for atoi
-#include <cstring>    // for strerror
 #include <functional> // for function
 #include <optional>   // for optional
 #include <string>     // for basic_string, operator+, char_traits, to_string, string

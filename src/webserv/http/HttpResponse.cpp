@@ -1,7 +1,7 @@
-#include "webserv/log/Log.hpp"
+#include <webserv/http/HttpResponse.hpp>
 
 #include <webserv/http/HttpConstants.hpp> // for getStatusCodeReason
-#include <webserv/http/HttpResponse.hpp>
+#include <webserv/log/Log.hpp>
 
 #include <iomanip>
 #include <string> // for basic_string, operator+, string, char_traits, to_string

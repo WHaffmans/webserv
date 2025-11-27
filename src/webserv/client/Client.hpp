@@ -25,6 +25,7 @@ class HttpResponse;
 class ASocket;
 class HttpRequest;
 class Router;
+class TimerSocket;
 
 class Client
 {
@@ -46,8 +47,6 @@ class Client
 
     void addSocket(ASocket *socket);
     void removeSocket(ASocket *socket);
-
-  
 
     [[nodiscard]] ClientSocket *getClientSocket() const noexcept;
     [[nodiscard]] HttpRequest &getHttpRequest() const noexcept;

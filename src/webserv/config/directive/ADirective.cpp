@@ -4,9 +4,7 @@
 
 #include <utility> // for move
 
-ADirective::ADirective(std::string name) : name_(std::move(name))
-{
-}
+ADirective::ADirective(std::string name) : name_(std::move(name)) {}
 
 DirectiveValue ADirective::getValue() const
 {

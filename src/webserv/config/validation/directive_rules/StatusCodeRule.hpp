@@ -9,7 +9,7 @@
 class StatusCodeRule : public AValidationRule
 {
   public:
-    //TODO we could use this to not have the ttype parameter twice ( clang-lint)
+    // TODO we could use this to not have the ttype parameter twice ( clang-lint)
     using ValidationPredicate = std::function<bool(int)>;
 
     StatusCodeRule(bool requiresValue, ValidationPredicate validator);

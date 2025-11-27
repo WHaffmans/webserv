@@ -1,7 +1,8 @@
+#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
+
 #include <webserv/config/AConfig.hpp>       // for AConfig
 #include <webserv/config/ConfigManager.hpp> // for ConfigManager
 #include <webserv/config/GlobalConfig.hpp>  // for GlobalConfig
-#include <webserv/handler/ErrorHandler.hpp> // for ErrorHandler
 #include <webserv/http/HttpConstants.hpp>   // for getStatusCodeReason, INTERNAL_SERVER_ERROR, METHOD_NOT_ALLOWED
 #include <webserv/http/HttpResponse.hpp>    // for HttpResponse
 #include <webserv/log/Log.hpp>              // for Log, LOCATION
