@@ -1,8 +1,7 @@
-#include <webserv/handler/URI.hpp>
-
 #include <webserv/config/AConfig.hpp>        // for AConfig
 #include <webserv/config/LocationConfig.hpp> // for LocationConfig
 #include <webserv/config/ServerConfig.hpp>   // for ServerConfig
+#include <webserv/handler/URI.hpp>
 #include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
 #include <webserv/log/Log.hpp>          // for Log, LOCATION
 #include <webserv/utils/FileUtils.hpp>  // for joinPath, isDirectory, isFile, getExtension, isValidPath
@@ -59,7 +58,9 @@ const AConfig *URI::matchConfig(const std::string &uri, const ServerConfig &serv
 
         // Ensure we have an exact path boundary match
         // Either the URI is exactly the location, or the next character is '/'
-        if (uri.length() > trimmedLocation.length() && uri[trimmedLocation.length()] != '/')
+        size_t queryPos = uri.find_first_of('?');
+        auto checkUri = (queryPos != std::string::npos) ? uri.substr(0, queryPos) : uri;
+        if (checkUri.length() > trimmedLocation.length() && checkUri[trimmedLocation.length()] != '/')
         {
             continue; // Not a path boundary match
         }
