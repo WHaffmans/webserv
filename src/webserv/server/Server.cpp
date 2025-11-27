@@ -28,6 +28,28 @@
 #include <sys/socket.h> // for SOMAXCONN
 #include <unistd.h>     // for close
 
+/**
+
+              -.--.
+          )  " '-,
+          ',' 2  \_
+           \q \ .  \
+        _.--'  '----.__
+       /  ._      _.__ \__
+    _.'_.'  \_ .-._\_ '-, }
+   (,/ _.---;-(  . \ \   ~
+ ____ (  .___\_\  \/_/
+(      '-._ \   \ |
+ '._       ),> _) >
+    '-._ c='  Cooo  -._
+        '-._           '.
+            '-._         `\
+       snd      '-._       '.
+                    '-._     \
+                        `~---'
+
+*/
+
 volatile sig_atomic_t Server::signum_ = 0;
 
 Server::Server(const ConfigManager &configManager) : epoll_fd_(epoll_create1(O_CLOEXEC)), configManager_(configManager)
