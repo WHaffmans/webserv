@@ -47,6 +47,7 @@ constexpr uint16_t UNAUTHORIZED = 401;
 constexpr uint16_t FORBIDDEN = 403;
 constexpr uint16_t NOT_FOUND = 404;
 constexpr uint16_t METHOD_NOT_ALLOWED = 405;
+constexpr uint16_t REQUEST_TIMEOUT = 408;
 constexpr uint16_t PAYLOAD_TOO_LARGE = 413;
 constexpr uint16_t URI_TOO_LONG = 414;
 constexpr uint16_t INTERNAL_SERVER_ERROR = 500;

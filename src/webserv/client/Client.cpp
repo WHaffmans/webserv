@@ -1,5 +1,4 @@
 #include <webserv/client/Client.hpp>
-
 #include <webserv/handler/CgiHandler.hpp>    // for CgiHandler
 #include <webserv/handler/ErrorHandler.hpp>  // for ErrorHandler
 #include <webserv/handler/URI.hpp>           // for URI
@@ -222,7 +221,17 @@ void Client::handleTimeout()
     {
         return;
     }
-    server_.disconnect(*this);
+    Log::warning(clientSocket_->toString() + ": request parsing timed out;");
+    int status = httpRequest_->getBody().size() == httpRequest_->getHeaders().getContentLength()
+                     ? Http::StatusCode::REQUEST_TIMEOUT
+                     : Http::StatusCode::BAD_REQUEST; // Request Timeout
+
+    if (!httpResponse_->isComplete())
+    {
+        ErrorHandler::createErrorResponse(status, *httpResponse_);
+    }
+    clientSocket_->setCallback([this]() { respond(); });
+    clientSocket_->setIOState(ASocket::IoState::WRITE);
 }
 
 HttpRequest &Client::getHttpRequest() const noexcept
