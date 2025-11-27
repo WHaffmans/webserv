@@ -255,7 +255,6 @@ bool UploadHandler::decode(const std::string &part)
     return true;
 }
 
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 std::string UploadHandler::getHeaderValue(const std::string &headers, const std::string &key)
 {
     std::string search = key;

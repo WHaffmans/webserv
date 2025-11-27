@@ -26,12 +26,6 @@ class ADirective
     [[nodiscard]] DirectiveValue getValue() const;
     [[nodiscard]] std::string getName() const;
 
-    // [[nodiscard]] std::string toString() const;
-    // template <typename T> [[nodiscard]] T getValueAs() const
-    // {
-    //     return getValue().try_get<T>();
-    // }
-
   protected:
     std::string name_; // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
 };

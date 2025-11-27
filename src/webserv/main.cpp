@@ -4,8 +4,10 @@
 #include <webserv/log/Log.hpp>                            // for Log
 #include <webserv/server/Server.hpp>                      // for Server
 
+#include <array>
 #include <csignal>
 #include <iostream> // for ios_base
+#include <span>     // for span
 #include <string>   // for allocator, basic_string, char_traits, operator+, string
 #include <vector>   // for vector
 
@@ -16,29 +18,27 @@ int main(int argc, char **argv)
     try
     {
         std::string configPath;
-
-        // NOLINTBEGIN
-        if ((argc == 3 || argc == 4) && std::string(argv[1]) == "-c")
+        std::span<char *> args(argv, argc);
+        if (argc < 2 || argc > 4)
         {
-            configPath = argv[2];
+            std::cerr << "Usage: " + std::string(args[0]) + " [-c] <config_file_path>"; 
+            return 1;
+        }
+        if ((argc == 3 || argc == 4) && std::string(args[1]) == "-c")
+        {
+            configPath = args[2];
         }
         else if (argc == 2)
         {
-            configPath = argv[1];
+            configPath = args[1];
         }
-        else
-        {
-            std::cerr << "Usage: " + std::string(argv[0]) + " [-c] <config_file_path>"; // NOLINT
-            return 1;
-        }
-        // NOLINTEND
 
         Log::setFileChannel("logs/webserv.log");
         Log::setStdoutChannel();
         ::signal(SIGPIPE, SIG_IGN); // Ignore SIGPIPE globally
         printHeader();
         ConfigManager &configManager = ConfigManager::getInstance();
-        configManager.init(configPath); // NOLINT
+        configManager.init(configPath);
 
         ConfigValidator validator{configManager.getGlobalConfig()};
         if (validator.hasErrors())

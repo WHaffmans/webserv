@@ -50,7 +50,6 @@ void CgiHandler::handle()
     Log::info(request_.getClient().getClientSocket()->toString() + ": CGI started");
 }
 
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 static inline bool findHeaderEnd(const std::string &s, size_t &pos, long &sepSize)
 {
     Log::trace(LOCATION);

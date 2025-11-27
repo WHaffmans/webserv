@@ -183,7 +183,7 @@ void Client::respond()
     writeOffset_ += bytesSent;
 
     resetTimer();
-    
+
     if (payload.empty())
     {
         Log::debug(clientSocket_->toString() + ": closing connection to client");
@@ -226,13 +226,14 @@ HttpResponse &Client::getHttpResponse() const noexcept
     return *httpResponse_;
 }
 
-// NOLINTBEGIN
+
 std::string Client::getClientAddress() const noexcept
 {
     const struct sockaddr *addr = clientSocket_->getAddress();
     if (addr->sa_family == AF_INET)
     {
-        const struct sockaddr_in *ipv4 = reinterpret_cast<const struct sockaddr_in *>(addr);
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+        const auto *ipv4 = reinterpret_cast<const struct sockaddr_in *>(addr);
         const char *addr = inet_ntoa(ipv4->sin_addr);
         return std::string(addr);
     }
@@ -245,4 +246,3 @@ ClientSocket *Client::getClientSocket() const noexcept
     return clientSocket_.get();
 }
 
-// NOLINTEND

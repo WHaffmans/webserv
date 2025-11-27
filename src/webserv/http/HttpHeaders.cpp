@@ -1,6 +1,5 @@
-#include <webserv/http/HttpHeaders.hpp>   // for HttpHeaders
-
 #include <webserv/http/HttpConstants.hpp> // for CRLF
+#include <webserv/http/HttpHeaders.hpp>   // for HttpHeaders
 #include <webserv/log/Log.hpp>
 #include <webserv/utils/utils.hpp> // for trim
 
@@ -40,7 +39,6 @@ std::optional<std::string> HttpHeaders::getHost() const noexcept
     return value;
 }
 
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 void HttpHeaders::add(const std::string &name, const std::string &value) noexcept
 {
     std::string lower = name;

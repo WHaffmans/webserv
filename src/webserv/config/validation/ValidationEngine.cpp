@@ -9,6 +9,7 @@
 #include <webserv/config/validation/structural_rules/AStructuralValidationRule.hpp> // for AStructuralValidationRule
 #include <webserv/log/Log.hpp>                                                      // for Log, LOCATION
 
+#include <algorithm> // for ranges::any_of
 #include <exception> // for exception
 #include <utility>   // for move, get
 
@@ -71,18 +72,13 @@ std::vector<ValidationResult> ValidationEngine::getWarnings() const
     }
     return warnings;
 }
-
 bool ValidationEngine::hasErrors() const noexcept
 {
-    for (const auto &result : results_) // NOLINT(readability-use-anyofallof)
-    {
-        if (!result.isValidResult())
-        {
-            return true;
-        }
-    }
-    return false;
+    return std::ranges::any_of(results_, [](const ValidationResult &result) {
+        return !result.isValidResult();
+    });
 }
+
 
 void ValidationEngine::validateConfig(RuleMap const &rulesMap, const AConfig *config)
 {

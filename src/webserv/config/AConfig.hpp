@@ -54,5 +54,5 @@ class AConfig
     std::vector<std::unique_ptr<ADirective>>
         directives_;                  // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
     const AConfig *parent_ = nullptr; // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
-    std::string baseDir_{};           // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
+    std::string baseDir_;             // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
 };

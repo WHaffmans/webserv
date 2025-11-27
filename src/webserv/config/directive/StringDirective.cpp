@@ -1,12 +1,10 @@
-#include <webserv/config/directive/StringDirective.hpp> // for IntDirective
-
 #include <webserv/config/directive/ADirective.hpp>      // for ADirective
 #include <webserv/config/directive/DirectiveValue.hpp>  // for DirectiveValueType
+#include <webserv/config/directive/StringDirective.hpp> // for IntDirective
 
 #include <linux/limits.h>
 
-StringDirective::StringDirective(const std::string &name, const std::string &value)
-    : ADirective(name) // NOLINT(bugprone-easily-swappable-parameters)
+StringDirective::StringDirective(const std::string &name, const std::string &value) : ADirective(name)
 {
     parse(value);
 }

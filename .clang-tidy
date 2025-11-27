@@ -8,6 +8,7 @@ Checks: >
   performance-*,
   performance-noexcept-move-constructor,
   readability-*,
+  -bugprone-easily-swappable-parameters,
   -modernize-use-trailing-return-type,
   -modernize-avoid-c-arrays,
   -cppcoreguidelines-avoid-magic-numbers,

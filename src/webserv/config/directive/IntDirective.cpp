@@ -1,10 +1,8 @@
-#include <webserv/config/directive/IntDirective.hpp>   // for IntDirective
-
 #include <webserv/config/directive/ADirective.hpp>     // for ADirective
 #include <webserv/config/directive/DirectiveValue.hpp> // for DirectiveValueType
+#include <webserv/config/directive/IntDirective.hpp>   // for IntDirective
 #include <webserv/log/Log.hpp>                         // for Log
 
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 IntDirective::IntDirective(const std::string &name, const std::string &value) : ADirective(name)
 {
     parse(value);
