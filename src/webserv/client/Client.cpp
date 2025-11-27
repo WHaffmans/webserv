@@ -213,6 +213,12 @@ void Client::resetTimer()
 void Client::handleTimeout()
 {
     Log::info(clientSocket_->toString() + ": client timeout reached; disconnecting");
+    std::array<char, 9> buffer = {};
+    ssize_t bytesRead = timerSocket_->read(buffer.data(), buffer.size() - 1);
+    if (bytesRead <= 0)
+    {
+        return;
+    }
     server_.disconnect(*this);
 }
 
