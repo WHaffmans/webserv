@@ -55,7 +55,7 @@ void ServerSocket::bind(const std::string &host, const int port) const
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     if (::bind(getFd(), reinterpret_cast<struct sockaddr *>(&address), sizeof(address)) < 0)
     {
-        Log::fatal("Cannot bind to " + host + ":" + std::to_string(port)
+        Log::error("Cannot bind to " + host + ":" + std::to_string(port)
                    + " - address already in use or permission denied");
         throw std::runtime_error("Bind failed");
     }
