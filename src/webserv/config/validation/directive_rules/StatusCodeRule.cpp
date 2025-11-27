@@ -1,17 +1,16 @@
-#include <webserv/config/validation/directive_rules/StatusCodeRule.hpp>
-
 #include <webserv/config/AConfig.hpp>                                    // for AConfig
 #include <webserv/config/directive/ADirective.hpp>                       // for ADirective
 #include <webserv/config/directive/DirectiveValue.hpp>                   // for DirectiveValue
 #include <webserv/config/validation/ValidationResult.hpp>                // for ValidationResult
 #include <webserv/config/validation/directive_rules/AValidationRule.hpp> // for AValidationRule
+#include <webserv/config/validation/directive_rules/StatusCodeRule.hpp>
 #include <webserv/utils/FileUtils.hpp> // for isFile
 
 #include <string>
 #include <utility>
 
-StatusCodeRule::StatusCodeRule(bool requiresValue)
-    : AValidationRule("CgiExt", "Ensure CGI extension is valid", requiresValue)
+StatusCodeRule::StatusCodeRule(bool requiresValue, ValidationPredicate validator)
+    : AValidationRule("StatusCode", "Ensure StatusCode is valid", requiresValue), validator_(std::move(validator))
 {
 }
 
@@ -26,7 +25,7 @@ ValidationResult StatusCodeRule::validateValue(const AConfig *config, const std:
 
     auto value = directive->getValue().get<std::pair<int, std::string>>();
     int statusCode = value.first;
-    if (statusCode < 100 || statusCode > 599)
+    if (!validator_(statusCode))
     {
         return ValidationResult::error("Directive '" + directive->getName()
                                        + "' has invalid status code: " + std::to_string(statusCode));

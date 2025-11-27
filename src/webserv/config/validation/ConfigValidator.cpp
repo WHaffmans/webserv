@@ -1,5 +1,4 @@
 #include <webserv/config/validation/ConfigValidator.hpp>
-
 #include <webserv/config/validation/ValidationEngine.hpp>                     // for ValidationEngine
 #include <webserv/config/validation/directive_rules/AValidationRule.hpp>      // for AValidationRule
 #include <webserv/config/validation/directive_rules/AllowedValuesRule.hpp>    // for AllowedValuesRule
@@ -24,6 +23,7 @@ class ValidationResult;
 ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make_unique<ValidationEngine>(config))
 {
     Log::trace(LOCATION);
+    // TODO seems weird that errorpages are only checked globally and per location, not per server block? check the rest aswell
 
     /*Structural Rules*/
     engine_->addStructuralRule(std::make_unique<MinimumServerBlocksRule>(1));
@@ -36,7 +36,9 @@ ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make
         "client_max_body_size", "cgi_timeout", "redirect", "timeout", "42_tester"}));
 
     /*Global Directive Rules*/
-    engine_->addServerRule("error_page", std::make_unique<StatusCodeRule>(false));
+    engine_->addServerRule("error_page", std::make_unique<StatusCodeRule>(false, [](int statusCode) {
+                               return statusCode >= 100 && statusCode <= 599;
+                           }));
 
     /*Server Directive Rules*/
     engine_->addServerRule("listen", std::make_unique<PortValidationRule>());
@@ -47,7 +49,14 @@ ConfigValidator::ConfigValidator(const GlobalConfig *config) : engine_(std::make
     engine_->addLocationRule("allowed_methods",
                              std::make_unique<AllowedValuesRule>(
                                  std::vector<std::string>{"GET", "POST", "DELETE", "PUT", "HEAD", "OPTIONS"}, false));
-    engine_->addLocationRule("error_page", std::make_unique<StatusCodeRule>(false));
+    engine_->addLocationRule("error_page", std::make_unique<StatusCodeRule>(false, [](int statusCode) {
+                                 return statusCode >= 100 && statusCode <= 599;
+                             }));
+    engine_->addLocationRule("redirect", std::make_unique<StatusCodeRule>(false, [](int statusCode) {
+                                 // Only accept valid redirect codes: 301, 302, 303, 307, 308
+                                 return statusCode == 301 || statusCode == 302 || statusCode == 303 || statusCode == 307
+                                        || statusCode == 308;
+                             }));
     // Folder existence validation disabled - paths are relative to server runtime directory
     engine_->addLocationRule("cgi_handler", std::make_unique<CgiExtValidationRule>(false));
 
