@@ -367,10 +367,17 @@ void Server::run()
     struct epoll_event events[MAX_EVENTS]; // NOLINT
     while (signum_ != SIGINT && signum_ != SIGTERM)
     {
-        connectionInfo();
-        pollSockets();
-        pollClients();
-        handleEpoll(events, MAX_EVENTS); // NOLINT (cppcoreguidelines-pro-bounds-pointer-arithmetic)
+        try
+        {
+            connectionInfo();
+            pollSockets();
+            pollClients();
+            handleEpoll(events, MAX_EVENTS); // NOLINT (cppcoreguidelines-pro-bounds-pointer-arithmetic)
+        }
+        catch (const std::exception &e)
+        {
+            Log::error("Exception in server run loop: " + std::string(e.what()));
+        }
     }
     Log::info("Server stopping...");
 }
