@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webserv - High Performance HTTP Server</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        background: 'var(--background)',
+                        foreground: 'var(--foreground)',
+                        card: 'var(--card)',
+                        'card-foreground': 'var(--card-foreground)',
+                        popover: 'var(--popover)',
+                        'popover-foreground': 'var(--popover-foreground)',
+                        primary: 'var(--primary)',
+                        'primary-foreground': 'var(--primary-foreground)',
+                        secondary: 'var(--secondary)',
+                        'secondary-foreground': 'var(--secondary-foreground)',
+                        muted: 'var(--muted)',
+                        'muted-foreground': 'var(--muted-foreground)',
+                        accent: 'var(--accent)',
+                        'accent-foreground': 'var(--accent-foreground)',
+                        destructive: 'var(--destructive)',
+                        'destructive-foreground': 'var(--destructive-foreground)',
+                        border: 'var(--border)',
+                        input: 'var(--input)',
+                        ring: 'var(--ring)',
+                    },
+                    borderRadius: {
+                        lg: 'var(--radius)',
+                        md: 'calc(var(--radius) - 2px)',
+                        sm: 'calc(var(--radius) - 4px)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* CSS Variables based on your OKLCH values */
+        :root {
+            --radius: 0.625rem;
+            
+            /* Using the Dark Mode values as default since the design is dark-themed */
+            --background: oklch(0.13 0.005 260);
+            --foreground: oklch(0.98 0 0);
+            --card: oklch(0.18 0.005 260);
+            --card-foreground: oklch(0.98 0 0);
+            --popover: oklch(0.18 0.005 260);
+            --popover-foreground: oklch(0.98 0 0);
+            --primary: oklch(0.98 0 0);
+            --primary-foreground: oklch(0.13 0.005 260);
+            --secondary: oklch(0.25 0.005 260);
+            --secondary-foreground: oklch(0.98 0 0);
+            --muted: oklch(0.25 0.005 260);
+            --muted-foreground: oklch(0.65 0 0);
+            --accent: oklch(0.72 0.15 145);
+            --accent-foreground: oklch(0.13 0.005 260);
+            --destructive: oklch(0.396 0.141 25.723);
+            --destructive-foreground: oklch(0.637 0.237 25.331);
+            --border: oklch(0.28 0.005 260);
+            --input: oklch(0.28 0.005 260);
+            --ring: oklch(0.72 0.15 145);
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--foreground);
+            font-family: 'Inter', sans-serif;
+            border-color: var(--border);
+        }
+
+        /* Utility to ensure borders use the variable */
+        *, ::before, ::after {
+            border-color: var(--border);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+    <main class="flex-grow">
+        
+        <section class="relative min-h-screen flex flex-col items-center justify-center px-6 py-24 overflow-hidden">
+            <div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] pointer-events-none"></div>
+
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent opacity-5 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10 max-w-5xl mx-auto text-center">
+                <div class="flex justify-center mb-8">
+                    <div class="p-4 rounded-2xl bg-card border border-border">
+                        <i data-lucide="server" class="w-12 h-12 text-accent"></i>
+                    </div>
+                </div>
+
+                <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight text-foreground mb-8">
+                    NGINY
+                </h1>
+
+                <p class="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed">
+                    A custom-built HTTP server with full CGI support. Serving static content and dynamic scripts with performance in mind.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="/gallery" class="inline-flex items-center justify-center w-full sm:w-auto bg-primary text-primary-foreground hover:opacity-90 px-8 py-6 text-base font-medium rounded-lg transition-colors">
+                        <i data-lucide="image" class="w-5 h-5 mr-2"></i>
+                        View Gallery
+                    </a>
+
+                    <a href="/python" class="inline-flex items-center justify-center w-full sm:w-auto border border-border bg-card text-foreground hover:bg-secondary px-8 py-6 text-base font-medium rounded-lg transition-colors">
+                        <i data-lucide="code-2" class="w-5 h-5 mr-2"></i>
+                        Python CGI
+                    </a>
+
+                    <a href="/php" class="inline-flex items-center justify-center w-full sm:w-auto border border-border bg-card text-foreground hover:bg-secondary px-8 py-6 text-base font-medium rounded-lg transition-colors">
+                        <i data-lucide="file-code" class="w-5 h-5 mr-2"></i>
+                        PHP CGI
+                    </a>
+                </div>
+
+                <div class="mt-16 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border font-mono text-sm text-muted-foreground">
+                    <span class="text-accent">▲</span>
+                    <span>./webserv config.conf</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 px-6 border-t border-border">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl sm:text-4xl font-bold text-foreground mb-4">What's in Webserv?</h2>
+                    <p class="text-muted-foreground text-lg">Everything you need to serve content on the web.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="p-6 rounded-xl bg-card border border-border hover:border-accent/50 transition-colors">
+                        <i data-lucide="zap" class="w-10 h-10 text-accent mb-4"></i>
+                        <h3 class="text-lg font-semibold text-foreground mb-2">High Performance</h3>
+                        <p class="text-muted-foreground text-sm leading-relaxed">Built for speed with efficient request handling and minimal overhead.</p>
+                    </div>
+
+                    <div class="p-6 rounded-xl bg-card border border-border hover:border-accent/50 transition-colors">
+                        <i data-lucide="shield" class="w-10 h-10 text-accent mb-4"></i>
+                        <h3 class="text-lg font-semibold text-foreground mb-2">Secure by Design</h3>
+                        <p class="text-muted-foreground text-sm leading-relaxed">Proper input validation and secure CGI execution environment.</p>
+                    </div>
+
+                    <div class="p-6 rounded-xl bg-card border border-border hover:border-accent/50 transition-colors">
+                        <i data-lucide="cog" class="w-10 h-10 text-accent mb-4"></i>
+                        <h3 class="text-lg font-semibold text-foreground mb-2">CGI Support</h3>
+                        <p class="text-muted-foreground text-sm leading-relaxed">Full support for Python and PHP scripts with environment variable passing.</p>
+                    </div>
+
+                    <div class="p-6 rounded-xl bg-card border border-border hover:border-accent/50 transition-colors">
+                        <i data-lucide="globe" class="w-10 h-10 text-accent mb-4"></i>
+                        <h3 class="text-lg font-semibold text-foreground mb-2">Static Content</h3>
+                        <p class="text-muted-foreground text-sm leading-relaxed">Efficient serving of static files with proper MIME type detection.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="py-12 px-6 border-t border-border">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <i data-lucide="server" class="w-5 h-5 text-accent"></i>
+                <span class="font-semibold text-foreground">Webserv</span>
+            </div>
+            <p class="text-sm text-muted-foreground">A custom HTTP server built from scratch.</p>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

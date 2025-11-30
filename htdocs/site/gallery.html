@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webserv Gallery</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        background: 'var(--background)',
+                        foreground: 'var(--foreground)',
+                        card: 'var(--card)',
+                        'card-foreground': 'var(--card-foreground)',
+                        primary: 'var(--primary)',
+                        'primary-foreground': 'var(--primary-foreground)',
+                        secondary: 'var(--secondary)',
+                        'secondary-foreground': 'var(--secondary-foreground)',
+                        muted: 'var(--muted)',
+                        'muted-foreground': 'var(--muted-foreground)',
+                        accent: 'var(--accent)',
+                        'accent-foreground': 'var(--accent-foreground)',
+                        border: 'var(--border)',
+                        ring: 'var(--ring)',
+                    },
+                    borderRadius: {
+                        lg: 'var(--radius)',
+                        md: 'calc(var(--radius) - 2px)',
+                        sm: 'calc(var(--radius) - 4px)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* CSS Variables based on your OKLCH values (Same as index.html) */
+        :root {
+            --radius: 0.625rem;
+
+            --background: oklch(0.13 0.005 260);
+            --foreground: oklch(0.98 0 0);
+            --card: oklch(0.18 0.005 260);
+            --card-foreground: oklch(0.98 0 0);
+            --primary: oklch(0.98 0 0);
+            --primary-foreground: oklch(0.13 0.005 260);
+            --secondary: oklch(0.25 0.005 260);
+            --secondary-foreground: oklch(0.98 0 0);
+            --muted: oklch(0.25 0.005 260);
+            --muted-foreground: oklch(0.65 0 0);
+            --accent: oklch(0.72 0.15 145);
+            --accent-foreground: oklch(0.13 0.005 260);
+            --destructive: oklch(0.396 0.141 25.723);
+            --destructive-foreground: oklch(0.637 0.237 25.331);
+            --border: oklch(0.28 0.005 260);
+            --input: oklch(0.28 0.005 260);
+            --ring: oklch(0.72 0.15 145);
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--foreground);
+            font-family: 'Inter', sans-serif;
+            border-color: var(--border);
+        }
+
+        *,
+        ::before,
+        ::after {
+            border-color: var(--border);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col antialiased">
+    <main class="min-h-screen bg-background">
+        <div class="container mx-auto px-6 py-8">
+
+            <a href="index.html"
+                class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                Back to Home
+            </a>
+
+            <div id="gallery-header"
+                class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-foreground mb-2">Gallery</h1>
+                    <p class="text-muted-foreground">Browse and manage your uploaded images</p>
+                </div>
+
+                <input id="file-input" type="file" accept="image/*" multiple class="hidden">
+
+                <button id="upload-button"
+                    class="inline-flex items-center justify-center bg-accent text-accent-foreground hover:bg-accent/90 px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span id="upload-default-state" class="inline-flex items-center">
+                        <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                        Upload Image
+                    </span>
+                    <span id="upload-loading-state" class="hidden items-center">
+                        <i data-lucide="upload" class="w-4 h-4 mr-2 animate-pulse"></i>
+                        Uploading...
+                    </span>
+                </button>
+            </div>
+
+            <div id="gallery-grid">
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-12 px-6 border-t border-border">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <i data-lucide="server" class="w-5 h-5 text-accent"></i>
+                <span class="font-semibold text-foreground">Webserv</span>
+            </div>
+            <p class="text-sm text-muted-foreground">A custom HTTP server built from scratch.</p>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('file-input');
+            const uploadButton = document.getElementById('upload-button');
+            const defaultState = document.getElementById('upload-default-state');
+            const loadingState = document.getElementById('upload-loading-state');
+            const gridContainer = document.getElementById('gallery-grid');
+
+            let images = [];
+            let isUploading = false;
+            let isLoading = true;
+
+            // --- UI Rendering Functions ---
+            const renderImageCard = (image) => {
+                const card = document.createElement('div');
+                const randomHeight = (Math.random() * 100 + 300) + 'px';
+                card.className = "mb-4 break-inside-avoid rounded-lg border border-border bg-card overflow-hidden group relative hover:shadow-lg transition-all";
+                card.style.height = randomHeight;
+                card.innerHTML = `
+                    <img src="${image.src}" alt="${image.name}" class="w-full h-full object-cover transition-transform group-hover:scale-[1.03]" loading="lazy">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="absolute bottom-0 left-0 p-3 text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity font-mono">
+                        ${image.name}
+                    </div>
+                    <button class="delete-btn absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1
+                       rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700">
+                    Delete
+                    </button>
+                `;
+                const deleteBtn = card.querySelector('.delete-btn');
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // prevent card click issues
+                    handleDelete(image);
+                });
+                return card;
+            };
+
+            const renderGrid = () => {
+                gridContainer.innerHTML = '';
+                gridContainer.className = "columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4";
+                if (isLoading) {
+                    const loadingHTML = [...Array(8)].map((_, i) => `
+                        <div key="${i}" class="mb-4 break-inside-avoid rounded-lg bg-card animate-pulse" style="height: ${Math.random() * 150 + 200}px;"></div>
+                    `).join('');
+                    gridContainer.innerHTML = loadingHTML;
+                } else if (!images || images.length === 0) {
+                    gridContainer.className = "flex flex-col items-center justify-center py-20 text-muted-foreground border border-dashed border-border rounded-lg h-64";
+                    gridContainer.innerHTML = `
+                        <p class="text-lg mb-2">No images yet</p>
+                        <p class="text-sm">Upload your first image to get started</p>
+                    `;
+                } else {
+                    images.forEach(image => {
+                        gridContainer.appendChild(renderImageCard(image));
+                    });
+                }
+                lucide.createIcons();
+            };
+
+            const updateButtonState = () => {
+                uploadButton.disabled = isUploading;
+                if (isUploading) {
+                    defaultState.style.display = 'none';
+                    loadingState.style.display = 'inline-flex';
+                } else {
+                    defaultState.style.display = 'inline-flex';
+                    loadingState.style.display = 'none';
+                }
+            };
+
+            const handleUploadClick = () => {
+                fileInput.click();
+            };
+
+            const handleFileChange = async (e) => {
+                const files = e.target.files;
+                if (!files || files.length === 0) return;
+
+                isUploading = true;
+                updateButtonState();
+
+                const formData = new FormData();
+
+                // Append each file under the SAME key (e.g. "file")
+                for (let i = 0; i < files.length; i++) {
+                    formData.append("file", files[i]);
+                }
+
+                try {
+                    const response = await fetch("/upload", {
+                        method: "POST",
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("Upload failed with HTTP " + response.status);
+                    }
+
+                    // After uploading, re-load from /images directory
+                    await loadImagesFromFolder();
+
+                } catch (error) {
+                    console.error("Upload failed:", error);
+                    alert("Upload failed: " + error.message);
+                } finally {
+                    isUploading = false;
+                    updateButtonState();
+                    fileInput.value = "";
+                }
+            };
+
+            async function handleDelete(image) {
+                if (!confirm(`Delete ${image.name}?`)) return;
+
+                try {
+                    const response = await fetch(image.src, {
+                        method: "DELETE"
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("Failed with HTTP " + response.status);
+                    }
+
+                    // Remove from UI list
+                    images = images.filter(img => img.id !== image.id);
+
+                    // Refresh grid OR reload from server
+                    await loadImagesFromFolder();
+
+                } catch (err) {
+                    console.error("Delete failed:", err);
+                    alert("Delete failed: " + err.message);
+                }
+            }
+
+            // --- Initialization ---
+            uploadButton.addEventListener('click', handleUploadClick);
+            fileInput.addEventListener('change', handleFileChange);
+
+
+            // Dynamically fetch and display all images in htdocs/site/images/
+            async function loadImagesFromFolder() {
+                try {
+                    const response = await fetch("images/");
+                    if (!response.ok) throw new Error("Failed to fetch images directory");
+                    const text = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(text, "text/html");
+                    const links = Array.from(doc.querySelectorAll("a"));
+                    images = links
+                        .filter(link => {
+                            const href = link.getAttribute("href");
+                            return href && /\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(href);
+                        })
+                        .map(link => {
+                            const href = link.getAttribute("href");
+                            const filename = href.split("/").pop();  // <-- FIX (extract only filename)
+                            return {
+                                id: filename,
+                                name: filename,
+                                src: "/images/" + filename          // <-- FIX (construct correct URL)
+                            };
+                        });
+
+                } catch (e) {
+                    images = [];
+                } finally {
+                    isLoading = false;
+                    renderGrid();
+                }
+            }
+
+            loadImagesFromFolder();
+            updateButtonState();
+            renderGrid();
+        });
+    </script>
+</body>
+
+</html>
