@@ -11,7 +11,7 @@ document.getElementById("code-input").value = defaultCode;
 document.getElementById("run-code").onclick = async () => {
     const code = document.getElementById("code-input").value;
 
-    const resp = await fetch("/cgi-bin/execute.py", {
+    const resp = await fetch("/cgi-bin/python/execute.py", {
         method: "POST",
         body: new URLSearchParams({ code })
     });
@@ -34,7 +34,7 @@ document.getElementById("form-processor").onsubmit = async (e) => {
 
     const formData = new FormData(e.target);
 
-    const resp = await fetch("/cgi-bin/form.py", {
+    const resp = await fetch("/cgi-bin/python/form.py", {
         method: "POST",
         body: formData
     });
@@ -61,7 +61,7 @@ document.getElementById("calc-run").onclick = async () => {
     const a = document.getElementById("calc-a").value;
     const b = document.getElementById("calc-b").value;
 
-    const resp = await fetch("/cgi-bin/calc.py", {
+    const resp = await fetch("/cgi-bin/python/calc.py", {
         method: "POST",
         body: new URLSearchParams({ a, b, op: currentOp })
     });
@@ -75,7 +75,7 @@ document.getElementById("calc-run").onclick = async () => {
 // ------------------------------------------------------
 
 async function loadSystemInfo() {
-    const resp = await fetch("/cgi-bin/sysinfo.py");
+    const resp = await fetch("/cgi-bin/python/sysinfo.py");
     const json = await resp.json();
 
     const container = document.getElementById("sysinfo-grid");
@@ -116,17 +116,17 @@ document.getElementById("sys-refresh").onclick = loadSystemInfo;
 loadSystemInfo();
 
 document.getElementById("set-cookie").onclick = async () => {
-    const resp = await fetch("/cgi-bin/cookie.py?set=hello123");
+    const resp = await fetch("/cgi-bin/python/cookie.py?set=hello123");
     document.getElementById("cookie-output").textContent = await resp.text();
 };
 
 document.getElementById("clear-cookie").onclick = async () => {
-    const resp = await fetch("/cgi-bin/cookie.py?clear=1");
+    const resp = await fetch("/cgi-bin/python/cookie.py?clear=1");
     document.getElementById("cookie-output").textContent = await resp.text();
 };
 
 async function loadSession() {
-    const resp = await fetch("/cgi-bin/session.py");
+    const resp = await fetch("/cgi-bin/python/session.py");
     document.getElementById("session-output").textContent = await resp.text();
 }
 
