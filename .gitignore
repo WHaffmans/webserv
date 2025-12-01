@@ -12,3 +12,5 @@ uploads/
 obj/
 webserv
 !webserv/
+dist/
+sources.mk

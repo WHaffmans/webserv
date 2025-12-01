@@ -108,5 +108,13 @@ format:
 	@echo "Running code formatting..."
 	./scripts/format.sh
 
+sources.mk: 
+	@echo "Generating sources.mk..."
+	./scripts/generate_sources.sh
+
+dist: sources.mk
+	@echo "Creating distribution package..."
+	./scripts/create_dist.sh
+
 # Mark targets as phony
-.PHONY: all release debug asan run run_release run_debug run_asan clean fclean re test test_verbose test_build coverage coverage_clean coverage_manual format
+.PHONY: all release debug asan run run_release run_debug run_asan clean fclean re test test_verbose test_build coverage coverage_clean coverage_manual format sources.mk

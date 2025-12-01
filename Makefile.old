@@ -12,11 +12,21 @@
 
 VPATH=src
 
+# Colors
+RESET		= \033[0m
+BOLD		= \033[1m
+RED			= \033[31m
+GREEN		= \033[32m
+YELLOW		= \033[33m
+BLUE		= \033[34m
+MAGENTA		= \033[35m
+CYAN		= \033[36m
+
 # Compiler and flags
 CXX			= clang++
 CXXFLAGS	= -Wall -Wextra -Werror -std=c++20 -O2
 INCLUDES	= -I./src
-MAKEFLAGS	+= -j$(shell nproc)
+# MAKEFLAGS	+= -j$(shell nproc)
 
 # Target executable
 NAME		= webserv
@@ -32,28 +42,45 @@ OBJS		= $(SRCS:%.cpp=$(OBJDIR)/%.o)
 # Dependency files
 DEPS		= $(OBJS:.o=.d)
 
+# Progress tracking
+TOTAL		= $(words $(SRCS))
+CURRENT		= 0
+
 # Rules
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
+	@printf "\n$(GREEN)$(BOLD)✓ Linking $(NAME)$(RESET)\n"
+	@$(CXX) $(CXXFLAGS) $(OBJS) -o $(NAME)
+	@printf "$(GREEN)$(BOLD)✓ Build complete!$(RESET)\n\n"
 
 $(OBJDIR)/%.o: %.cpp
-	mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -MMD -MP -c $< -o $@
+	@mkdir -p $(dir $@)
+	@$(eval CURRENT=$(shell echo $$(($(CURRENT)+1))))
+	@printf "$(CYAN)Compiling [$(CURRENT)/$(TOTAL)]$(RESET) $(BLUE)$<$(RESET)\n"
+	@$(CXX) $(CXXFLAGS) $(INCLUDES) -MMD -MP -c $< -o $@
 
 clean:
-	rm -rf $(OBJDIR)
+	@printf "$(YELLOW)Cleaning object files...$(RESET)\n"
+	@rm -rf $(OBJDIR)
+	@printf "$(GREEN)✓ Clean complete$(RESET)\n"
 
 fclean: clean
-	rm -f $(NAME)
+	@printf "$(YELLOW)Removing $(NAME)...$(RESET)\n"
+	@rm -f $(NAME)
+	@printf "$(GREEN)✓ Full clean complete$(RESET)\n"
 
 re: fclean all
 
 run: all
-	./$(NAME) $(CONFIG_FILE)
+	@printf "$(MAGENTA)$(BOLD)Starting $(NAME)...$(RESET)\n\n"
+	@./$(NAME) $(CONFIG_FILE)
+
+test: 
+	@printf "$(MAGENTA)$(BOLD)Running webserv-tester...$(RESET)\n\n"
+	@webserv-tester/run_test.sh
 
 # Include dependencies
 -include $(DEPS)
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re run test
