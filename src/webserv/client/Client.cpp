@@ -1,8 +1,10 @@
 #include <webserv/client/Client.hpp>
+
 #include <webserv/handler/CgiHandler.hpp>    // for CgiHandler
 #include <webserv/handler/ErrorHandler.hpp>  // for ErrorHandler
 #include <webserv/handler/URI.hpp>           // for URI
-#include <webserv/http/HttpConstants.hpp>    // for getStatusCodeReason
+#include <webserv/http/HttpConstants.hpp>    // for getStatusCodeReason, BAD_REQUEST, REQUEST_TIMEOUT
+#include <webserv/http/HttpHeaders.hpp>      // for HttpHeaders
 #include <webserv/http/HttpRequest.hpp>      // for HttpRequest
 #include <webserv/http/HttpResponse.hpp>     // for HttpResponse
 #include <webserv/http/RequestValidator.hpp> // for RequestValidator
@@ -19,6 +21,7 @@
 #include <exception>  // for exception
 #include <functional> // for function, ref, reference_wrapper
 #include <memory>     // for unique_ptr, allocator, make_unique, operator==, default_delete
+#include <optional>   // for operator==, optional
 #include <stdexcept>  // for runtime_error
 #include <string>     // for operator+, basic_string, char_traits, to_string, string
 #include <utility>    // for move, pair

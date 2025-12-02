@@ -1,7 +1,8 @@
+#include <webserv/handler/URI.hpp>
+
 #include <webserv/config/AConfig.hpp>        // for AConfig
 #include <webserv/config/LocationConfig.hpp> // for LocationConfig
 #include <webserv/config/ServerConfig.hpp>   // for ServerConfig
-#include <webserv/handler/URI.hpp>
 #include <webserv/http/HttpHeaders.hpp> // for HttpHeaders
 #include <webserv/log/Log.hpp>          // for Log, LOCATION
 #include <webserv/utils/FileUtils.hpp>  // for joinPath, isDirectory, isFile, getExtension, isValidPath
@@ -13,7 +14,6 @@
 #include <vector>   // for vector
 
 /**
-
 
                                           .-----------...
                                         .:---*.     #*-:----::....

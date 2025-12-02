@@ -7,12 +7,11 @@
 #include <algorithm>  // for find
 #include <filesystem> // for path
 #include <fstream>    // for basic_ifstream, basic_filebuf, basic_ostream::operator<<, ifstream, stringstream
-#include <functional> // for identity
 #include <optional>   // for optional
 #include <ranges>     // for __find_fn, find
 #include <sstream>    // for basic_stringstream
 #include <stdexcept>  // for runtime_error
-#include <string>     // for basic_string, char_traits, operator+, string, to_string, operator==, stoi
+#include <string>     // for basic_string, char_traits, operator+, string, to_string, stoi, operator==
 #include <vector>     // for vector
 
 #include <stddef.h> // for size_t
