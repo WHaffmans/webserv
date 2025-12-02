@@ -37,6 +37,7 @@ cp -r src/webserv "$DIST_DIR/src/"
 # Copy docker folder
 echo -e "${BLUE}🐳 Copying docker configuration...${NC}"
 cp -r docker "$DIST_DIR/"
+rm -rf "$DIST_DIR/docker/.git"
 
 # Copy config folder
 echo -e "${BLUE}⚙️  Copying config files...${NC}"
@@ -49,6 +50,7 @@ cp -r htdocs "$DIST_DIR/"
 # Copy webserv-tester folder
 echo -e "${BLUE}🧪 Copying webserv-tester...${NC}"
 cp -r webserv-tester "$DIST_DIR/"
+rm -rf "$DIST_DIR/webserv-tester/.git"
 
 # Update SERVER_PATH in the copied run_test.sh
 echo -e "${BLUE}🔧 Updating SERVER_PATH in webserv-tester/run_test.sh...${NC}"
@@ -69,7 +71,6 @@ cp sources.mk "$DIST_DIR/"
 # Copy Makefile.old as Makefile
 echo -e "${BLUE}🔨 Copying Makefile.old as Makefile...${NC}"
 cp Makefile.old "$DIST_DIR/Makefile"
-
 
 echo -e "${GREEN}✅ Distribution package created successfully in ${DIST_DIR}/${NC}"
 echo -e "${BLUE}📦 Contents:${NC}"
