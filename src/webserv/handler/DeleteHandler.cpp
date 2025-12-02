@@ -15,7 +15,12 @@ DeleteHandler::DeleteHandler(const HttpRequest &request, HttpResponse &response)
 void DeleteHandler::handle()
 {
     Log::trace(LOCATION);
-    // delete file:
+    if (! request_.getUri().deleteAllowed())
+    {
+        Log::warning("DeleteHandler: DELETE method not allowed for this resource");
+        ErrorHandler::createErrorResponse(Http::StatusCode::FORBIDDEN, response_, request_.getUri().getConfig());
+        return;
+    }
     std::string fullPath = request_.getUri().getFullPath();
     if (fullPath.empty() || !FileUtils::isValidPath(fullPath))
     {

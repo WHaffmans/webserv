@@ -104,7 +104,7 @@ std::optional<RequestValidator::ValidationError> RequestValidator::validateMetho
     }
     else
     {
-        allowedMethods = {"GET"};
+        allowedMethods = {"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"};
     }
     for (const std::string &method : allowedMethods)
     {

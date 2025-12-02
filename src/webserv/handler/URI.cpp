@@ -242,6 +242,17 @@ bool URI::isUpload() const noexcept
     return uploadStoreOpt.has_value();
 }
 
+bool URI::deleteAllowed() const noexcept
+{
+    auto allowed = config_->get<std::vector<std::string>>("allowed_methods");
+    if (!allowed)
+    {
+        return false;
+    }
+
+    return std::find(allowed->begin(), allowed->end(), "DELETE") != allowed->end();
+}
+
 std::pair<int, std::string> URI::getRedirect() const
 {
     auto redirectOpt = config_->get<std::pair<int, std::string>>("redirect");
