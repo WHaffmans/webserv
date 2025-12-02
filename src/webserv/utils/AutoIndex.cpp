@@ -1,7 +1,6 @@
-#include <webserv/utils/AutoIndex.hpp>
-
 #include <webserv/config/AConfig.hpp> // for AConfig
 #include <webserv/handler/URI.hpp>    // for URI
+#include <webserv/utils/AutoIndex.hpp>
 #include <webserv/utils/FileUtils.hpp> // for listDirectory
 
 #include <algorithm>  // for find
@@ -29,7 +28,7 @@ std::string AutoIndex::generate(const std::string &dir, const URI &uri)
 
     html << "<!DOCTYPE html>\n"
          << "<html><head>\n"
-         << "<title>Index of " << dir << "</title>\n"
+         << "<title>Index of " << uri.getUriForPath(dir) << "</title>\n"
          << "<style>\n"
          << "body { font-family: Arial, sans-serif; margin: 40px; }\n"
          << "h1 { border-bottom: 1px solid #ccc; }\n"
@@ -41,7 +40,7 @@ std::string AutoIndex::generate(const std::string &dir, const URI &uri)
          << ".dir { font-weight: bold; }\n"
          << "</style>\n"
          << "</head><body>\n"
-         << "<h1>Index of " << dir << "</h1>\n"
+         << "<h1>Index of " << uri.getUriForPath(dir) << "</h1>\n"
          << "<table>\n"
          << "<tr><th>Name</th><th>Last Modified</th><th>Size</th><th></th></tr>\n";
 
@@ -91,7 +90,7 @@ std::string AutoIndex::generate(const std::string &dir, const URI &uri)
     {
 
         html << "<form method=\"POST\" enctype=\"multipart/form-data\" action=\"" << uri.getUriForPath(dir)
-             << "/?autoindex=on\">\n"
+             << "?autoindex=on\">\n"
              << "<input type=\"file\" name=\"file\" />\n"
              << "<input type=\"submit\" value=\"Upload\" />\n"
              << "</form>\n";

@@ -56,7 +56,9 @@ void UploadHandler::handle()
     }
 
     const auto *locationConfig = dynamic_cast<const LocationConfig *>(request_.getUri().getConfig());
-    if (locationConfig != nullptr && request_.getTarget() != locationConfig->getPath())
+    auto target = request_.getTarget();
+    target = target.substr(0, target.find_first_of('?'));
+    if (locationConfig != nullptr && target != locationConfig->getPath())
     {
         Log::warning("Upload request target does not match location path");
         ErrorHandler::createErrorResponse(Http::StatusCode::FORBIDDEN, response_);
