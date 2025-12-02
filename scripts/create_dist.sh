@@ -34,6 +34,10 @@ echo -e "${BLUE}📄 Copying source files...${NC}"
 mkdir -p "$DIST_DIR/src"
 cp -r src/webserv "$DIST_DIR/src/"
 
+# Copy ubuntu tester files
+echo -e "${BLUE}🧪 Copying ubuntu tester files...${NC}"
+cp ubuntu_tester ubuntu_cgi_tester "$DIST_DIR/"
+
 # Copy docker folder
 echo -e "${BLUE}🐳 Copying docker configuration...${NC}"
 cp -r docker "$DIST_DIR/"
