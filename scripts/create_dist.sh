@@ -58,6 +58,10 @@ sed -i 's|SERVER_PATH="../build/webserv"|SERVER_PATH="../webserv"|g' "$DIST_DIR/
 echo -e "${BLUE}🔧 Updating webserv_path in webserv-tester/tests_suites/invalid_config_tests.py...${NC}"
 sed -i 's|self.webserv_path = Path("../build/webserv")|self.webserv_path = Path("../webserv")|g' "$DIST_DIR/webserv-tester/tests_suites/invalid_config_tests.py"
 
+# Update Dockerfile to use correct webserv binary path (Makefile builds to ./ not build/)
+echo -e "${BLUE}🔧 Updating Dockerfile webserv binary path...${NC}"
+sed -i 's|COPY --from=0 /tmp/build/webserv /webserv/.|COPY --from=0 /tmp/webserv /webserv/.|g' "$DIST_DIR/docker/webserv/Dockerfile"
+
 # Copy sources.mk
 echo -e "${BLUE}📋 Copying sources.mk...${NC}"
 cp sources.mk "$DIST_DIR/"
