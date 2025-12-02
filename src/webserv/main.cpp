@@ -33,7 +33,7 @@ int main(int argc, char **argv)
             configPath = args[1];
         }
 
-        Log::setFileChannel("logs/webserv.log");
+        Log::setFileChannel("webserv.log");
         Log::setStdoutChannel();
         ::signal(SIGPIPE, SIG_IGN); // Ignore SIGPIPE globally
         printHeader();
